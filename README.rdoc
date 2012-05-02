@@ -23,8 +23,7 @@ If you want to build the gem from source:
   $ gem build sift.gemspec
   $ gem push sift-<current version>.gem
 
-
-
+  # Fetch dependencies, build, install and release the gem
   $ bundle
   $ rake -T
   $ rake build
