@@ -1,17 +1,14 @@
-require "bundler/gem_tasks"
-Bundler::GemHelper.install_tasks
+begin
+  require "bundler/gem_tasks"
+  Bundler::GemHelper.install_tasks
+rescue LoadError => e
+  warn "It is recommended that you use bundler during development: gem install bundler"
+end
 
-require "rubygems"
 require "rspec/core/rake_task"
 
-desc "Run unit tests"
-RSpec::Core::RakeTask.new("spec:unit") do |t|
-  t.pattern = "spec/unit/*_spec.rb"
-  t.rspec_opts = ["--backtrace"]
-end
+desc "Run tests"
+RSpec::Core::RakeTask.new(:spec)
 
-desc "Run integration tests"
-RSpec::Core::RakeTask.new("spec:integration") do |t|
-  t.pattern = "spec/integration/*_spec.rb"
-  t.rspec_opts = ["--backtrace"]
-end
+task :default => :spec
+task :test => :spec
