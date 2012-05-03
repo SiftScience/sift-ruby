@@ -4,12 +4,12 @@ describe Sift::Client do
 
   def valid_transaction_properties
     {
-      :$buyer_user_id => 123456,
-      :$seller_user_id => 654321,
+      :$buyer_user_id => "123456",
+      :$seller_user_id => "654321",
       :$amount => 1253200,
       :$currency_code => "USD",
       :$time => Time.now.to_i,
-      :$transaction_id => Time.now.to_i,
+      :$transaction_id => "my_transaction_id",
       :$billing_name => "Mike Snow",
       :$billing_bin => "411111",
       :$billing_last4 => "1111",
