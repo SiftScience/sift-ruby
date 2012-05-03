@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+#
+# A simple example of how to use the API.
 
 require 'rubygems'
 require 'sift'
@@ -31,7 +33,7 @@ event = "my_custom_event"
 properties = {
   "my_custom_field1" => "my custom value 1",
   "my_custom_field2" => "my custom value 2",
-  "$user_id" => 3,
+  "$user_id" => "3",
   "$time" => Time.now.to_i,
 }
 
