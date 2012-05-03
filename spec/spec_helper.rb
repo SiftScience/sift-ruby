@@ -1,5 +1,10 @@
 
-require "rubygems"
+require "bundler/setup"
 require "sift"
+require "fakeweb"
 
-puts "I'm included!"
+# Setup Fakeweb
+FakeWeb.allow_net_connect = false
+
+RSpec.configure do |config|
+end
