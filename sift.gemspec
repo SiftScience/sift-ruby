@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.email       = ["freds@siftscience.com"]
   s.homepage    = "http://siftscience.com"
   s.summary     = %q{Sift Science Ruby API Gem}
-  s.description = %q{The description goes here}
+  s.description = %q{Sift Science Ruby API. Please see http://siftscience.com for more details.}
 
   s.rubyforge_project = "sift"
 
