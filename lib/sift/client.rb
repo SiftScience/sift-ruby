@@ -61,10 +61,7 @@ module Sift
     end
 
     # Tracks an event and associated properties through the Sift Science API. This call
-    # is blocking
-    #
-    # For more information on how to use this API, please see:
-    # http://siftscience.com/api/doc
+    # is blocking.
     #
     # == Parameters:
     # event
