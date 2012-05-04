@@ -9,7 +9,7 @@ module Sift
     attr_reader :json
     attr_reader :http_status_code
     attr_reader :api_status
-    attr_reader :api_status_message
+    attr_reader :api_error_message
     attr_reader :original_request
 
     # Constructor
@@ -25,7 +25,7 @@ module Sift
       @original_request = MultiJson.load(@json["request"].to_s) if @json["request"]
       @http_status_code = http_response_code
       @api_status = @json["status"].to_i
-      @api_status_message = @json["message"].to_s
+      @api_error_message = @json["error_message"].to_s
     end
 
     # Helper method returns true if and only if the response from the API call was

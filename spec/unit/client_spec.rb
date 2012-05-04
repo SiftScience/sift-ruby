@@ -62,7 +62,7 @@ describe Sift::Client do
 
   it "Successfuly handles an event and returns OK" do
 
-    response_json = { :status => 0, :message => "OK" }
+    response_json = { :status => 0, :error_message => "OK" }
 
     FakeWeb.register_uri(:post, fully_qualified_api_endpoint,
                          :body => MultiJson.dump(response_json),
@@ -76,7 +76,7 @@ describe Sift::Client do
     response = Sift::Client.new(api_key).track(event, properties)
     response.ok?.should eq(true)
     response.api_status.should eq(0)
-    response.api_status_message.should eq("OK")
+    response.api_error_message.should eq("OK")
   end
 
 end
