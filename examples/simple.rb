@@ -42,7 +42,7 @@ if response.nil?
   puts 'Error: there was an HTTP error calling through the API'
 else
   puts 'Successfully sent request; was ok? : ' + response.ok?.to_s
-  puts 'API status message                 : ' + response.api_status_message.to_s
+  puts 'API error message                  : ' + response.api_error_message.to_s
   puts 'API status code                    : ' + response.api_status.to_s
   puts 'HTTP status code                   : ' + response.http_status_code.to_s
   puts 'original request                   : ' + response.original_request.to_s
