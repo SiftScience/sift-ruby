@@ -5,7 +5,7 @@ module Sift
 
   # Returns the path for the current API version
   def self.current_rest_api_path
-    "/v201/events"
+    "/v202/events"
   end
 
   # Sets the Output logger to use within the client. This can be left uninitializaed
