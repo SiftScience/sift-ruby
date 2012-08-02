@@ -54,9 +54,12 @@ module Sift
     # api_key
     #   The Sift Science API key associated with your customer account. This parameter
     #   cannot be nil or blank.
+    # path
+    #   The path to the event API, e.g., "/v201/events"
     #
-    def initialize(api_key)
+    def initialize(api_key, path = Sift.current_rest_api_path)
       @api_key = api_key.to_s
+      @path = path
       raise(RuntimeError, "api_key is required") if @api_key.nil? || @api_key.empty?
     end
 
@@ -94,7 +97,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
       begin
-        response = self.class.post(Sift.current_rest_api_path, options)
+        response = self.class.post(@path, options)
         Response.new(response.body, response.code)
       rescue StandardError => e
         Sift.warn("Failed to track event: " + e.to_s)
