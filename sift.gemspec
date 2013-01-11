@@ -24,6 +24,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "fakeweb", "~> 1.3.0"
 
   # Gems that must be intalled for sift to work
-  s.add_dependency "httparty", ">= 0.8.3"
+  s.add_dependency "httparty", ">= 0.10.0"
   s.add_dependency "multi_json", ">= 1.3.4"
 end
