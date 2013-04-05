@@ -42,7 +42,7 @@ module Sift
   #
   class Client
     API_ENDPOINT = "https://api.siftscience.com"
-    API_TIMEOUT = 2
+    API_TIMEOUT = 10
 
     include HTTParty
     base_uri API_ENDPOINT
