@@ -46,6 +46,12 @@ describe Sift::Client do
     lambda { Sift::Client.new("foo").track(event) }.should raise_error
   end
 
+  it "Score call must specify an event name" do
+    lambda { Sift::Client.new("foo").score(nil) }.should raise_error
+    lambda { Sift::Client.new("foo").score("") }.should raise_error
+  end
+
+
   it "Doesn't raise an exception on Net/HTTP errors" do
 
     FakeWeb.register_uri(:post, fully_qualified_api_endpoint,
@@ -107,6 +113,8 @@ describe Sift::Client do
     response.ok?.should eq(true)
     response.api_status.should eq(0)
     response.api_error_message.should eq("OK")
+
+    response.json["score"].should eq(0.93)
   end
 
 end

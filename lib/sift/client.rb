@@ -17,7 +17,7 @@ module Sift
     # == Parameters:
     # http_response
     #   The HTTP body text returned from the API call. The body is expected to be
-    #   a JSON object that can be decoded into status, message and request 
+    #   a JSON object that can be decoded into status, message and request
     #   sections.
     #
     def initialize(http_response, http_response_code)
@@ -92,7 +92,7 @@ module Sift
       raise(RuntimeError, "properties cannot be empty") if properties.empty?
 
       options = {
-        :body => MultiJson.dump(properties.merge({"$type" => event, 
+        :body => MultiJson.dump(properties.merge({"$type" => event,
                                                   "$api_key" => @api_key})),
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
@@ -103,6 +103,15 @@ module Sift
         Sift.warn("Failed to track event: " + e.to_s)
         Sift.warn(e.backtrace)
       end
+    end
+
+    def score(user_id)
+
+      raise(RuntimeError, "user_id must be a string") if user_id.nil? || user_id.to_s.empty?
+
+      response = self.class.get('/v203/score/'+user_id)
+      Response.new(response.body, response.code)
+
     end
   end
 end
