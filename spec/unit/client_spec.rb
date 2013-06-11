@@ -46,7 +46,7 @@ describe Sift::Client do
     lambda { Sift::Client.new("foo").track(event) }.should raise_error
   end
 
-  it "Score call must specify an event name" do
+  it "Score call must specify a user_id" do
     lambda { Sift::Client.new("foo").score(nil) }.should raise_error
     lambda { Sift::Client.new("foo").score("") }.should raise_error
   end

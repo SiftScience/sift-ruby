@@ -105,6 +105,19 @@ module Sift
       end
     end
 
+    # Retrieves a user's fraud score from the Sift Science API. This call
+    # is blocking.
+    #
+    # == Parameters:
+    # user_id
+    #   A user's id. This id should be the same as the user_id used in
+    #   event calls.
+    #
+    # == Returns:
+    #   A Response object is returned and captures
+    #   the status message and status code. In general, you can ignore the returned
+    #   result, though.
+    #
     def score(user_id)
 
       raise(RuntimeError, "user_id must be a string") if user_id.nil? || user_id.to_s.empty?
