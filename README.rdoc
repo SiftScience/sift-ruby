@@ -37,5 +37,4 @@ Building and publishing the gem is captured by the following steps:
 
 To run the various tests use the rake command as follows:
 
-  $ rake spec:unit
-  $ rake spec:integration
+  $ rake spec
