@@ -46,6 +46,12 @@ describe Sift::Client do
     lambda { Sift::Client.new("foo").track(event) }.should raise_error
   end
 
+  it "Score call must specify a user_id" do
+    lambda { Sift::Client.new("foo").score(nil) }.should raise_error
+    lambda { Sift::Client.new("foo").score("") }.should raise_error
+  end
+
+
   it "Doesn't raise an exception on Net/HTTP errors" do
 
     FakeWeb.register_uri(:post, fully_qualified_api_endpoint,
@@ -77,6 +83,38 @@ describe Sift::Client do
     response.ok?.should eq(true)
     response.api_status.should eq(0)
     response.api_error_message.should eq("OK")
+  end
+
+  it "Successfully fetches a score" do
+
+    api_key = "foobar"
+    user_id = "247019"
+
+    response_json = {
+      :user_id => user_id,
+      :score => 0.93,
+      :reasons => [{
+                     :name => "UsersPerDevice",
+                     :value => 4,
+                     :details => {
+                       :users => "a, b, c, d"
+                     }
+                   }],
+      :status => 0,
+      :error_message => "OK"
+    }
+
+    FakeWeb.register_uri(:get, Sift::Client::API_ENDPOINT + '/v203/score/'+user_id,
+                         :body => MultiJson.dump(response_json),
+                         :status => [Net::HTTPOK, "OK"],
+                         :content_type => "text/json")
+
+    response = Sift::Client.new(api_key).score(user_id)
+    response.ok?.should eq(true)
+    response.api_status.should eq(0)
+    response.api_error_message.should eq("OK")
+
+    response.json["score"].should eq(0.93)
   end
 
 end
