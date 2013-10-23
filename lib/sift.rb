@@ -8,6 +8,11 @@ module Sift
     "/v202/events"
   end
 
+  def self.current_users_label_api_path(user_id)
+    # This API version is a minor version ahead of the /events API
+    "/v203/users/#{URI.encode(user_id)}/labels"
+  end
+
   # Sets the Output logger to use within the client. This can be left uninitializaed
   # but is useful for debugging.
   def self.logger=(logger)
