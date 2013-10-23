@@ -60,5 +60,5 @@ properties = {
 }
 
 handle_response client.track(event, properties, TIMEOUT)
-handle_response client.label(user_id, {"$is_bad" => true, "$reasons" => ["$chargeback", "$span"], "$description" => "free form text here" }, TIMEOUT)
+handle_response client.label(user_id, {"$is_bad" => true, "$reasons" => ["$chargeback", "$spam"], "$description" => "free form text here" }, TIMEOUT)
 
