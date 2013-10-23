@@ -76,9 +76,13 @@ module Sift
     #   A hash of name-value pairs that specify the event-specific attributes to track.
     #   This parameter must be specified.
     #
-    # timeout
+    # timeout (optional)
     #   The number of seconds to wait before failing the request. By default this is
     #   configured to 2 seconds (see above). This parameter is optional.
+    #
+    # path (optional)
+    #   Overrides the default API path with a different URL.
+    #
     #
     # == Returns:
     #   In the case of an HTTP error (timeout, broken connection, etc.), this
@@ -86,18 +90,19 @@ module Sift
     #   the status message and status code. In general, you can ignore the returned
     #   result, though.
     #
-    def track(event, properties = {}, timeout = nil)
+    def track(event, properties = {}, timeout = nil, path = nil)
 
       raise(RuntimeError, "event must be a string") if event.nil? || event.to_s.empty?
       raise(RuntimeError, "properties cannot be empty") if properties.empty?
 
+      path ||= @path
       options = {
         :body => MultiJson.dump(properties.merge({"$type" => event,
                                                   "$api_key" => @api_key})),
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
       begin
-        response = self.class.post(@path, options)
+        response = self.class.post(path, options)
         Response.new(response.body, response.code)
       rescue StandardError => e
         Sift.warn("Failed to track event: " + e.to_s)
@@ -114,17 +119,43 @@ module Sift
     #   event calls.
     #
     # == Returns:
-    #   A Response object is returned and captures
-    #   the status message and status code. In general, you can ignore the returned
-    #   result, though.
+    #   A Response object is returned and captures the status message and
+    #   status code. In general, you can ignore the returned result, though.
     #
     def score(user_id)
 
       raise(RuntimeError, "user_id must be a string") if user_id.nil? || user_id.to_s.empty?
 
-      response = self.class.get('/v203/score/'+user_id)
+      response = self.class.get('/v203/score/' + user_id)
       Response.new(response.body, response.code)
 
+    end
+
+    # Labels a user as either good or bad. This call is blocking.
+    #
+    # == Parameters:
+    # user_id
+    #   A user's id. This id should be the same as the user_id used in
+    #   event calls.
+    #
+    # properties
+    #   A hash of name-value pairs that specify the label attributes.
+    #   This parameter must be specified.
+    #
+    # timeout (optional)
+    #   The number of seconds to wait before failing the request. By default this is
+    #   configured to 2 seconds (see above). This parameter is optional.
+    #
+    # == Returns:
+    #   A Response object is returned and captures the status message and
+    #   status code. In general, you can ignore the returned result, though.
+    #
+    def label(user_id, properties = {}, timeout = nil)
+
+      raise(RuntimeError, "user_id must be a string") if user_id.nil? || user_id.to_s.empty?
+
+      path = Sift.current_users_label_api_path(user_id)
+      track("$label", properties, timeout, path)
     end
   end
 end
