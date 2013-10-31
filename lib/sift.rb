@@ -5,7 +5,7 @@ module Sift
 
   # Returns the path for the current API version
   def self.current_rest_api_path
-    "/v202/events"
+    "/v203/events"
   end
 
   def self.current_users_label_api_path(user_id)
