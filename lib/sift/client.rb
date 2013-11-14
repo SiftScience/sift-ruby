@@ -126,7 +126,7 @@ module Sift
 
       raise(RuntimeError, "user_id must be a string") if user_id.nil? || user_id.to_s.empty?
 
-      response = self.class.get('/v203/score/' + user_id)
+      response = self.class.get("/v203/score/#{user_id}/?api_key=#{@api_key}")
       Response.new(response.body, response.code)
 
     end
