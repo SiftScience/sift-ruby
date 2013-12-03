@@ -104,7 +104,7 @@ describe Sift::Client do
       :error_message => "OK"
     }
 
-    FakeWeb.register_uri(:get, Sift::Client::API_ENDPOINT + '/v203/score/'+user_id,
+    FakeWeb.register_uri(:get, Sift::Client::API_ENDPOINT + '/v203/score/'+user_id+'/?api_key=foobar',
                          :body => MultiJson.dump(response_json),
                          :status => [Net::HTTPOK, "OK"],
                          :content_type => "text/json")
