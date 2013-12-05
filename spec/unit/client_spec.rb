@@ -18,7 +18,7 @@ describe Sift::Client do
       :$billing_region => "CA",
       :$billing_country => "US",
       :$billing_zip => "94131",
-      :$buyer_email => "mike@example.com"
+      :$user_email => "mike@example.com"
     }
   end
 
