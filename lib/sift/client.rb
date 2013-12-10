@@ -97,8 +97,8 @@ module Sift
 
       path ||= @path
       options = {
-        :body => MultiJson.dump(properties.merge({"$type" => event,
-                                                  "$api_key" => @api_key})),
+        :body => MultiJson.dump(delete_nils(properties).merge({"$type" => event,
+                                                               "$api_key" => @api_key}))
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
       begin
@@ -155,7 +155,22 @@ module Sift
       raise(RuntimeError, "user_id must be a string") if user_id.nil? || user_id.to_s.empty?
 
       path = Sift.current_users_label_api_path(user_id)
-      track("$label", properties, timeout, path)
+      track("$label", delete_nils(properties), timeout, path)
+    end
+
+    private
+    def delete_nils(properties)
+      properties.delete_if do |k, v|
+        case v
+        when nil
+          true
+        when Hash
+          delete_nils(v)
+          false
+        else
+          false
+        end
+      end
     end
   end
 end

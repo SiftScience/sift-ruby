@@ -1,10 +1,10 @@
 
 require "bundler/setup"
 require "sift"
-require "fakeweb"
+require "webmock/rspec"
 
 # Setup Fakeweb
-FakeWeb.allow_net_connect = false
+WebMock.disable_net_connect!
 
 RSpec.configure do |config|
 end
