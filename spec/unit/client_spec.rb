@@ -54,12 +54,12 @@ describe Sift::Client do
 
   it "Doesn't raise an exception on Net/HTTP errors" do
 
-    FakeWeb.register_uri(:post, fully_qualified_api_endpoint,
-                         :body => nil, :exception => Net::HTTPError)
 
     api_key = "foobar"
     event = "$transaction"
     properties = valid_transaction_properties
+
+    stub_request(:any, /.*/).to_return(:status => 401)
 
     # This method should just return false -- the track call failed because
     # of an HTTP error
@@ -70,15 +70,42 @@ describe Sift::Client do
 
     response_json = { :status => 0, :error_message => "OK" }
 
-    FakeWeb.register_uri(:post, fully_qualified_api_endpoint,
-                         :body => MultiJson.dump(response_json),
-                         :status => [Net::HTTPOK, "OK"],
-                         :content_type => "text/json")
+    stub_request(:post, "https://api.siftscience.com/v203/events").
+      with { |request|
+        parsed_body = JSON.parse(request.body)
+        parsed_body.should include("$buyer_user_id" => "123456")
+      }.to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
 
     api_key = "foobar"
     event = "$transaction"
     properties = valid_transaction_properties
 
+    response = Sift::Client.new(api_key).track(event, properties)
+    response.ok?.should eq(true)
+    response.api_status.should eq(0)
+    response.api_error_message.should eq("OK")
+  end
+
+  it "Successfuly scrubs nils" do
+
+    response_json = { :status => 0, :error_message => "OK" }
+
+    stub_request(:post, "https://api.siftscience.com/v203/events").
+      with { |request|
+        parsed_body = JSON.parse(request.body)
+        parsed_body.should_not include("fake_property")
+        parsed_body.should include("sub_object" => {"one" => "two"})
+      }.to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
+
+    api_key = "foobar"
+    event = "$transaction"
+    properties = valid_transaction_properties.merge(
+      "fake_property" => nil,
+      "sub_object" => {
+        "one" => "two",
+        "three" => nil
+      }
+    )
     response = Sift::Client.new(api_key).track(event, properties)
     response.ok?.should eq(true)
     response.api_status.should eq(0)
@@ -104,10 +131,8 @@ describe Sift::Client do
       :error_message => "OK"
     }
 
-    FakeWeb.register_uri(:get, Sift::Client::API_ENDPOINT + '/v203/score/'+user_id+'/?api_key=foobar',
-                         :body => MultiJson.dump(response_json),
-                         :status => [Net::HTTPOK, "OK"],
-                         :content_type => "text/json")
+    stub_request(:get, "https://api.siftscience.com/v203/score/247019/?api_key=foobar").
+      to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
 
     response = Sift::Client.new(api_key).score(user_id)
     response.ok?.should eq(true)
