@@ -51,9 +51,7 @@ describe Sift::Client do
     lambda { Sift::Client.new("foo").score("") }.should raise_error
   end
 
-
   it "Doesn't raise an exception on Net/HTTP errors" do
-
 
     api_key = "foobar"
     event = "$transaction"
@@ -61,8 +59,21 @@ describe Sift::Client do
 
     stub_request(:any, /.*/).to_return(:status => 401)
 
-    # This method should just return false -- the track call failed because
+    # This method should just return nil -- the track call failed because
     # of an HTTP error
+    Sift::Client.new(api_key).track(event, properties).should eq(nil)
+  end
+
+  it "Returns nil when a StandardError occurs within the request" do
+
+    api_key = "foobar"
+    event = "$transaction"
+    properties = valid_transaction_properties
+
+    stub_request(:any, /.*/).to_raise(StandardError)
+
+    # This method should just return nil -- the track call failed because
+    # a StandardError exception was thrown
     Sift::Client.new(api_key).track(event, properties).should eq(nil)
   end
 
