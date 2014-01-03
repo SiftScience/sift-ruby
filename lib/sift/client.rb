@@ -107,6 +107,7 @@ module Sift
       rescue StandardError => e
         Sift.warn("Failed to track event: " + e.to_s)
         Sift.warn(e.backtrace)
+        nil
       end
     end
 
