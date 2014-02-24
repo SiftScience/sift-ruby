@@ -1,4 +1,4 @@
-= Sift Science Ruby bindings
+= Sift Science Ruby bindings {<img src="https://travis-ci.org/SiftScience/sift-ruby.png?branch=master" alt="Build Status" />}[https://travis-ci.org/SiftScience/sift-ruby]
 
 == Installation
 
