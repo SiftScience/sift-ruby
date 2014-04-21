@@ -83,6 +83,9 @@ module Sift
     # path (optional)
     #   Overrides the default API path with a different URL.
     #
+    # return_score (optional)
+    #   Whether the API response should include a score for this user (the score will 
+    #   be calculated using the submitted event
     #
     # == Returns:
     #   In the case of an HTTP error (timeout, broken connection, etc.), this
@@ -90,11 +93,11 @@ module Sift
     #   the status message and status code. In general, you can ignore the returned
     #   result, though.
     #
-    def track(event, properties = {}, timeout = nil, return_score = true, path = nil)
+    def track(event, properties = {}, timeout = nil, path = nil, return_score = false)
       raise(RuntimeError, "event must be a string") if event.nil? || event.to_s.empty?
       raise(RuntimeError, "properties cannot be empty") if properties.empty?
       path ||= @path
-      path = path + "?return_score=" + (return_score ? "true" : "false")
+      path = path + "?return_score=#{return_score ? "true" : "false"}"
       options = {
         :body => MultiJson.dump(delete_nils(properties).merge({"$type" => event,
                                                                "$api_key" => @api_key}))
