@@ -97,7 +97,9 @@ module Sift
       raise(RuntimeError, "event must be a string") if event.nil? || event.to_s.empty?
       raise(RuntimeError, "properties cannot be empty") if properties.empty?
       path ||= @path
-      path = path + "?return_score=#{return_score ? "true" : "false"}"
+      if return_score
+        path = path + "?return_score=true"
+      end
       options = {
         :body => MultiJson.dump(delete_nils(properties).merge({"$type" => event,
                                                                "$api_key" => @api_key}))
