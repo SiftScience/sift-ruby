@@ -22,6 +22,22 @@ describe Sift::Client do
     }
   end
 
+  def score_response_json
+    {
+      :user_id => "247019",
+      :score => 0.93,
+      :reasons => [{
+                     :name => "UsersPerDevice",
+                     :value => 4,
+                     :details => {
+                     :users => "a, b, c, d"
+                     }
+                   }],
+      :status => 0,
+      :error_message => "OK"
+    }
+  end
+
   def fully_qualified_api_endpoint
     Sift::Client::API_ENDPOINT + Sift.current_rest_api_path
   end
@@ -126,31 +142,37 @@ describe Sift::Client do
   it "Successfully fetches a score" do
 
     api_key = "foobar"
-    user_id = "247019"
-
-    response_json = {
-      :user_id => user_id,
-      :score => 0.93,
-      :reasons => [{
-                     :name => "UsersPerDevice",
-                     :value => 4,
-                     :details => {
-                       :users => "a, b, c, d"
-                     }
-                   }],
-      :status => 0,
-      :error_message => "OK"
-    }
+    response_json = score_response_json
 
     stub_request(:get, "https://api.siftscience.com/v203/score/247019/?api_key=foobar").
       to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
 
-    response = Sift::Client.new(api_key).score(user_id)
+    response = Sift::Client.new(api_key).score(score_response_json[:user_id])
     response.ok?.should eq(true)
     response.api_status.should eq(0)
     response.api_error_message.should eq("OK")
 
     response.json["score"].should eq(0.93)
+  end
+
+  it "Successfuly make a sync score request" do
+
+    api_key = "foobar"
+    response_json = {
+      :status => 0,
+      :error_message => "OK",
+      :score_response => score_response_json
+    }
+
+    stub_request(:post, "https://api.siftscience.com/v203/events?return_score=true").
+      to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
+
+    event = "$transaction"
+    properties = valid_transaction_properties
+    response = Sift::Client.new(api_key).track(event, properties, nil, nil, true)
+    response.ok?.should eq(true)
+    response.api_status.should eq(0)
+    response.api_error_message.should eq("OK")
   end
 
 end
