@@ -5,12 +5,12 @@ module Sift
 
   # Returns the path for the current API version
   def self.current_rest_api_path
-    "/v203/events"
+    "/v#{API_VERSION}/events"
   end
 
   def self.current_users_label_api_path(user_id)
     # This API version is a minor version ahead of the /events API
-    "/v203/users/#{URI.encode(user_id)}/labels"
+    "/v#{API_VERSION}/users/#{URI.encode(user_id)}/labels"
   end
 
   # Sets the Output logger to use within the client. This can be left uninitializaed

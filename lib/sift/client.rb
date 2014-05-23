@@ -63,6 +63,10 @@ module Sift
       raise(RuntimeError, "api_key is required") if @api_key.nil? || @api_key.empty?
     end
 
+    def user_agent
+      "SiftScience/v#{API_VERSION} sift-ruby/#{VERSION}"
+    end
+
     # Tracks an event and associated properties through the Sift Science API. This call
     # is blocking.
     #
@@ -102,7 +106,8 @@ module Sift
       end
       options = {
         :body => MultiJson.dump(delete_nils(properties).merge({"$type" => event,
-                                                               "$api_key" => @api_key}))
+                                                               "$api_key" => @api_key})),
+        :headers => {"User-Agent" => user_agent}
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
       begin
@@ -131,7 +136,8 @@ module Sift
 
       raise(RuntimeError, "user_id must be a string") if user_id.nil? || user_id.to_s.empty?
 
-      response = self.class.get("/v203/score/#{user_id}/?api_key=#{@api_key}")
+      response = self.class.get("/v#{API_VERSION}/score/#{user_id}/?api_key=#{@api_key}",
+                                headers: {"User-Agent" => user_agent})
       Response.new(response.body, response.code)
 
     end
