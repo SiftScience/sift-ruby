@@ -57,10 +57,14 @@ module Sift
     # path
     #   The path to the event API, e.g., "/v201/events"
     #
-    def initialize(api_key, path = Sift.current_rest_api_path)
-      @api_key = api_key.to_s
+    def initialize(api_key = Sift.api_key, path = Sift.current_rest_api_path)
+      @api_key = api_key
       @path = path
-      raise(RuntimeError, "api_key is required") if @api_key.nil? || @api_key.empty?
+      raise(RuntimeError, "api_key must be a non-empty string") if (!@api_key.is_a? String) || @api_key.empty?
+    end
+
+    def api_key
+      @api_key
     end
 
     def user_agent
@@ -98,7 +102,7 @@ module Sift
     #   result, though.
     #
     def track(event, properties = {}, timeout = nil, path = nil, return_score = false)
-      raise(RuntimeError, "event must be a string") if event.nil? || event.to_s.empty?
+      raise(RuntimeError, "event must be a non-empty string") if (!event.is_a? String) || event.empty?
       raise(RuntimeError, "properties cannot be empty") if properties.empty?
       path ||= @path
       if return_score
@@ -134,7 +138,7 @@ module Sift
     #
     def score(user_id)
 
-      raise(RuntimeError, "user_id must be a string") if user_id.nil? || user_id.to_s.empty?
+      raise(RuntimeError, "user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
 
       response = self.class.get("/v#{API_VERSION}/score/#{user_id}/?api_key=#{@api_key}",
                                 headers: {"User-Agent" => user_agent})
@@ -163,7 +167,7 @@ module Sift
     #
     def label(user_id, properties = {}, timeout = nil)
 
-      raise(RuntimeError, "user_id must be a string") if user_id.nil? || user_id.to_s.empty?
+      raise(RuntimeError, "user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
 
       path = Sift.current_users_label_api_path(user_id)
       track("$label", delete_nils(properties), timeout, path)

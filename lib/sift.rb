@@ -12,6 +12,11 @@ module Sift
     # This API version is a minor version ahead of the /events API
     "/v#{API_VERSION}/users/#{URI.encode(user_id)}/labels"
   end
+ 
+  # Adding module scoped public API key 
+  class << self
+    attr_accessor :api_key
+  end
 
   # Sets the Output logger to use within the client. This can be left uninitializaed
   # but is useful for debugging.

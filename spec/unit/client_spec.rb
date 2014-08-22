@@ -2,6 +2,10 @@ require File.expand_path(File.join(File.dirname(__FILE__), "..", "spec_helper"))
 
 describe Sift::Client do
 
+  before :each do
+    Sift.api_key = nil
+  end
+
   def valid_transaction_properties
     {
       :$buyer_user_id => "123456",
@@ -42,9 +46,22 @@ describe Sift::Client do
     Sift::Client::API_ENDPOINT + Sift.current_rest_api_path
   end
 
-  it "Cannot instantiate client with nil or blank api key" do
+  it "Can instantiate client with blank api key if Sift.api_key set" do
+    Sift.api_key = "test_global_api_key"
+    Sift::Client.new().api_key.should eq(Sift.api_key)
+  end
+
+  it "Parameter passed api key takes precedence over Sift.api_key" do
+    Sift.api_key = "test_global_api_key"
+    api_key = "test_local_api_key"
+    Sift::Client.new(api_key).api_key.should eq(api_key)
+  end
+
+  it "Cannot instantiate client with nil, empty, non-string, or blank api key" do
     lambda { Sift::Client.new(nil) }.should raise_error
     lambda { Sift::Client.new("") }.should raise_error
+    lambda { Sift::Client.new(123456) }.should raise_error
+    lambda { Sift::Client.new() }.should raise_error
   end
 
   it "Track call must specify an event name" do
