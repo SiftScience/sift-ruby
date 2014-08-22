@@ -64,6 +64,10 @@ describe Sift::Client do
     lambda { Sift::Client.new() }.should raise_error
   end
 
+  it "Can instantiate client with non-default timeout" do
+    lambda { Sift::Client.new("test_local_api_key", Sift.current_rest_api_path, 4) }.should_not raise_error
+  end
+
   it "Track call must specify an event name" do
     lambda { Sift::Client.new("foo").track(nil) }.should raise_error
     lambda { Sift::Client.new("foo").track("") }.should raise_error
@@ -186,7 +190,7 @@ describe Sift::Client do
 
     event = "$transaction"
     properties = valid_transaction_properties
-    response = Sift::Client.new(api_key).track(event, properties, nil, nil, true)
+    response = Sift::Client.new(api_key).track(event, properties, nil, true)
     response.ok?.should eq(true)
     response.api_status.should eq(0)
     response.api_error_message.should eq("OK")

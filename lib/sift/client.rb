@@ -46,7 +46,6 @@ module Sift
 
     include HTTParty
     base_uri API_ENDPOINT
-    default_timeout API_TIMEOUT
 
     # Constructor
     #
@@ -57,9 +56,10 @@ module Sift
     # path
     #   The path to the event API, e.g., "/v201/events"
     #
-    def initialize(api_key = Sift.api_key, path = Sift.current_rest_api_path)
+    def initialize(api_key = Sift.api_key, path = Sift.current_rest_api_path, timeout = API_TIMEOUT)
       @api_key = api_key
       @path = path
+      @timeout = timeout
 
       raise(RuntimeError, "api_key must be a non-empty string") if (!@api_key.is_a? String) || @api_key.empty?
     end
@@ -102,7 +102,7 @@ module Sift
     #   the status message and status code. In general, you can ignore the returned
     #   result, though.
     #
-    def track(event, properties = {}, timeout = nil, path = nil, return_score = false)
+    def track(event, properties = {}, path = nil, return_score = false)
       raise(RuntimeError, "event must be a non-empty string") if (!event.is_a? String) || event.empty?
       raise(RuntimeError, "properties cannot be empty") if properties.empty?
       path ||= @path
@@ -114,7 +114,7 @@ module Sift
                                                                "$api_key" => @api_key})),
         :headers => {"User-Agent" => user_agent}
       }
-      options.merge!(:timeout => timeout) unless timeout.nil?
+      options.merge!(:timeout => @timeout) unless @timeout.nil?
       begin
         response = self.class.post(path, options)
         Response.new(response.body, response.code)
@@ -141,8 +141,10 @@ module Sift
 
       raise(RuntimeError, "user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
 
-      response = self.class.get("/v#{API_VERSION}/score/#{user_id}/?api_key=#{@api_key}",
-                                headers: {"User-Agent" => user_agent})
+      options = { :headers => {"User-Agent" => user_agent} }
+      options.merge!(:timeout => @timeout) unless @timeout.nil?
+
+      response = self.class.get("/v#{API_VERSION}/score/#{user_id}/?api_key=#{@api_key}", options)
       Response.new(response.body, response.code)
 
     end
@@ -166,12 +168,12 @@ module Sift
     #   A Response object is returned and captures the status message and
     #   status code. In general, you can ignore the returned result, though.
     #
-    def label(user_id, properties = {}, timeout = nil)
+    def label(user_id, properties = {})
 
       raise(RuntimeError, "user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
 
       path = Sift.current_users_label_api_path(user_id)
-      track("$label", delete_nils(properties), timeout, path)
+      track("$label", delete_nils(properties), path)
     end
 
     private
