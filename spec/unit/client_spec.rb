@@ -169,7 +169,7 @@ describe Sift::Client do
     response.api_status.should eq(0)
     response.api_error_message.should eq("OK")
 
-    response.json["score"].should eq(0.93)
+    response.body["score"].should eq(0.93)
   end
 
   it "Successfuly make a sync score request" do
@@ -190,7 +190,7 @@ describe Sift::Client do
     response.ok?.should eq(true)
     response.api_status.should eq(0)
     response.api_error_message.should eq("OK")
-    response.json["score_response"]["score"].should eq(0.93)
+    response.body["score_response"]["score"].should eq(0.93)
   end
 
 end

@@ -6,11 +6,11 @@ module Sift
   # Represents the payload returned from a call through the track API
   #
   class Response
-    attr_reader :json
+    attr_reader :body
     attr_reader :http_status_code
     attr_reader :api_status
     attr_reader :api_error_message
-    attr_reader :original_request
+    attr_reader :request
 
     # Constructor
     #
@@ -21,11 +21,11 @@ module Sift
     #   sections.
     #
     def initialize(http_response, http_response_code)
-      @json = MultiJson.load(http_response)
-      @original_request = MultiJson.load(@json["request"].to_s) if @json["request"]
+      @body = MultiJson.load(http_response)
+      @request = MultiJson.load(@body["request"].to_s) if @body["request"]
       @http_status_code = http_response_code
-      @api_status = @json["status"].to_i
-      @api_error_message = @json["error_message"].to_s
+      @api_status = @body["status"].to_i
+      @api_error_message = @body["error_message"].to_s
     end
 
     # Helper method returns true if and only if the response from the API call was
@@ -60,6 +60,7 @@ module Sift
     def initialize(api_key = Sift.api_key, path = Sift.current_rest_api_path)
       @api_key = api_key
       @path = path
+
       raise(RuntimeError, "api_key must be a non-empty string") if (!@api_key.is_a? String) || @api_key.empty?
     end
 
