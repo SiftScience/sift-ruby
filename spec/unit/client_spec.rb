@@ -64,6 +64,13 @@ describe Sift::Client do
     lambda { Sift::Client.new() }.should raise_error
   end
 
+  it "Cannot instantiate client with nil, empty, non-string, or blank path" do
+    api_key = "test_local_api_key"
+    lambda { Sift::Client.new(api_key, nil) }.should raise_error
+    lambda { Sift::Client.new(api_key, "") }.should raise_error
+    lambda { Sift::Client.new(api_key, 123456) }.should raise_error
+  end
+
   it "Can instantiate client with non-default timeout" do
     lambda { Sift::Client.new("test_local_api_key", Sift.current_rest_api_path, 4) }.should_not raise_error
   end

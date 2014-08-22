@@ -57,11 +57,13 @@ module Sift
     #   The path to the event API, e.g., "/v201/events"
     #
     def initialize(api_key = Sift.api_key, path = Sift.current_rest_api_path, timeout = API_TIMEOUT)
+      raise(RuntimeError, "api_key must be a non-empty string") if (!api_key.is_a? String) || api_key.empty?
+      raise(RuntimeError, "path must be a non-empty string") if (!path.is_a? String) || path.empty?
       @api_key = api_key
       @path = path
       @timeout = timeout
 
-      raise(RuntimeError, "api_key must be a non-empty string") if (!@api_key.is_a? String) || @api_key.empty?
+      
     end
 
     def api_key
