@@ -102,7 +102,7 @@ module Sift
     #   result, though.
     #
     def track(event, properties = {}, timeout = nil, path = nil, return_score = false)
-      raise(RuntimeError, "event must be a non-empty string") if (!event.is_a? String) || event.to_s.empty?
+      raise(RuntimeError, "event must be a non-empty string") if (!event.is_a? String) || event.empty?
       raise(RuntimeError, "properties cannot be empty") if properties.empty?
       path ||= @path
       if return_score
