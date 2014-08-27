@@ -166,12 +166,13 @@ module Sift
     #   A Response object is returned and captures the status message and
     #   status code. In general, you can ignore the returned result, though.
     #
-    def score(user_id)
+    def score(user_id, timeout = nil)
 
       raise(RuntimeError, "user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
+      timetout ||= @timeout
 
       options = { :headers => {"User-Agent" => user_agent} }
-      options.merge!(:timeout => @timeout) unless @timeout.nil?
+      options.merge!(:timeout => timeout) unless timeout.nil?
 
       response = self.class.get("/v#{API_VERSION}/score/#{user_id}/?api_key=#{@api_key}", options)
       Response.new(response.body, response.code)
