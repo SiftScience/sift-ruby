@@ -27,7 +27,7 @@ describe Sift::Client do
     properties = valid_label_properties
 
     response = Sift::Client.new(api_key).label(user_id, properties)
-    response.ok?.should eq(true)
+    response.is_ok?.should eq(true)
     response.api_status.should eq(0)
     response.api_error_message.should eq("OK")
   end

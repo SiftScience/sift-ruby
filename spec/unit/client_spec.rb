@@ -136,7 +136,7 @@ describe Sift::Client do
     properties = valid_transaction_properties
 
     response = Sift::Client.new(api_key).track(event, properties)
-    response.ok?.should eq(true)
+    response.is_ok?.should eq(true)
     response.api_status.should eq(0)
     response.api_error_message.should eq("OK")
   end
@@ -162,7 +162,7 @@ describe Sift::Client do
       }
     )
     response = Sift::Client.new(api_key).track(event, properties)
-    response.ok?.should eq(true)
+    response.is_ok?.should eq(true)
     response.api_status.should eq(0)
     response.api_error_message.should eq("OK")
   end
@@ -176,7 +176,7 @@ describe Sift::Client do
       to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
 
     response = Sift::Client.new(api_key).score(score_response_json[:user_id])
-    response.ok?.should eq(true)
+    response.is_ok?.should eq(true)
     response.api_status.should eq(0)
     response.api_error_message.should eq("OK")
 
@@ -197,8 +197,8 @@ describe Sift::Client do
 
     event = "$transaction"
     properties = valid_transaction_properties
-    response = Sift::Client.new(api_key).track(event, properties, nil, true)
-    response.ok?.should eq(true)
+    response = Sift::Client.new(api_key).track(event, properties, nil, nil, true)
+    response.is_ok?.should eq(true)
     response.api_status.should eq(0)
     response.api_error_message.should eq("OK")
     response.body["score_response"]["score"].should eq(0.93)

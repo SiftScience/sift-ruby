@@ -33,8 +33,34 @@ module Sift
     #
     # == Returns:
     #   true on success; false otherwise
-    def ok?
+    def is_ok?
       0 == @api_status.to_i
+    end
+
+    # DEPRECIATED
+    # Helper method returns true if and only if the response from the API call was
+    # successful
+    #
+    # == Returns:
+    #   true on success; false otherwise
+    def ok?
+      warn("method 'ok?' is depreciated.  Please use 'is_ok?' instead.")
+      is_ok?
+    end
+
+
+    # DEPRECIATED
+    # Getter method for depreciated 'json' member variable.
+    def json
+      warn("The member variable 'json' is depreciated.  Please use 'body' instead.")
+      @body
+    end
+
+    # DEPRECIATED
+    # Getter method for depreciated 'original_request' member variable.
+    def original_request
+      warn("The member variable 'original_request' is depreciated.  Please use 'request' instead.")
+      @request
     end
   end
 
@@ -104,10 +130,11 @@ module Sift
     #   the status message and status code. In general, you can ignore the returned
     #   result, though.
     #
-    def track(event, properties = {}, path = nil, return_score = false)
+    def track(event, properties = {}, timeout = nil, path = nil, return_score = false)
       raise(RuntimeError, "event must be a non-empty string") if (!event.is_a? String) || event.empty?
       raise(RuntimeError, "properties cannot be empty") if properties.empty?
       path ||= @path
+      timeout ||= @timeout
       if return_score
         path = path + "?return_score=true"
       end
@@ -116,7 +143,7 @@ module Sift
                                                                "$api_key" => @api_key})),
         :headers => {"User-Agent" => user_agent}
       }
-      options.merge!(:timeout => @timeout) unless @timeout.nil?
+      options.merge!(:timeout => timeout) unless timeout.nil?
       begin
         response = self.class.post(path, options)
         Response.new(response.body, response.code)
@@ -170,12 +197,12 @@ module Sift
     #   A Response object is returned and captures the status message and
     #   status code. In general, you can ignore the returned result, though.
     #
-    def label(user_id, properties = {})
+    def label(user_id, properties = {}, timeout = nil)
 
       raise(RuntimeError, "user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
 
       path = Sift.current_users_label_api_path(user_id)
-      track("$label", delete_nils(properties), path)
+      track("$label", delete_nils(properties), timeout, path)
     end
 
     private
