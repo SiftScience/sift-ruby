@@ -44,7 +44,7 @@ module Sift
     # == Returns:
     #   true on success; false otherwise
     def ok?
-      warn("method 'ok?' is depreciated.  Please use 'is_ok?' instead.")
+      Sift.warn("method 'ok?' is depreciated.  Please use 'is_ok?' instead.")
       is_ok?
     end
 
@@ -52,14 +52,14 @@ module Sift
     # DEPRECIATED
     # Getter method for depreciated 'json' member variable.
     def json
-      warn("The member variable 'json' is depreciated.  Please use 'body' instead.")
+      Sift.warn("The member variable 'json' is depreciated.  Please use 'body' instead.")
       @body
     end
 
     # DEPRECIATED
     # Getter method for depreciated 'original_request' member variable.
     def original_request
-      warn("The member variable 'original_request' is depreciated.  Please use 'request' instead.")
+      Sift.warn("The member variable 'original_request' is depreciated.  Please use 'request' instead.")
       @request
     end
   end
