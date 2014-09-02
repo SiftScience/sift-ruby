@@ -33,33 +33,20 @@ module Sift
     #
     # == Returns:
     #   true on success; false otherwise
-    def is_ok?
-      0 == @api_status.to_i
-    end
-
-    # DEPRECIATED
-    # Helper method returns true if and only if the response from the API call was
-    # successful
-    #
-    # == Returns:
-    #   true on success; false otherwise
     def ok?
-      Sift.warn("method 'ok?' is depreciated.  Please use 'is_ok?' instead.")
-      is_ok?
+      0 == @api_status.to_i
     end
 
 
     # DEPRECIATED
     # Getter method for depreciated 'json' member variable.
     def json
-      Sift.warn("The member variable 'json' is depreciated.  Please use 'body' instead.")
       @body
     end
 
     # DEPRECIATED
     # Getter method for depreciated 'original_request' member variable.
     def original_request
-      Sift.warn("The member variable 'original_request' is depreciated.  Please use 'request' instead.")
       @request
     end
   end
