@@ -64,6 +64,17 @@ describe Sift::Client do
     lambda { Sift::Client.new() }.should raise_error
   end
 
+  it "Cannot instantiate client with nil, empty, non-string, or blank path" do
+    api_key = "test_local_api_key"
+    lambda { Sift::Client.new(api_key, nil) }.should raise_error
+    lambda { Sift::Client.new(api_key, "") }.should raise_error
+    lambda { Sift::Client.new(api_key, 123456) }.should raise_error
+  end
+
+  it "Can instantiate client with non-default timeout" do
+    lambda { Sift::Client.new("test_local_api_key", Sift.current_rest_api_path, 4) }.should_not raise_error
+  end
+
   it "Track call must specify an event name" do
     lambda { Sift::Client.new("foo").track(nil) }.should raise_error
     lambda { Sift::Client.new("foo").track("") }.should raise_error
@@ -169,7 +180,7 @@ describe Sift::Client do
     response.api_status.should eq(0)
     response.api_error_message.should eq("OK")
 
-    response.json["score"].should eq(0.93)
+    response.body["score"].should eq(0.93)
   end
 
   it "Successfuly make a sync score request" do
@@ -190,7 +201,7 @@ describe Sift::Client do
     response.ok?.should eq(true)
     response.api_status.should eq(0)
     response.api_error_message.should eq("OK")
-    response.json["score_response"]["score"].should eq(0.93)
+    response.body["score_response"]["score"].should eq(0.93)
   end
 
 end

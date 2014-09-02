@@ -6,11 +6,11 @@ module Sift
   # Represents the payload returned from a call through the track API
   #
   class Response
-    attr_reader :json
+    attr_reader :body
     attr_reader :http_status_code
     attr_reader :api_status
     attr_reader :api_error_message
-    attr_reader :original_request
+    attr_reader :request
 
     # Constructor
     #
@@ -21,11 +21,11 @@ module Sift
     #   sections.
     #
     def initialize(http_response, http_response_code)
-      @json = MultiJson.load(http_response)
-      @original_request = MultiJson.load(@json["request"].to_s) if @json["request"]
+      @body = MultiJson.load(http_response)
+      @request = MultiJson.load(@body["request"].to_s) if @body["request"]
       @http_status_code = http_response_code
-      @api_status = @json["status"].to_i
-      @api_error_message = @json["error_message"].to_s
+      @api_status = @body["status"].to_i
+      @api_error_message = @body["error_message"].to_s
     end
 
     # Helper method returns true if and only if the response from the API call was
@@ -35,6 +35,19 @@ module Sift
     #   true on success; false otherwise
     def ok?
       0 == @api_status.to_i
+    end
+
+
+    # DEPRECIATED
+    # Getter method for depreciated 'json' member variable.
+    def json
+      @body
+    end
+
+    # DEPRECIATED
+    # Getter method for depreciated 'original_request' member variable.
+    def original_request
+      @request
     end
   end
 
@@ -46,7 +59,6 @@ module Sift
 
     include HTTParty
     base_uri API_ENDPOINT
-    default_timeout API_TIMEOUT
 
     # Constructor
     #
@@ -57,10 +69,14 @@ module Sift
     # path
     #   The path to the event API, e.g., "/v201/events"
     #
-    def initialize(api_key = Sift.api_key, path = Sift.current_rest_api_path)
+    def initialize(api_key = Sift.api_key, path = Sift.current_rest_api_path, timeout = API_TIMEOUT)
+      raise(RuntimeError, "api_key must be a non-empty string") if (!api_key.is_a? String) || api_key.empty?
+      raise(RuntimeError, "path must be a non-empty string") if (!path.is_a? String) || path.empty?
       @api_key = api_key
       @path = path
-      raise(RuntimeError, "api_key must be a non-empty string") if (!@api_key.is_a? String) || @api_key.empty?
+      @timeout = timeout
+
+      
     end
 
     def api_key
@@ -105,6 +121,7 @@ module Sift
       raise(RuntimeError, "event must be a non-empty string") if (!event.is_a? String) || event.empty?
       raise(RuntimeError, "properties cannot be empty") if properties.empty?
       path ||= @path
+      timeout ||= @timeout
       if return_score
         path = path + "?return_score=true"
       end
@@ -136,12 +153,15 @@ module Sift
     #   A Response object is returned and captures the status message and
     #   status code. In general, you can ignore the returned result, though.
     #
-    def score(user_id)
+    def score(user_id, timeout = nil)
 
       raise(RuntimeError, "user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
+      timetout ||= @timeout
 
-      response = self.class.get("/v#{API_VERSION}/score/#{user_id}/?api_key=#{@api_key}",
-                                headers: {"User-Agent" => user_agent})
+      options = { :headers => {"User-Agent" => user_agent} }
+      options.merge!(:timeout => timeout) unless timeout.nil?
+
+      response = self.class.get("/v#{API_VERSION}/score/#{user_id}/?api_key=#{@api_key}", options)
       Response.new(response.body, response.code)
 
     end
