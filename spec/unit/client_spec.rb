@@ -141,6 +141,25 @@ describe Sift::Client do
     response.api_error_message.should eq("OK")
   end
 
+  it "Successfully submits event with overriden key" do
+    response_json = { :status => 0, :error_message => "OK"}
+    stub_request(:post, "https://api.siftscience.com/v203/events").
+      with { | request|
+        parsed_body = JSON.parse(request.body)
+        parsed_body.should include("$buyer_user_id" => "123456")
+        parsed_body.should include("$api_key" => "overridden")
+      }.to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
+
+    api_key = "foobar"
+    event = "$transaction"
+    properties = valid_transaction_properties
+
+    response = Sift::Client.new(api_key).track(event, properties, nil, nil, false, "overridden")
+    response.ok?.should eq(true)
+    response.api_status.should eq(0)
+    response.api_error_message.should eq("OK")
+  end
+
   it "Successfuly scrubs nils" do
 
     response_json = { :status => 0, :error_message => "OK" }
@@ -183,6 +202,23 @@ describe Sift::Client do
     response.body["score"].should eq(0.93)
   end
 
+  it "Successfully fetches a score with an overridden key" do
+
+    api_key = "foobar"
+    response_json = score_response_json
+
+    stub_request(:get, "https://api.siftscience.com/v203/score/247019/?api_key=overridden").
+      to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
+
+    response = Sift::Client.new(api_key).score(score_response_json[:user_id], nil, "overridden")
+    response.ok?.should eq(true)
+    response.api_status.should eq(0)
+    response.api_error_message.should eq("OK")
+
+    response.body["score"].should eq(0.93)
+  end
+
+
   it "Successfuly make a sync score request" do
 
     api_key = "foobar"
@@ -203,5 +239,7 @@ describe Sift::Client do
     response.api_error_message.should eq("OK")
     response.body["score_response"]["score"].should eq(0.93)
   end
+
+
 
 end

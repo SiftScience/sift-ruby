@@ -76,7 +76,7 @@ module Sift
       @path = path
       @timeout = timeout
 
-      
+
     end
 
     def api_key
@@ -108,7 +108,7 @@ module Sift
     #   Overrides the default API path with a different URL.
     #
     # return_score (optional)
-    #   Whether the API response should include a score for this user (the score will 
+    #   Whether the API response should include a score for this user (the score will
     #   be calculated using the submitted event
     #
     # == Returns:
@@ -117,9 +117,10 @@ module Sift
     #   the status message and status code. In general, you can ignore the returned
     #   result, though.
     #
-    def track(event, properties = {}, timeout = nil, path = nil, return_score = false)
+    def track(event, properties = {}, timeout = nil, path = nil, return_score = false, api_key = @api_key)
       raise(RuntimeError, "event must be a non-empty string") if (!event.is_a? String) || event.empty?
       raise(RuntimeError, "properties cannot be empty") if properties.empty?
+      raise(RuntimeError, "Bad api_key parameter") if api_key.empty?
       path ||= @path
       timeout ||= @timeout
       if return_score
@@ -127,7 +128,7 @@ module Sift
       end
       options = {
         :body => MultiJson.dump(delete_nils(properties).merge({"$type" => event,
-                                                               "$api_key" => @api_key})),
+                                                               "$api_key" => api_key})),
         :headers => {"User-Agent" => user_agent}
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
@@ -153,15 +154,16 @@ module Sift
     #   A Response object is returned and captures the status message and
     #   status code. In general, you can ignore the returned result, though.
     #
-    def score(user_id, timeout = nil)
+    def score(user_id, timeout = nil, api_key = @api_key)
 
       raise(RuntimeError, "user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
+      raise(RuntimeError, "Bad api_key parameter") if api_key.empty?
       timetout ||= @timeout
 
       options = { :headers => {"User-Agent" => user_agent} }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = self.class.get("/v#{API_VERSION}/score/#{user_id}/?api_key=#{@api_key}", options)
+      response = self.class.get("/v#{API_VERSION}/score/#{user_id}/?api_key=#{api_key}", options)
       Response.new(response.body, response.code)
 
     end
@@ -185,12 +187,12 @@ module Sift
     #   A Response object is returned and captures the status message and
     #   status code. In general, you can ignore the returned result, though.
     #
-    def label(user_id, properties = {}, timeout = nil)
+    def label(user_id, properties = {}, timeout = nil, api_key = @api_key)
 
       raise(RuntimeError, "user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
 
       path = Sift.current_users_label_api_path(user_id)
-      track("$label", delete_nils(properties), timeout, path)
+      track("$label", delete_nils(properties), timeout, path, false, api_key)
     end
 
     private
