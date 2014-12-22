@@ -3,6 +3,8 @@ require 'multi_json'
 
 module Sift
 
+  
+
   # Represents the payload returned from a call through the track API
   #
   class Response
@@ -12,6 +14,8 @@ module Sift
     attr_reader :api_error_message
     attr_reader :request
 
+    HTTP_CODES_WITH_NO_BODY = [204,304].freeze
+
     # Constructor
     #
     # == Parameters:
@@ -20,12 +24,16 @@ module Sift
     #   a JSON object that can be decoded into status, message and request
     #   sections.
     #
-    def initialize(http_response, http_response_code)
-      @body = MultiJson.load(http_response)
-      @request = MultiJson.load(@body["request"].to_s) if @body["request"]
+    def initialize(http_response, http_headers, http_response_code)
       @http_status_code = http_response_code
-      @api_status = @body["status"].to_i
-      @api_error_message = @body["error_message"].to_s
+
+
+      if !(Response::HTTP_CODES_WITH_NO_BODY.include? @http_status_code) then
+        @body = MultiJson.load(http_response)
+        @request = MultiJson.load(@body["request"].to_s) if @body["request"]
+        @api_status = @body["status"].to_i
+        @api_error_message = @body["error_message"].to_s
+      end
     end
 
     # Helper method returns true if and only if the response from the API call was
@@ -34,7 +42,13 @@ module Sift
     # == Returns:
     #   true on success; false otherwise
     def ok?
-      0 == @api_status.to_i
+      #if there is no content expected, use HTTP code
+      if Response::HTTP_CODES_WITH_NO_BODY.include? @http_status_code
+        204 == @http_status_code
+      # otherwise use API status
+      else
+        0 == @api_status.to_i 
+      end
     end
 
 
@@ -134,7 +148,7 @@ module Sift
       options.merge!(:timeout => timeout) unless timeout.nil?
       begin
         response = self.class.post(path, options)
-        Response.new(response.body, response.code)
+        Response.new(response.body, response.headers, response.code)
       rescue StandardError => e
         Sift.warn("Failed to track event: " + e.to_s)
         Sift.warn(e.backtrace)
@@ -164,7 +178,7 @@ module Sift
       options.merge!(:timeout => timeout) unless timeout.nil?
 
       response = self.class.get("/v#{API_VERSION}/score/#{user_id}/?api_key=#{api_key}", options)
-      Response.new(response.body, response.code)
+      Response.new(response.body, response.headers, response.code)
 
     end
 
@@ -193,6 +207,19 @@ module Sift
 
       path = Sift.current_users_label_api_path(user_id)
       track("$label", delete_nils(properties), timeout, path, false, api_key)
+    end
+
+    def unlabel(user_id, timeout = nil)
+
+      raise(RuntimeError, "user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
+      timetout ||= @timeout
+
+      options = { :headers => {"User-Agent" => user_agent} }
+      options.merge!(:timeout => timeout) unless timeout.nil?
+      path = Sift.current_users_label_api_path(user_id)
+      response = self.class.delete(path + "?api_key=#{@api_key}", options)
+      Response.new(response.body, response.headers, response.code)
+
     end
 
     private

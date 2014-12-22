@@ -21,7 +21,8 @@ describe Sift::Client do
 
     stub_request(:post, "https://api.siftscience.com/v203/users/frodo_baggins/labels").
       with(:body => '{"$reasons":["$fake"],"$is_bad":true,"$description":"Listed a fake item","$type":"$label","$api_key":"foobar"}').
-      to_return(:body => MultiJson.dump(response_json), :status => 200, :content_type => "text/json")
+      to_return(:body => MultiJson.dump(response_json), :status => 200, :content_type => "text/json", :headers => 
+        {"content-type"=>"application/json; charset=UTF-8","content-length"=> "74"})
 
     api_key = "foobar"
     properties = valid_label_properties
@@ -30,6 +31,19 @@ describe Sift::Client do
     response.ok?.should eq(true)
     response.api_status.should eq(0)
     response.api_error_message.should eq("OK")
+  end
+
+  it "Successfully handles an $unlabel with the v203 API endpoing and returns OK" do
+    response_json = { :status => 0, :error_message => "OK" }
+    user_id = "frodo_baggins"
+
+    stub_request(:delete, "https://api.siftscience.com/v203/users/frodo_baggins/labels?api_key=foobar").
+      to_return(:status => 204)
+
+    api_key = "foobar"
+
+    response = Sift::Client.new(api_key).unlabel(user_id)
+    response.ok?.should eq(true)
   end
 
 end

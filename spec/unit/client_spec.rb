@@ -1,4 +1,5 @@
 require File.expand_path(File.join(File.dirname(__FILE__), "..", "spec_helper"))
+require 'logger'
 
 describe Sift::Client do
 
@@ -110,6 +111,7 @@ describe Sift::Client do
 
   it "Returns nil when a StandardError occurs within the request" do
 
+    Sift.logger = Logger.new(STDOUT)
     api_key = "foobar"
     event = "$transaction"
     properties = valid_transaction_properties
@@ -129,7 +131,7 @@ describe Sift::Client do
       with { |request|
         parsed_body = JSON.parse(request.body)
         parsed_body.should include("$buyer_user_id" => "123456")
-      }.to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
+      }.to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {"content-type"=>"application/json; charset=UTF-8","content-length"=> "74"})
 
     api_key = "foobar"
     event = "$transaction"
@@ -169,7 +171,7 @@ describe Sift::Client do
         parsed_body = JSON.parse(request.body)
         parsed_body.should_not include("fake_property")
         parsed_body.should include("sub_object" => {"one" => "two"})
-      }.to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
+      }.to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {"content-type"=>"application/json; charset=UTF-8","content-length"=> "74"})
 
     api_key = "foobar"
     event = "$transaction"
@@ -192,7 +194,7 @@ describe Sift::Client do
     response_json = score_response_json
 
     stub_request(:get, "https://api.siftscience.com/v203/score/247019/?api_key=foobar").
-      to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
+      to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {"content-type"=>"application/json; charset=UTF-8","content-length"=> "74"})
 
     response = Sift::Client.new(api_key).score(score_response_json[:user_id])
     response.ok?.should eq(true)
@@ -229,7 +231,7 @@ describe Sift::Client do
     }
 
     stub_request(:post, "https://api.siftscience.com/v203/events?return_score=true").
-      to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
+      to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {"content-type"=>"application/json; charset=UTF-8","content-length"=> "74"})
 
     event = "$transaction"
     properties = valid_transaction_properties
