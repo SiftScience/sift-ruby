@@ -27,12 +27,12 @@ module Sift
     def initialize(http_response, http_headers, http_response_code)
       @http_status_code = http_response_code
 
-
-      if !(Response::HTTP_CODES_WITH_NO_BODY.include? @http_status_code) then
-        @body = MultiJson.load(http_response)
+      # only set these variables if a message-body is expected.
+      unless Response::HTTP_CODES_WITH_NO_BODY.include? @http_status_code
+        @body = MultiJson.load(http_response) unless http_response.nil?
         @request = MultiJson.load(@body["request"].to_s) if @body["request"]
-        @api_status = @body["status"].to_i
-        @api_error_message = @body["error_message"].to_s
+        @api_status = @body["status"].to_i if @body["status"]
+        @api_error_message = @body["error_message"].to_s if @body["error_message"]
       end
     end
 
@@ -209,6 +209,20 @@ module Sift
       track("$label", delete_nils(properties), timeout, path, false, api_key)
     end
 
+    # Unlabels a user.  This call is blocking.
+    #
+    # == Parameters:
+    # user_id
+    #   A user's id. This id should be the same as the user_id used in
+    #   event calls.
+    #
+    # timeout (optional)
+    #   The number of seconds to wait before failing the request. By default this is
+    #   configured to 2 seconds (see above). This parameter is optional.
+    #
+    # == Returns:
+    #   A Response object is returned with only an http code of 204.
+    #
     def unlabel(user_id, timeout = nil)
 
       raise(RuntimeError, "user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
