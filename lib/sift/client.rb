@@ -84,8 +84,8 @@ module Sift
     #   The path to the event API, e.g., "/v201/events"
     #
     def initialize(api_key = Sift.api_key, path = Sift.current_rest_api_path, timeout = API_TIMEOUT)
-      raise(RuntimeError, "api_key must be a non-empty string") if (!api_key.is_a? String) || api_key.empty?
-      raise(RuntimeError, "path must be a non-empty string") if (!path.is_a? String) || path.empty?
+      raise("api_key must be a non-empty string") if (!api_key.is_a? String) || api_key.empty?
+      raise("path must be a non-empty string") if (!path.is_a? String) || path.empty?
       @api_key = api_key
       @path = path
       @timeout = timeout
@@ -132,9 +132,9 @@ module Sift
     #   result, though.
     #
     def track(event, properties = {}, timeout = nil, path = nil, return_score = false, api_key = @api_key)
-      raise(RuntimeError, "event must be a non-empty string") if (!event.is_a? String) || event.empty?
-      raise(RuntimeError, "properties cannot be empty") if properties.empty?
-      raise(RuntimeError, "Bad api_key parameter") if api_key.empty?
+      raise("event must be a non-empty string") if (!event.is_a? String) || event.empty?
+      raise("properties cannot be empty") if properties.empty?
+      raise("Bad api_key parameter") if api_key.empty?
       path ||= @path
       timeout ||= @timeout
       if return_score
@@ -170,8 +170,8 @@ module Sift
     #
     def score(user_id, timeout = nil, api_key = @api_key)
 
-      raise(RuntimeError, "user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
-      raise(RuntimeError, "Bad api_key parameter") if api_key.empty?
+      raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
+      raise("Bad api_key parameter") if api_key.empty?
       timetout ||= @timeout
 
       options = { :headers => {"User-Agent" => user_agent} }
@@ -203,7 +203,7 @@ module Sift
     #
     def label(user_id, properties = {}, timeout = nil, api_key = @api_key)
 
-      raise(RuntimeError, "user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
+      raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
 
       path = Sift.current_users_label_api_path(user_id)
       track("$label", delete_nils(properties), timeout, path, false, api_key)
@@ -225,7 +225,7 @@ module Sift
     #
     def unlabel(user_id, timeout = nil)
 
-      raise(RuntimeError, "user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
+      raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
       timetout ||= @timeout
 
       options = { :headers => {"User-Agent" => user_agent} }
