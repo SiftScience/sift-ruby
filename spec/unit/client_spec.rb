@@ -1,5 +1,4 @@
 require File.expand_path(File.join(File.dirname(__FILE__), "..", "spec_helper"))
-require 'logger'
 
 describe Sift::Client do
 
@@ -49,51 +48,51 @@ describe Sift::Client do
 
   it "Can instantiate client with blank api key if Sift.api_key set" do
     Sift.api_key = "test_global_api_key"
-    Sift::Client.new().api_key.should eq(Sift.api_key)
+    expect(Sift::Client.new().api_key).to eq(Sift.api_key)
   end
 
   it "Parameter passed api key takes precedence over Sift.api_key" do
     Sift.api_key = "test_global_api_key"
     api_key = "test_local_api_key"
-    Sift::Client.new(api_key).api_key.should eq(api_key)
+    expect(Sift::Client.new(api_key).api_key).to eq(api_key)
   end
 
   it "Cannot instantiate client with nil, empty, non-string, or blank api key" do
-    lambda { Sift::Client.new(nil) }.should raise_error
-    lambda { Sift::Client.new("") }.should raise_error
-    lambda { Sift::Client.new(123456) }.should raise_error
-    lambda { Sift::Client.new() }.should raise_error
+    expect(lambda { Sift::Client.new(nil) }).to raise_error
+    expect(lambda { Sift::Client.new("") }).to raise_error
+    expect(lambda { Sift::Client.new(123456) }).to raise_error
+    expect(lambda { Sift::Client.new() }).to raise_error
   end
 
   it "Cannot instantiate client with nil, empty, non-string, or blank path" do
     api_key = "test_local_api_key"
-    lambda { Sift::Client.new(api_key, nil) }.should raise_error
-    lambda { Sift::Client.new(api_key, "") }.should raise_error
-    lambda { Sift::Client.new(api_key, 123456) }.should raise_error
+    expect(lambda { Sift::Client.new(api_key, nil) }).to raise_error
+    expect(lambda { Sift::Client.new(api_key, "") }).to raise_error
+    expect(lambda { Sift::Client.new(api_key, 123456) }).to raise_error
   end
 
   it "Can instantiate client with non-default timeout" do
-    lambda { Sift::Client.new("test_local_api_key", Sift.current_rest_api_path, 4) }.should_not raise_error
+    expect(lambda { Sift::Client.new("test_local_api_key", Sift.current_rest_api_path, 4) }).not_to raise_error
   end
 
   it "Track call must specify an event name" do
-    lambda { Sift::Client.new("foo").track(nil) }.should raise_error
-    lambda { Sift::Client.new("foo").track("") }.should raise_error
+    expect(lambda { Sift::Client.new("foo").track(nil) }).to raise_error
+    expect(lambda { Sift::Client.new("foo").track("") }).to raise_error
   end
 
   it "Must specify an event name" do
-    lambda { Sift::Client.new("foo").track(nil) }.should raise_error
-    lambda { Sift::Client.new("foo").track("") }.should raise_error
+    expect(lambda { Sift::Client.new("foo").track(nil) }).to raise_error
+    expect(lambda { Sift::Client.new("foo").track("") }).to raise_error
   end
 
   it "Must specify properties" do
     event = "custom_event_name"
-    lambda { Sift::Client.new("foo").track(event) }.should raise_error
+    expect(lambda { Sift::Client.new("foo").track(event) }).to raise_error
   end
 
   it "Score call must specify a user_id" do
-    lambda { Sift::Client.new("foo").score(nil) }.should raise_error
-    lambda { Sift::Client.new("foo").score("") }.should raise_error
+    expect(lambda { Sift::Client.new("foo").score(nil) }).to raise_error
+    expect(lambda { Sift::Client.new("foo").score("") }).to raise_error
   end
 
   it "Doesn't raise an exception on Net/HTTP errors" do
@@ -106,12 +105,11 @@ describe Sift::Client do
 
     # This method should just return nil -- the track call failed because
     # of an HTTP error
-    Sift::Client.new(api_key).track(event, properties).should eq(nil)
+    expect(Sift::Client.new(api_key).track(event, properties)).to eq(nil)
   end
 
   it "Returns nil when a StandardError occurs within the request" do
 
-    Sift.logger = Logger.new(STDOUT)
     api_key = "foobar"
     event = "$transaction"
     properties = valid_transaction_properties
@@ -120,7 +118,7 @@ describe Sift::Client do
 
     # This method should just return nil -- the track call failed because
     # a StandardError exception was thrown
-    Sift::Client.new(api_key).track(event, properties).should eq(nil)
+    expect(Sift::Client.new(api_key).track(event, properties)).to eq(nil)
   end
 
   it "Successfuly handles an event and returns OK" do
@@ -130,7 +128,7 @@ describe Sift::Client do
     stub_request(:post, "https://api.siftscience.com/v203/events").
       with { |request|
         parsed_body = JSON.parse(request.body)
-        parsed_body.should include("$buyer_user_id" => "123456")
+        expect(parsed_body).to include("$buyer_user_id" => "123456")
       }.to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {"content-type"=>"application/json; charset=UTF-8","content-length"=> "74"})
 
     api_key = "foobar"
@@ -138,9 +136,9 @@ describe Sift::Client do
     properties = valid_transaction_properties
 
     response = Sift::Client.new(api_key).track(event, properties)
-    response.ok?.should eq(true)
-    response.api_status.should eq(0)
-    response.api_error_message.should eq("OK")
+    expect(response.ok?).to eq(true)
+    expect(response.api_status).to eq(0)
+    expect(response.api_error_message).to eq("OK")
   end
 
   it "Successfully submits event with overriden key" do
@@ -148,8 +146,8 @@ describe Sift::Client do
     stub_request(:post, "https://api.siftscience.com/v203/events").
       with { | request|
         parsed_body = JSON.parse(request.body)
-        parsed_body.should include("$buyer_user_id" => "123456")
-        parsed_body.should include("$api_key" => "overridden")
+        expect(parsed_body).to include("$buyer_user_id" => "123456")
+        expect(parsed_body).to include("$api_key" => "overridden")
       }.to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
 
     api_key = "foobar"
@@ -157,9 +155,9 @@ describe Sift::Client do
     properties = valid_transaction_properties
 
     response = Sift::Client.new(api_key).track(event, properties, nil, nil, false, "overridden")
-    response.ok?.should eq(true)
-    response.api_status.should eq(0)
-    response.api_error_message.should eq("OK")
+    expect(response.ok?).to eq(true)
+    expect(response.api_status).to eq(0)
+    expect(response.api_error_message).to eq("OK")
   end
 
   it "Successfuly scrubs nils" do
@@ -169,8 +167,8 @@ describe Sift::Client do
     stub_request(:post, "https://api.siftscience.com/v203/events").
       with { |request|
         parsed_body = JSON.parse(request.body)
-        parsed_body.should_not include("fake_property")
-        parsed_body.should include("sub_object" => {"one" => "two"})
+        expect(parsed_body).not_to include("fake_property")
+        expect(parsed_body).to include("sub_object" => {"one" => "two"})
       }.to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {"content-type"=>"application/json; charset=UTF-8","content-length"=> "74"})
 
     api_key = "foobar"
@@ -183,9 +181,9 @@ describe Sift::Client do
       }
     )
     response = Sift::Client.new(api_key).track(event, properties)
-    response.ok?.should eq(true)
-    response.api_status.should eq(0)
-    response.api_error_message.should eq("OK")
+    expect(response.ok?).to eq(true)
+    expect(response.api_status).to eq(0)
+    expect(response.api_error_message).to eq("OK")
   end
 
   it "Successfully fetches a score" do
@@ -197,11 +195,11 @@ describe Sift::Client do
       to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {"content-type"=>"application/json; charset=UTF-8","content-length"=> "74"})
 
     response = Sift::Client.new(api_key).score(score_response_json[:user_id])
-    response.ok?.should eq(true)
-    response.api_status.should eq(0)
-    response.api_error_message.should eq("OK")
+    expect(response.ok?).to eq(true)
+    expect(response.api_status).to eq(0)
+    expect(response.api_error_message).to eq("OK")
 
-    response.body["score"].should eq(0.93)
+    expect(response.body["score"]).to eq(0.93)
   end
 
   it "Successfully fetches a score with an overridden key" do
@@ -213,11 +211,11 @@ describe Sift::Client do
       to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
 
     response = Sift::Client.new(api_key).score(score_response_json[:user_id], nil, "overridden")
-    response.ok?.should eq(true)
-    response.api_status.should eq(0)
-    response.api_error_message.should eq("OK")
+    expect(response.ok?).to eq(true)
+    expect(response.api_status).to eq(0)
+    expect(response.api_error_message).to eq("OK")
 
-    response.body["score"].should eq(0.93)
+    expect(response.body["score"]).to eq(0.93)
   end
 
 
@@ -236,10 +234,10 @@ describe Sift::Client do
     event = "$transaction"
     properties = valid_transaction_properties
     response = Sift::Client.new(api_key).track(event, properties, nil, nil, true)
-    response.ok?.should eq(true)
-    response.api_status.should eq(0)
-    response.api_error_message.should eq("OK")
-    response.body["score_response"]["score"].should eq(0.93)
+    expect(response.ok?).to eq(true)
+    expect(response.api_status).to eq(0)
+    expect(response.api_error_message).to eq("OK")
+    expect(response.body["score_response"]["score"]).to eq(0.93)
   end
 
 
