@@ -3,18 +3,15 @@ require 'multi_json'
 
 module Sift
 
-  
-
   # Represents the payload returned from a call through the track API
   #
   class Response
     attr_reader :body
+    attr_reader :http_class
     attr_reader :http_status_code
     attr_reader :api_status
     attr_reader :api_error_message
     attr_reader :request
-
-    HTTP_CODES_WITH_NO_BODY = [204,304].freeze
 
     # Constructor
     #
@@ -24,11 +21,12 @@ module Sift
     #   a JSON object that can be decoded into status, message and request
     #   sections.
     #
-    def initialize(http_response, http_headers, http_response_code)
+    def initialize(http_response, http_headers, http_response_code, http_response_class)
       @http_status_code = http_response_code
+      @http_class = http_response_class
 
       # only set these variables if a message-body is expected.
-      unless Response::HTTP_CODES_WITH_NO_BODY.include? @http_status_code
+      if not @http_class.kind_of? Net::HTTPNoContent
         @body = MultiJson.load(http_response) unless http_response.nil?
         @request = MultiJson.load(@body["request"].to_s) if @body["request"]
         @api_status = @body["status"].to_i if @body["status"]
@@ -42,12 +40,14 @@ module Sift
     # == Returns:
     #   true on success; false otherwise
     def ok?
-      #if there is no content expected, use HTTP code
-      if Response::HTTP_CODES_WITH_NO_BODY.include? @http_status_code
+
+      if @http_class.kind_of? Net::HTTPNoContent
+        #if there is no content expected, use HTTP code
+
         204 == @http_status_code
-      # otherwise use API status
       else
-        0 == @api_status.to_i 
+        # otherwise use API status
+        @http_class.kind_of? Net::HTTPOK and 0 == @api_status.to_i
       end
     end
 
@@ -84,8 +84,8 @@ module Sift
     #   The path to the event API, e.g., "/v201/events"
     #
     def initialize(api_key = Sift.api_key, path = Sift.current_rest_api_path, timeout = API_TIMEOUT)
-      raise("api_key must be a non-empty string") if (!api_key.is_a? String) || api_key.empty?
-      raise("path must be a non-empty string") if (!path.is_a? String) || path.empty?
+      raise("api_key must be a non-empty string") if !api_key.is_a?(String) || api_key.empty?
+      raise("path must be a non-empty string") if !path.is_a?(String) || path.empty?
       @api_key = api_key
       @path = path
       @timeout = timeout
@@ -148,7 +148,7 @@ module Sift
       options.merge!(:timeout => timeout) unless timeout.nil?
       begin
         response = self.class.post(path, options)
-        Response.new(response.body, response.headers, response.code)
+        Response.new(response.body, response.headers, response.code, response.response)
       rescue StandardError => e
         Sift.warn("Failed to track event: " + e.to_s)
         Sift.warn(e.backtrace)
@@ -178,7 +178,7 @@ module Sift
       options.merge!(:timeout => timeout) unless timeout.nil?
 
       response = self.class.get("/v#{API_VERSION}/score/#{user_id}/?api_key=#{api_key}", options)
-      Response.new(response.body, response.headers, response.code)
+      Response.new(response.body, response.headers, response.code, response.response)
 
     end
 
@@ -232,8 +232,7 @@ module Sift
       options.merge!(:timeout => timeout) unless timeout.nil?
       path = Sift.current_users_label_api_path(user_id)
       response = self.class.delete(path + "?api_key=#{@api_key}", options)
-      Response.new(response.body, response.headers, response.code)
-
+      Response.new(response.body, response.headers, response.code, response.response)
     end
 
     private
