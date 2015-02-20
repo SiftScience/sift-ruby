@@ -21,12 +21,12 @@ module Sift
     #   a JSON object that can be decoded into status, message and request
     #   sections.
     #
-    def initialize(http_response, http_headers, http_response_code, http_response_class)
+    def initialize(http_response, http_headers, http_response_code, http_raw_response)
       @http_status_code = http_response_code
-      @http_class = http_response_class
+      @http_raw_response = http_raw_response
 
       # only set these variables if a message-body is expected.
-      if not @http_class.kind_of? Net::HTTPNoContent
+      if not @http_raw_response.kind_of? Net::HTTPNoContent
         @body = MultiJson.load(http_response) unless http_response.nil?
         @request = MultiJson.load(@body["request"].to_s) if @body["request"]
         @api_status = @body["status"].to_i if @body["status"]
@@ -41,13 +41,12 @@ module Sift
     #   true on success; false otherwise
     def ok?
 
-      if @http_class.kind_of? Net::HTTPNoContent
+      if @http_raw_response.kind_of? Net::HTTPNoContent
         #if there is no content expected, use HTTP code
-
         204 == @http_status_code
       else
         # otherwise use API status
-        @http_class.kind_of? Net::HTTPOK and 0 == @api_status.to_i
+        @http_raw_response.kind_of? Net::HTTPOK and 0 == @api_status.to_i
       end
     end
 
