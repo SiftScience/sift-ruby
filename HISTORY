@@ -1,3 +1,6 @@
+=== 1.1.7.0 2015-02-24
+* Added Unlabel functionality
+
 === 1.1.6.2 2014-09-19
 * added API key parameter to track and label functions
 
