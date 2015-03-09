@@ -122,7 +122,9 @@ module Sift
     #
     # return_score (optional)
     #   Whether the API response should include a score for this user (the score will
-    #   be calculated using the submitted event
+    #   be calculated using the submitted event.  This feature must be
+    #   enabled for your account in order to use it.  Please contact
+    #   support@siftscience.com if you are interested in using this feature.
     #
     # == Returns:
     #   In the case of an HTTP error (timeout, broken connection, etc.), this
