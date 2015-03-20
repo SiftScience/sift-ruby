@@ -21,7 +21,7 @@ module Sift
     #   a JSON object that can be decoded into status, message and request
     #   sections.
     #
-    def initialize(http_response, http_headers, http_response_code, http_raw_response)
+    def initialize(http_response, http_response_code, http_raw_response)
       @http_status_code = http_response_code
       @http_raw_response = http_raw_response
 
@@ -149,7 +149,7 @@ module Sift
       options.merge!(:timeout => timeout) unless timeout.nil?
       begin
         response = self.class.post(path, options)
-        Response.new(response.body, response.headers, response.code, response.response)
+        Response.new(response.body, response.code, response.response)
       rescue StandardError => e
         Sift.warn("Failed to track event: " + e.to_s)
         Sift.warn(e.backtrace)
@@ -179,7 +179,7 @@ module Sift
       options.merge!(:timeout => timeout) unless timeout.nil?
 
       response = self.class.get("/v#{API_VERSION}/score/#{user_id}/?api_key=#{api_key}", options)
-      Response.new(response.body, response.headers, response.code, response.response)
+      Response.new(response.body, response.code, response.response)
 
     end
 
@@ -233,7 +233,7 @@ module Sift
       options.merge!(:timeout => timeout) unless timeout.nil?
       path = Sift.current_users_label_api_path(user_id)
       response = self.class.delete(path + "?api_key=#{@api_key}", options)
-      Response.new(response.body, response.headers, response.code, response.response)
+      Response.new(response.body, response.code, response.response)
     end
 
     private
