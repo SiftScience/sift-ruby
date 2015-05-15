@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rake", "~> 10.4"
 
   # Gems that must be intalled for sift to work
+  s.add_dependency "representable", "~> 2.1"
   s.add_dependency "httparty", "~> 0.13"
   s.add_dependency "multi_json", "~> 1.0"
 
