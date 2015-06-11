@@ -3,14 +3,17 @@ module Sift
   module TimestampRepresenter
     include Representable::JSON
     include Representable::Object
-    property :time
+    property :internal_time, as: :time
   end
 
-  class Timestamp < Struct.new :time
+  class Timestamp < Struct.new :internal_time
+    def time
+      # NB. The API returns timestamps in millis since the Epoch
+      Time.at(self.internal_time / 1000) if self.internal_time
+    end
   end
 
   module ListRepresenter
-
     include Representable::JSON
     include Representable::Object
 
@@ -29,15 +32,17 @@ module Sift
 
     property :id
     property :label
-    property :internal_labeled_at_millis, as: :labeled_at
-    property :first_seen
+    property :internal_labeled_at, as: :labeled_at
+    property :internal_first_seen, as: :first_seen
 
     property :network, extend: NetworkRepresenter, class: Network
     property :internal_session_timestamps, extend: ListRepresenter, class: List, as: :sessions
   end
 
-  class Device < Struct.new :id, :label, :internal_labeled_at_millis,
-                            :first_seen, :network, :internal_session_timestamps
+  class Device < Struct.new :id, :label, :network,
+                            :internal_session_timestamps,
+                            :internal_first_seen,
+                            :internal_labeled_at
 
     include Resource
 
@@ -70,7 +75,12 @@ module Sift
 
     def labeled_at
       # NB. The API returns timestamps in millis since the Epoch
-      Time.at(self.internal_labeled_at_millis / 1000) if self.internal_labeled_at_millis
+      Time.at(self.internal_labeled_at / 1000) if self.internal_labeled_at
+    end
+
+    def first_seen
+      # NB. The API returns timestamps in millis since the Epoch
+      Time.at(self.internal_first_seen / 1000) if self.internal_first_seen
     end
 
     def session_timestamps
