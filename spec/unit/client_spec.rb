@@ -58,17 +58,17 @@ describe Sift::Client do
   end
 
   it "Cannot instantiate client with nil, empty, non-string, or blank api key" do
-    expect(lambda { Sift::Client.new(nil) }).to raise_error
-    expect(lambda { Sift::Client.new("") }).to raise_error
-    expect(lambda { Sift::Client.new(123456) }).to raise_error
-    expect(lambda { Sift::Client.new() }).to raise_error
+    expect(lambda { Sift::Client.new(nil) }).to raise_error String
+    expect(lambda { Sift::Client.new("") }).to raise_error String
+    expect(lambda { Sift::Client.new(123456) }).to raise_error String
+    expect(lambda { Sift::Client.new() }).to raise_error String
   end
 
   it "Cannot instantiate client with nil, empty, non-string, or blank path" do
     api_key = "test_local_api_key"
-    expect(lambda { Sift::Client.new(api_key, nil) }).to raise_error
-    expect(lambda { Sift::Client.new(api_key, "") }).to raise_error
-    expect(lambda { Sift::Client.new(api_key, 123456) }).to raise_error
+    expect(lambda { Sift::Client.new(api_key, nil) }).to raise_error String
+    expect(lambda { Sift::Client.new(api_key, "") }).to raise_error String
+    expect(lambda { Sift::Client.new(api_key, 123456) }).to raise_error String
   end
 
   it "Can instantiate client with non-default timeout" do
@@ -76,23 +76,23 @@ describe Sift::Client do
   end
 
   it "Track call must specify an event name" do
-    expect(lambda { Sift::Client.new("foo").track(nil) }).to raise_error
-    expect(lambda { Sift::Client.new("foo").track("") }).to raise_error
+    expect(lambda { Sift::Client.new("foo").track(nil) }).to raise_error String
+    expect(lambda { Sift::Client.new("foo").track("") }).to raise_error String
   end
 
   it "Must specify an event name" do
-    expect(lambda { Sift::Client.new("foo").track(nil) }).to raise_error
-    expect(lambda { Sift::Client.new("foo").track("") }).to raise_error
+    expect(lambda { Sift::Client.new("foo").track(nil) }).to raise_error String
+    expect(lambda { Sift::Client.new("foo").track("") }).to raise_error String
   end
 
   it "Must specify properties" do
     event = "custom_event_name"
-    expect(lambda { Sift::Client.new("foo").track(event) }).to raise_error
+    expect(lambda { Sift::Client.new("foo").track(event) }).to raise_error String
   end
 
   it "Score call must specify a user_id" do
-    expect(lambda { Sift::Client.new("foo").score(nil) }).to raise_error
-    expect(lambda { Sift::Client.new("foo").score("") }).to raise_error
+    expect(lambda { Sift::Client.new("foo").score(nil) }).to raise_error String
+    expect(lambda { Sift::Client.new("foo").score("") }).to raise_error String
   end
 
   it "Doesn't raise an exception on Net/HTTP errors" do

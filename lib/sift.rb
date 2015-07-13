@@ -6,14 +6,16 @@ require 'representable/json'
 require 'representable/json/collection'
 require 'representable/object'
 
-require "sift/version"
-require "sift/resource"
-require "sift/label"
-require "sift/network"
-require "sift/device"
-require "sift/session"
-require "sift/credentials"
-require "sift/client"
+require 'sift/version'
+require 'sift/resource'
+require 'sift/helpers'
+require 'sift/list'
+require 'sift/ref'
+require 'sift/label'
+require 'sift/device'
+require 'sift/session'
+require 'sift/credentials'
+require 'sift/client'
 
 module Sift
 

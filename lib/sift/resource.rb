@@ -1,6 +1,4 @@
-
 module Sift
-
   class HttpRequestError < StandardError
     attr_reader :http_status
     attr_reader :body
@@ -12,14 +10,13 @@ module Sift
   end
 
   module Resource
-
     def self.included(klass)
       klass.extend(ClassMethods)
     end
 
     module ClassMethods
-
       BASE_URI = "https://api3.siftscience.com/v3/accounts/"
+      # BASE_URI = "http://localhost:8080/v3/accounts/"
 
       def resource_uri(path)
         raise(RuntimeError, "Sift.account_id hasn't been set") if Sift.account_id.nil?
@@ -27,19 +24,19 @@ module Sift
       end
 
       def post(uri, options = {})
-        http_request do 
+        http_request do
           HTTParty.post(uri, options.merge(default_options))
         end
       end
 
       def put(uri, options = {})
-        http_request do 
+        http_request do
           HTTParty.put(uri, options.merge(default_options))
         end
       end
 
       def get(uri, options = {})
-        http_request do 
+        http_request do
           HTTParty.get(uri, options.merge(default_options))
         end
       end
@@ -47,10 +44,10 @@ module Sift
     private
       def default_options
         {
-          headers: { 
-            "Authorization" => "Basic #{Sift.api_key}", 
-            "User-Agent" => "sift-ruby/#{Sift::VERSION}", 
-            "Content-Type" => "application/json", 
+          headers: {
+            "Authorization" => "Basic #{Sift.api_key}",
+            "User-Agent" => "sift-ruby/#{Sift::VERSION}",
+            "Content-Type" => "application/json",
           },
         }
       end
@@ -60,10 +57,10 @@ module Sift
         if response.success?
           response.body
         else
-          raise(HttpRequestError.new(response.code, response.body), "Request failed", caller)
+          raise(HttpRequestError.new(response.code, response.body),
+                "Request failed", caller)
         end
       end
-
     end
   end
 end
