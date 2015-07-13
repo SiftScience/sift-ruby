@@ -1,5 +1,4 @@
 module Sift
-
   module LabelRepresenter
     include Representable::JSON
     include Representable::Object
@@ -7,13 +6,10 @@ module Sift
     property :label
   end
 
-  class Label < Struct.new :label
-
+  class Label < OpenStruct
     BAD = 'bad'
     NOT_BAD = 'not_bad'
-
   end
-
 end
 
 

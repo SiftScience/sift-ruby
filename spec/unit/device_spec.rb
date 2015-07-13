@@ -82,8 +82,8 @@ describe Sift::Device do
     expect(device.network).to_not be_nil
     expect(device.network.first_seen).to eq(Time.at(1433440739))
     expect(device.network.score).to eq(0.5)
-    expect(device.network.risky?).to be false
-    expect(device.session_timestamps).to eq([Time.at(1433987326)])
+    expect(device.sessions.data).
+      to eq([Sift::SessionTime.new(:time => Time.at(1433987326))])
   end
 
   it "can fetch a device" do
@@ -106,8 +106,7 @@ describe Sift::Device do
     expect(device.network).to_not be_nil
     expect(device.network.first_seen).to eq(Time.at(1433440739))
     expect(device.network.score).to eq(0.5)
-    expect(device.network.risky?).to be false
-    expect(device.session_timestamps).to eq([Time.at(1433987326)])
+    expect(device.sessions.data).
+      to eq([Sift::SessionTime.new(:time => Time.at(1433987326))])
   end
-
 end

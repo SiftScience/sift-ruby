@@ -5,11 +5,11 @@
 require 'rubygems'
 require 'sift'
 require 'multi_json'
+require 'logger'
 
-TIMEOUT = 5 
+TIMEOUT = 5
 api_key = ENV['API_KEY']
 account_id = ENV['ACCOUNT_ID']
-
 
 if api_key.nil? || account_id.nil?
   puts "Please specify the environment variables API_KEY and ACCOUNT_ID"
@@ -19,55 +19,49 @@ if api_key.nil? || account_id.nil?
   exit 1
 end
 
-class MyLogger
-  def warn(e)
-    $stderr.puts "[WARN]  " + e.to_s
-  end
-
-  def error(e)
-    $stderr.puts "[ERROR] " + e.to_s
-  end
-
-  def fatal(e)
-    $stderr.puts "[FATAL] " + e.to_s
-  end
-
-  def info(e)
-    $stderr.puts "[INFO]  " + e.to_s
-  end
-end
-
-Sift.logger = MyLogger.new
+Sift.logger = Logger.new(STDERR)
 Sift.api_key = api_key
 Sift.account_id = account_id
 
-def print_device(d)
-  puts 'i got the device obj: ' + d.inspect
-  puts 'device first_seen ' + d.first_seen.to_s
-  puts 'device bad? ' + d.bad?.to_s
-  puts 'device labeled? ' + d.labeled?.to_s
-  puts 'device labeled_at ' + d.labeled_at.to_s
-  puts 'device session timestamps ' + d.session_timestamps.join(',')
-end
-
 begin
+  device_id = ENV['DEVICE_ID']
+  session_id = ENV['SESSION_ID']
 
-  device_id = ENV['DEVICE_ID'] || raise("DEVICE_ID env variable not specified")
-  session_id = ENV['SESSION_ID'] || raise("SESSION_ID env variable not specified")
+  device =
+    if device_id
+      Sift::Device.retrieve(device_id)
+    elsif session_id
+      session = Sift::Session.retrieve(session_id)
+      if session
+        session.device
+      end
+    else
+      raise("Must provide one of DEVICE_ID or SESSION_ID")
+    end
 
-  device = Sift::Device.retrieve(device_id)
   if device
-    print_device(device)
-  end
-
-  session = Sift::Session.retrieve(session_id)
-  if session
-    print_device(session.device)
-    current_label = session.device.label_bad!
-
-    puts 'got label from API result: ' + current_label.to_s
-    puts 'session device label ' + session.device.label
-
+    puts "device obj: #{device}"
+    puts "first_seen: #{device.first_seen}"
+    puts "device bad? #{device.bad?}"
+    puts "device labeled? #{device.labeled?}"
+    puts "device labeled_at #{device.labeled_at.to_s}"
+    puts
+    puts "Visit times: #{device.sessions.data.map{|x| x.time.to_s}.join(", ")}"
+    puts
+    puts "network first seen time: #{device.network.first_seen}"
+    puts "device score: #{device.network.score}"
+    puts
+    print "Label [bad|not_bad]> "
+    case gets.strip
+    when "bad"
+      puts "device #{device.id} now #{device.label_bad!}"
+    when "not_bad"
+      puts "device #{device.id} now #{device.label_not_bad!}"
+    else
+      $stderr.puts "invalid label; options are 'bad' and 'not_bad'"
+    end
+  else
+    raise("Device not found")
   end
 rescue Sift::HttpRequestError => e
   $stderr.puts e.http_status
