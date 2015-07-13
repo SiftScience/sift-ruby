@@ -1,7 +1,6 @@
-require 'httparty'
-require 'multi_json'
-
 module Sift
+
+  include Credentials
 
   # Represents the payload returned from a call through the track API
   #
@@ -88,8 +87,6 @@ module Sift
       @api_key = api_key
       @path = path
       @timeout = timeout
-
-
     end
 
     def api_key

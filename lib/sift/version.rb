@@ -1,4 +1,4 @@
 module Sift
-  VERSION = "1.1.7.2"
+  VERSION = "1.2.0.0"
   API_VERSION = "203"
 end

@@ -1,5 +1,21 @@
-require "sift/version"
-require "sift/client"
+require 'httparty'
+require 'multi_json'
+require 'ostruct'
+require 'representable'
+require 'representable/json'
+require 'representable/json/collection'
+require 'representable/object'
+
+require 'sift/version'
+require 'sift/resource'
+require 'sift/helpers'
+require 'sift/list'
+require 'sift/ref'
+require 'sift/label'
+require 'sift/device'
+require 'sift/session'
+require 'sift/credentials'
+require 'sift/client'
 
 module Sift
 
