@@ -121,10 +121,13 @@ module Sift
     #   Overrides the default API path with a different URL.
     #
     # return_score (optional)
-    #   Whether the API response should include a score for this user (the score will
+    #   Whether the API response should include a score for this user. The score will
     #   be calculated using the submitted event.  This feature must be
     #   enabled for your account in order to use it.  Please contact
     #   support@siftscience.com if you are interested in using this feature.
+    #
+    # return_action (optional)
+    #   Whether the API response should include an action triggered for this transaction.
     #
     # == Returns:
     #   In the case of an HTTP error (timeout, broken connection, etc.), this
