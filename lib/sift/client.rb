@@ -213,7 +213,7 @@ module Sift
       raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
 
       path = Sift.current_users_label_api_path(user_id)
-      track("$label", delete_nils(properties), timeout, path, false, api_key)
+      track("$label", delete_nils(properties), timeout, path, false, false, api_key)
     end
 
     # Unlabels a user.  This call is blocking.
