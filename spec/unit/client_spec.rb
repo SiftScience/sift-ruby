@@ -189,7 +189,7 @@ describe Sift::Client do
     event = "$transaction"
     properties = valid_transaction_properties
 
-    response = Sift::Client.new(api_key).track(event, properties, nil, nil, false, false, "overridden")
+    response = Sift::Client.new(api_key).track(event, properties, nil, nil, false, "overridden", false)
     expect(response.ok?).to eq(true)
     expect(response.api_status).to eq(0)
     expect(response.api_error_message).to eq("OK")
@@ -268,7 +268,7 @@ describe Sift::Client do
 
     event = "$transaction"
     properties = valid_transaction_properties
-    response = Sift::Client.new(api_key).track(event, properties, nil, nil, true)
+    response = Sift::Client.new(api_key).track(event, properties, nil, nil, true, nil, nil)
     expect(response.ok?).to eq(true)
     expect(response.api_status).to eq(0)
     expect(response.api_error_message).to eq("OK")
@@ -289,7 +289,7 @@ describe Sift::Client do
 
     event = "$transaction"
     properties = valid_transaction_properties
-    response = Sift::Client.new(api_key).track(event, properties, nil, nil, nil, true)
+    response = Sift::Client.new(api_key).track(event, properties, nil, nil, nil, nil, true)
     expect(response.ok?).to eq(true)
     expect(response.api_status).to eq(0)
     expect(response.api_error_message).to eq("OK")

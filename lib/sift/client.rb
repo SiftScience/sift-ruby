@@ -135,7 +135,9 @@ module Sift
     #   the status message and status code. In general, you can ignore the returned
     #   result, though.
     #
-    def track(event, properties = {}, timeout = nil, path = nil, return_score = false, return_action = false, api_key = @api_key)
+    def track(event, properties = {}, timeout = nil, path = nil, return_score = false, api_key = @api_key, return_action = false)
+      warn "[WARNING] api_key cannot be empty, fallback to default api_key." if api_key.to_s.empty?
+      api_key ||= @api_key
       raise("event must be a non-empty string") if (!event.is_a? String) || event.empty?
       raise("properties cannot be empty") if properties.empty?
       raise("Bad api_key parameter") if api_key.empty?
@@ -213,7 +215,7 @@ module Sift
       raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
 
       path = Sift.current_users_label_api_path(user_id)
-      track("$label", delete_nils(properties), timeout, path, false, false, api_key)
+      track("$label", delete_nils(properties), timeout, path, false, api_key, false)
     end
 
     # Unlabels a user.  This call is blocking.
