@@ -215,6 +215,8 @@ module Sift
       raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
 
       path = Sift.current_users_label_api_path(user_id)
+
+      # No return_action logic supported when using labels.
       track("$label", delete_nils(properties), timeout, path, false, api_key, false)
     end
 
