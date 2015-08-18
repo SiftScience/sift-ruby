@@ -42,6 +42,41 @@ describe Sift::Client do
     }
   end
 
+  def action_response_json
+    {
+      :user_id => "247019",
+      :score => 0.93,
+      :actions => [{
+                    :action_id => "1234567890abcdefghijklmn",
+                    :time => 1437421587052,
+                    :triggers => [{
+                      :triggerType => "FORMULA",
+                      :source => "synchronous_action",
+                      :trigger_id => "12345678900987654321abcd"
+                    }],
+                    :entity => {
+                      :type => "USER",
+                      :id => "23056"
+                    }
+                  },
+                  {
+                    :action_id => "12345678901234567890abcd",
+                    :time => 1437421587410,
+                    :triggers => [{
+                      :triggerType => "FORMULA",
+                      :source => "synchronous_action",
+                      :trigger_id => "abcd12345678901234567890"
+                    }],
+                    :entity => {
+                      :type => "ORDER",
+                      :id => "order_at_ 1437421587009"
+                    }
+                  }],
+      :status => 0,
+      :error_message => "OK"
+    }
+  end
+
   def fully_qualified_api_endpoint
     Sift::Client::API_ENDPOINT + Sift.current_rest_api_path
   end
@@ -58,17 +93,17 @@ describe Sift::Client do
   end
 
   it "Cannot instantiate client with nil, empty, non-string, or blank api key" do
-    expect(lambda { Sift::Client.new(nil) }).to raise_error
-    expect(lambda { Sift::Client.new("") }).to raise_error
-    expect(lambda { Sift::Client.new(123456) }).to raise_error
-    expect(lambda { Sift::Client.new() }).to raise_error
+    expect(lambda { Sift::Client.new(nil) }).to raise_error(StandardError)
+    expect(lambda { Sift::Client.new("") }).to raise_error(StandardError)
+    expect(lambda { Sift::Client.new(123456) }).to raise_error(StandardError)
+    expect(lambda { Sift::Client.new() }).to raise_error(StandardError)
   end
 
   it "Cannot instantiate client with nil, empty, non-string, or blank path" do
     api_key = "test_local_api_key"
-    expect(lambda { Sift::Client.new(api_key, nil) }).to raise_error
-    expect(lambda { Sift::Client.new(api_key, "") }).to raise_error
-    expect(lambda { Sift::Client.new(api_key, 123456) }).to raise_error
+    expect(lambda { Sift::Client.new(api_key, nil) }).to raise_error(StandardError)
+    expect(lambda { Sift::Client.new(api_key, "") }).to raise_error(StandardError)
+    expect(lambda { Sift::Client.new(api_key, 123456) }).to raise_error(StandardError)
   end
 
   it "Can instantiate client with non-default timeout" do
@@ -76,23 +111,23 @@ describe Sift::Client do
   end
 
   it "Track call must specify an event name" do
-    expect(lambda { Sift::Client.new("foo").track(nil) }).to raise_error
-    expect(lambda { Sift::Client.new("foo").track("") }).to raise_error
+    expect(lambda { Sift::Client.new("foo").track(nil) }).to raise_error(StandardError)
+    expect(lambda { Sift::Client.new("foo").track("") }).to raise_error(StandardError)
   end
 
   it "Must specify an event name" do
-    expect(lambda { Sift::Client.new("foo").track(nil) }).to raise_error
-    expect(lambda { Sift::Client.new("foo").track("") }).to raise_error
+    expect(lambda { Sift::Client.new("foo").track(nil) }).to raise_error(StandardError)
+    expect(lambda { Sift::Client.new("foo").track("") }).to raise_error(StandardError)
   end
 
   it "Must specify properties" do
     event = "custom_event_name"
-    expect(lambda { Sift::Client.new("foo").track(event) }).to raise_error
+    expect(lambda { Sift::Client.new("foo").track(event) }).to raise_error(StandardError)
   end
 
   it "Score call must specify a user_id" do
-    expect(lambda { Sift::Client.new("foo").score(nil) }).to raise_error
-    expect(lambda { Sift::Client.new("foo").score("") }).to raise_error
+    expect(lambda { Sift::Client.new("foo").score(nil) }).to raise_error(StandardError)
+    expect(lambda { Sift::Client.new("foo").score("") }).to raise_error(StandardError)
   end
 
   it "Doesn't raise an exception on Net/HTTP errors" do
@@ -141,7 +176,7 @@ describe Sift::Client do
     expect(response.api_error_message).to eq("OK")
   end
 
-  it "Successfully submits event with overriden key" do
+  it "Successfully submits event with overridden key" do
     response_json = { :status => 0, :error_message => "OK"}
     stub_request(:post, "https://api.siftscience.com/v203/events").
       with { | request|
@@ -154,7 +189,7 @@ describe Sift::Client do
     event = "$transaction"
     properties = valid_transaction_properties
 
-    response = Sift::Client.new(api_key).track(event, properties, nil, nil, false, "overridden")
+    response = Sift::Client.new(api_key).track(event, properties, nil, nil, false, "overridden", false)
     expect(response.ok?).to eq(true)
     expect(response.api_status).to eq(0)
     expect(response.api_error_message).to eq("OK")
@@ -233,11 +268,32 @@ describe Sift::Client do
 
     event = "$transaction"
     properties = valid_transaction_properties
-    response = Sift::Client.new(api_key).track(event, properties, nil, nil, true)
+    response = Sift::Client.new(api_key).track(event, properties, nil, nil, true, nil, nil)
     expect(response.ok?).to eq(true)
     expect(response.api_status).to eq(0)
     expect(response.api_error_message).to eq("OK")
     expect(response.body["score_response"]["score"]).to eq(0.93)
+  end
+
+  it "Successfuly make a sync action request" do
+
+    api_key = "foobar"
+    response_json = {
+      :status => 0,
+      :error_message => "OK",
+      :score_response => action_response_json
+    }
+
+    stub_request(:post, "https://api.siftscience.com/v203/events?return_action=true").
+      to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {"content-type"=>"application/json; charset=UTF-8","content-length"=> "74"})
+
+    event = "$transaction"
+    properties = valid_transaction_properties
+    response = Sift::Client.new(api_key).track(event, properties, nil, nil, nil, nil, true)
+    expect(response.ok?).to eq(true)
+    expect(response.api_status).to eq(0)
+    expect(response.api_error_message).to eq("OK")
+    expect(response.body["score_response"]["actions"].first["entity"]["type"]).to eq("USER")
   end
 
 

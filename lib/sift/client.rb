@@ -121,10 +121,13 @@ module Sift
     #   Overrides the default API path with a different URL.
     #
     # return_score (optional)
-    #   Whether the API response should include a score for this user (the score will
+    #   Whether the API response should include a score for this user. The score will
     #   be calculated using the submitted event.  This feature must be
     #   enabled for your account in order to use it.  Please contact
     #   support@siftscience.com if you are interested in using this feature.
+    #
+    # return_action (optional)
+    #   Whether the API response should include an action triggered for this transaction.
     #
     # == Returns:
     #   In the case of an HTTP error (timeout, broken connection, etc.), this
@@ -132,15 +135,20 @@ module Sift
     #   the status message and status code. In general, you can ignore the returned
     #   result, though.
     #
-    def track(event, properties = {}, timeout = nil, path = nil, return_score = false, api_key = @api_key)
+    def track(event, properties = {}, timeout = nil, path = nil, return_score = false, api_key = @api_key, return_action = false)
+      warn "[WARNING] api_key cannot be empty, fallback to default api_key." if api_key.to_s.empty?
+      api_key ||= @api_key
       raise("event must be a non-empty string") if (!event.is_a? String) || event.empty?
       raise("properties cannot be empty") if properties.empty?
       raise("Bad api_key parameter") if api_key.empty?
       path ||= @path
       timeout ||= @timeout
-      if return_score
-        path = path + "?return_score=true"
-      end
+
+      uri = URI.parse(API_ENDPOINT)      
+      uri.query = URI.encode_www_form(URI.decode_www_form(uri.query.to_s) << ["return_score", "true"]) if return_score
+      uri.query = URI.encode_www_form(URI.decode_www_form(uri.query.to_s) << ["return_action", "true"]) if return_action
+      path = path + "?" + uri.query if !uri.query.to_s.empty?
+
       options = {
         :body => MultiJson.dump(delete_nils(properties).merge({"$type" => event,
                                                                "$api_key" => api_key})),
@@ -207,7 +215,9 @@ module Sift
       raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
 
       path = Sift.current_users_label_api_path(user_id)
-      track("$label", delete_nils(properties), timeout, path, false, api_key)
+
+      # No return_action logic supported when using labels.
+      track("$label", delete_nils(properties), timeout, path, false, api_key, false)
     end
 
     # Unlabels a user.  This call is blocking.
@@ -237,6 +247,9 @@ module Sift
     end
 
     private
+    # def add_query_parameter(query_parameter)
+    #   uri = URI.parse(API_ENDPOINT)
+    # end
     def delete_nils(properties)
       properties.delete_if do |k, v|
         case v
