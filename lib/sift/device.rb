@@ -10,7 +10,7 @@ module Sift
     class << self
       def retrieve(device_id)
         json = get(resource_uri("/devices/#{device_id}"))
-        Device.new.extend(DeviceRepresenter).from_json(json)
+        self.new.extend(DeviceRepresenter).from_json(json)
       end
     end
 

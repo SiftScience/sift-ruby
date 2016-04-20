@@ -1,14 +1,4 @@
 module Sift
-  class HttpRequestError < StandardError
-    attr_reader :http_status
-    attr_reader :body
-
-    def initialize(http_status, body)
-      @http_status = http_status
-      @body = body
-    end
-  end
-
   module Resource
     def self.included(klass)
       klass.extend(ClassMethods)
@@ -19,26 +9,23 @@ module Sift
       # BASE_URI = "http://localhost:8080/v3/accounts/"
 
       def resource_uri(path)
-        raise(RuntimeError, "Sift.account_id hasn't been set") if Sift.account_id.nil?
+        raise(ConfigError, "Sift.account_id hasn't been set") if Sift.account_id.nil?
         BASE_URI + Sift.account_id + path
       end
 
       def post(uri, options = {})
-        http_request do
-          HTTParty.post(uri, options.merge(default_options))
-        end
+        handle_response(
+          HTTParty.post(uri, options.merge(default_options)))
       end
 
       def put(uri, options = {})
-        http_request do
-          HTTParty.put(uri, options.merge(default_options))
-        end
+        handle_response(
+          HTTParty.put(uri, options.merge(default_options)))
       end
 
       def get(uri, options = {})
-        http_request do
-          HTTParty.get(uri, options.merge(default_options))
-        end
+        handle_response(
+          HTTParty.get(uri, options.merge(default_options)))
       end
 
     private
@@ -52,8 +39,7 @@ module Sift
         }
       end
 
-      def http_request(&blk)
-        response = blk.call
+      def handle_response(response)
         if response.success?
           response.body
         else

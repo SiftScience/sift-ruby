@@ -7,6 +7,7 @@ require 'representable/json/collection'
 require 'representable/object'
 
 require 'sift/version'
+require 'sift/error'
 require 'sift/resource'
 require 'sift/helpers'
 require 'sift/list'
@@ -14,10 +15,14 @@ require 'sift/ref'
 require 'sift/label'
 require 'sift/device'
 require 'sift/session'
-require 'sift/credentials'
 require 'sift/client'
 
 module Sift
+
+  # Adding module scoped public API key
+  class << self
+    attr_accessor :api_key, :account_id
+  end
 
   # Returns the path for the current API version
   def self.current_rest_api_path
@@ -27,11 +32,6 @@ module Sift
   def self.current_users_label_api_path(user_id)
     # This API version is a minor version ahead of the /events API
     "/v#{API_VERSION}/users/#{URI.encode(user_id)}/labels"
-  end
- 
-  # Adding module scoped public API key 
-  class << self
-    attr_accessor :api_key
   end
 
   # Sets the Output logger to use within the client. This can be left uninitializaed
