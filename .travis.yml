@@ -1,8 +1,14 @@
 language: ruby
-script: "bundle exec rake spec"
+before_install:
+  - "gem install bundler"
+  - "bundle -v"
+script: "bundle exec rspec --color"
 rvm:
   - 1.9.3
   - 2.0.0
+  - 2.1.10
+  - 2.2.5
+  - 2.3.1
 env:
   # None for now
 gemfile:

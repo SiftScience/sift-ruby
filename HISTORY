@@ -1,3 +1,7 @@
+=== 1.2.0.0 2015-06-12
+* Upgraded third-party dependencies to latest stable versions
+* Added APIs for accessing Device IDs
+
 === 1.1.7.2 2015-04-13
 * Fixed backwards compatibility issue
 

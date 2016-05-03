@@ -1,8 +1,4 @@
-require 'httparty'
-require 'multi_json'
-
 module Sift
-
   # Represents the payload returned from a call through the track API
   #
   class Response
@@ -73,6 +69,8 @@ module Sift
     include HTTParty
     base_uri API_ENDPOINT
 
+    attr_reader :api_key
+
     # Constructor
     #
     # == Parameters:
@@ -83,17 +81,11 @@ module Sift
     #   The path to the event API, e.g., "/v201/events"
     #
     def initialize(api_key = Sift.api_key, path = Sift.current_rest_api_path, timeout = API_TIMEOUT)
-      raise("api_key must be a non-empty string") if !api_key.is_a?(String) || api_key.empty?
-      raise("path must be a non-empty string") if !path.is_a?(String) || path.empty?
+      raise(ConfigError, "api_key must be a non-empty string") if !api_key.is_a?(String) || api_key.empty?
+      raise(ConfigError, "path must be a non-empty string") if !path.is_a?(String) || path.empty?
       @api_key = api_key
       @path = path
       @timeout = timeout
-
-
-    end
-
-    def api_key
-      @api_key
     end
 
     def user_agent
@@ -138,13 +130,13 @@ module Sift
     def track(event, properties = {}, timeout = nil, path = nil, return_score = false, api_key = @api_key, return_action = false)
       warn "[WARNING] api_key cannot be empty, fallback to default api_key." if api_key.to_s.empty?
       api_key ||= @api_key
-      raise("event must be a non-empty string") if (!event.is_a? String) || event.empty?
-      raise("properties cannot be empty") if properties.empty?
-      raise("Bad api_key parameter") if api_key.empty?
+      raise(Error, "event must be a non-empty string") if (!event.is_a? String) || event.empty?
+      raise(Error, "properties cannot be empty") if properties.empty?
+      raise(ConfigError, "Bad api_key parameter") if api_key.empty?
       path ||= @path
       timeout ||= @timeout
 
-      uri = URI.parse(API_ENDPOINT)      
+      uri = URI.parse(API_ENDPOINT)
       uri.query = URI.encode_www_form(URI.decode_www_form(uri.query.to_s) << ["return_score", "true"]) if return_score
       uri.query = URI.encode_www_form(URI.decode_www_form(uri.query.to_s) << ["return_action", "true"]) if return_action
       path = path + "?" + uri.query if !uri.query.to_s.empty?
@@ -179,8 +171,8 @@ module Sift
     #
     def score(user_id, timeout = nil, api_key = @api_key)
 
-      raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
-      raise("Bad api_key parameter") if api_key.empty?
+      raise(Error, "user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
+      raise(Error, "Bad api_key parameter") if api_key.empty?
       timetout ||= @timeout
 
       options = { :headers => {"User-Agent" => user_agent} }
@@ -247,9 +239,7 @@ module Sift
     end
 
     private
-    # def add_query_parameter(query_parameter)
-    #   uri = URI.parse(API_ENDPOINT)
-    # end
+
     def delete_nils(properties)
       properties.delete_if do |k, v|
         case v

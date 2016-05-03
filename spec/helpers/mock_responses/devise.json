@@ -1,0 +1,17 @@
+{
+  "first_seen": 1433869933142,
+  "id": "device_id",
+  "label": "bad",
+  "labeled_at": 1434042758141,
+  "network": {
+    "first_seen": 1433440739499,
+    "score": 0.5
+  },
+  "sessions": {
+    "data": [{
+     "time": 1433987326843
+    }],
+    "has_more": false,
+    "total_results": 1
+  }
+}
