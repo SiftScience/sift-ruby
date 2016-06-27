@@ -136,25 +136,9 @@ module Sift
     #   result, though.
     #
     def track(event, properties = {}, timeout = nil, path = nil, return_score = false, api_key = @api_key, return_action = false)
-      warn "[WARNING] api_key cannot be empty, fallback to default api_key." if api_key.to_s.empty?
-      api_key ||= @api_key
-      raise("event must be a non-empty string") if (!event.is_a? String) || event.empty?
-      raise("properties cannot be empty") if properties.empty?
-      raise("Bad api_key parameter") if api_key.empty?
-      path ||= @path
-      timeout ||= @timeout
 
-      uri = URI.parse(API_ENDPOINT)      
-      uri.query = URI.encode_www_form(URI.decode_www_form(uri.query.to_s) << ["return_score", "true"]) if return_score
-      uri.query = URI.encode_www_form(URI.decode_www_form(uri.query.to_s) << ["return_action", "true"]) if return_action
-      path = path + "?" + uri.query if !uri.query.to_s.empty?
+      path, options = prepare_track_request(event, properties, timeout, path, return_score, api_key, return_action)
 
-      options = {
-        :body => MultiJson.dump(delete_nils(properties).merge({"$type" => event,
-                                                               "$api_key" => api_key})),
-        :headers => {"User-Agent" => user_agent}
-      }
-      options.merge!(:timeout => timeout) unless timeout.nil?
       begin
         response = self.class.post(path, options)
         Response.new(response.body, response.code, response.response)
@@ -163,6 +147,49 @@ module Sift
         Sift.warn(e.backtrace)
         nil
       end
+    end
+
+    # Tracks an event and associated properties through the Sift Science API. This call
+    # is blocking.
+    #
+    # == Parameters:
+    # event
+    #   The name of the event to send. This can be either a reserved event name, like
+    #   $transaction or $label or a custom event name (that does not start with a $).
+    #   This parameter must be specified.
+    #
+    # properties
+    #   A hash of name-value pairs that specify the event-specific attributes to track.
+    #   This parameter must be specified.
+    #
+    # timeout (optional)
+    #   The number of seconds to wait before failing the request. By default this is
+    #   configured to 2 seconds (see above). This parameter is optional.
+    #
+    # path (optional)
+    #   Overrides the default API path with a different URL.
+    #
+    # return_score (optional)
+    #   Whether the API response should include a score for this user. The score will
+    #   be calculated using the submitted event.  This feature must be
+    #   enabled for your account in order to use it.  Please contact
+    #   support@siftscience.com if you are interested in using this feature.
+    #
+    # return_action (optional)
+    #   Whether the API response should include an action triggered for this transaction.
+    #
+    # == Returns:
+    #   In the case of an HTTP error (timeout, broken connection, etc.), this
+    #   method returns nil; otherwise, a Response object is returned and captures
+    #   the status message and status code. In general, you can ignore the returned
+    #   result, though.
+    #
+    def track!(event, properties = {}, timeout = nil, path = nil, return_score = false, api_key = @api_key, return_action = false)
+
+      path, options = prepare_track_request(event, properties, timeout, path, return_score, api_key, return_action)
+
+      response = self.class.post(path, options)
+      Response.new(response.body, response.code, response.response)
     end
 
     # Retrieves a user's fraud score from the Sift Science API. This call
@@ -262,6 +289,30 @@ module Sift
           false
         end
       end
+    end
+
+    def prepare_track_request(event, properties = {}, timeout = nil, path = nil, return_score = false, api_key = @api_key, return_action = false)
+      warn "[WARNING] api_key cannot be empty, fallback to default api_key." if api_key.to_s.empty?
+      api_key ||= @api_key
+      raise("event must be a non-empty string") if (!event.is_a? String) || event.empty?
+      raise("properties cannot be empty") if properties.empty?
+      raise("Bad api_key parameter") if api_key.empty?
+      path ||= @path
+      timeout ||= @timeout
+
+      uri = URI.parse(API_ENDPOINT)
+      uri.query = URI.encode_www_form(URI.decode_www_form(uri.query.to_s) << ["return_score", "true"]) if return_score
+      uri.query = URI.encode_www_form(URI.decode_www_form(uri.query.to_s) << ["return_action", "true"]) if return_action
+      path = path + "?" + uri.query if !uri.query.to_s.empty?
+
+      options = {
+        :body => MultiJson.dump(delete_nils(properties).merge({"$type" => event,
+                                                               "$api_key" => api_key})),
+        :headers => {"User-Agent" => user_agent}
+      }
+      options.merge!(:timeout => timeout) unless timeout.nil?
+
+      [path, options]
     end
   end
 end

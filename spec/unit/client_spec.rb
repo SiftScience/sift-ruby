@@ -221,6 +221,20 @@ describe Sift::Client do
     expect(response.api_error_message).to eq("OK")
   end
 
+  it "allows errors to raise when calling 'track!' instead of 'track'" do
+    api_key = "foobar"
+    event = "$transaction"
+    properties = valid_transaction_properties
+
+    error = StandardError.new("Something went wrong")
+
+    stub_request(:any, /.*/).to_raise(error)
+
+    expect {
+      Sift::Client.new(api_key).track!(event, properties)
+    }.to raise_error(error)
+  end
+
   it "Successfully fetches a score" do
 
     api_key = "foobar"
