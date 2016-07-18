@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.name        = "sift"
   s.version     = Sift::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Fred Sadaghiani", "Yoav Schatzberg"]
+  s.authors     = ["Fred Sadaghiani", "Yoav Schatzberg", "Jacob Burnim"]
   s.email       = ["support@siftscience.com"]
   s.homepage    = "http://siftscience.com"
   s.summary     = %q{Sift Science Ruby API Gem}
@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
 
   # Gems that must be intalled for sift to compile and build
   s.add_development_dependency "rspec", ">=2.14.1"
-  s.add_development_dependency "webmock", ">= 1.16.0"
+  s.add_development_dependency "webmock", ">= 1.16.0", "< 2"
 
   # Gems that must be intalled for sift to work
   s.add_dependency "httparty", ">= 0.11.0"

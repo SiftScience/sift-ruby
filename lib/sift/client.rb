@@ -15,8 +15,9 @@ module Sift
 
     # Constructor
     #
-    # == Parameters:
-    # http_response
+    # ==== Parameters:
+    #
+    # http_response::
     #   The HTTP body text returned from the API call. The body is expected to be
     #   a JSON object that can be decoded into status, message and request
     #   sections.
@@ -37,10 +38,11 @@ module Sift
     # Helper method returns true if and only if the response from the API call was
     # successful
     #
-    # == Returns:
-    #   true on success; false otherwise
+    # ==== Returns:
+    #
+    # true on success; false otherwise
+    #
     def ok?
-
       if @http_raw_response.kind_of? Net::HTTPNoContent
         #if there is no content expected, use HTTP code
         204 == @http_status_code
@@ -51,14 +53,14 @@ module Sift
     end
 
 
-    # DEPRECIATED
-    # Getter method for depreciated 'json' member variable.
+    # DEPRECATED
+    # Getter method for deprecated 'json' member variable.
     def json
       @body
     end
 
-    # DEPRECIATED
-    # Getter method for depreciated 'original_request' member variable.
+    # DEPRECATED
+    # Getter method for deprecated 'original_request' member variable.
     def original_request
       @request
     end
@@ -67,29 +69,50 @@ module Sift
   # This class wraps accesses through the API
   #
   class Client
-    API_ENDPOINT = "https://api.siftscience.com"
-    API_TIMEOUT = 2
+    API_ENDPOINT = 'https://api.siftscience.com'
+    API3_ENDPOINT = 'https://api3.siftscience.com'
 
     include HTTParty
     base_uri API_ENDPOINT
 
+
     # Constructor
     #
-    # == Parameters:
-    # api_key
-    #   The Sift Science API key associated with your customer account. This parameter
-    #   cannot be nil or blank.
-    # path
-    #   The path to the event API, e.g., "/v201/events"
+    # ==== Parameters:
     #
-    def initialize(api_key = Sift.api_key, path = Sift.current_rest_api_path, timeout = API_TIMEOUT)
-      raise("api_key must be a non-empty string") if !api_key.is_a?(String) || api_key.empty?
-      raise("path must be a non-empty string") if !path.is_a?(String) || path.empty?
-      @api_key = api_key
-      @path = path
-      @timeout = timeout
+    # opts (optional)::
+    #   A Hash of optional parameters for this Client --
+    #
+    #   :api_key::
+    #     The Sift Science API key associated with your account.
+    #     Sift.api_key is used if this parameter is not set.
+    #
+    #   :account_id::
+    #     The ID of your Sift Science account.  Sift.account_id is
+    #     used if this parameter is not set.
+    #
+    #   :timeout::
+    #     The number of seconds to wait before failing a request. By
+    #     default this is configured to 2 seconds.
+    #
+    #   :version::
+    #     The version of the Events API, Score API, and Labels API to call.
+    #     By default, version 204.
+    #
+    #   :path::
+    #     The URL path to use for Events API path.  By default, the
+    #     official path of the specified-version of the Events API.
+    #
+    #
+    def initialize(opts = {})
+      @api_key = opts[:api_key] || Sift.api_key
+      @account_id = opts[:account_id] || Sift.account_id
+      @version = opts[:version] || API_VERSION
+      @timeout = opts[:timeout] || 2  # 2-second timeout by default
+      @path = opts[:path] || Sift.rest_api_path(@version)
 
-
+      raise("api_key must be a non-empty string") if !@api_key.is_a?(String) || @api_key.empty?
+      raise("path must be a non-empty string") if !@path.is_a?(String) || @path.empty?
     end
 
     def api_key
@@ -97,64 +120,95 @@ module Sift
     end
 
     def user_agent
-      "SiftScience/v#{API_VERSION} sift-ruby/#{VERSION}"
+      "SiftScience/v#{@version} sift-ruby/#{VERSION}"
     end
 
-    # Tracks an event and associated properties through the Sift Science API. This call
-    # is blocking.
+
+    # Sends an event to the Sift Science Events API.
     #
-    # == Parameters:
-    # event
-    #   The name of the event to send. This can be either a reserved event name, like
-    #   $transaction or $label or a custom event name (that does not start with a $).
-    #   This parameter must be specified.
+    # See https://siftscience.com/developers/docs/ruby/events-api .
     #
-    # properties
-    #   A hash of name-value pairs that specify the event-specific attributes to track.
-    #   This parameter must be specified.
+    # ==== Parameters:
     #
-    # timeout (optional)
-    #   The number of seconds to wait before failing the request. By default this is
-    #   configured to 2 seconds (see above). This parameter is optional.
+    # event::
+    #   The name of the event to send. This can be either a reserved
+    #   event name, like $transaction or $label or a custom event name
+    #   (that does not start with a $).  This parameter must be
+    #   specified.
     #
-    # path (optional)
-    #   Overrides the default API path with a different URL.
+    # properties::
+    #   A hash of name-value pairs that specify the event-specific
+    #   attributes to track.  This parameter must be specified.
     #
-    # return_score (optional)
-    #   Whether the API response should include a score for this user. The score will
-    #   be calculated using the submitted event.  This feature must be
-    #   enabled for your account in order to use it.  Please contact
-    #   support@siftscience.com if you are interested in using this feature.
+    # opts (optional)::
+    #   A Hash of optional parameters for the request --
     #
-    # return_action (optional)
-    #   Whether the API response should include an action triggered for this transaction.
+    #   :return_score::
+    #     If true, requests that the response include a score for this
+    #     user, computed using the submitted event.  See
+    #     https://siftscience.com/developers/docs/ruby/score-api/synchronous-scores
     #
-    # == Returns:
-    #   In the case of an HTTP error (timeout, broken connection, etc.), this
-    #   method returns nil; otherwise, a Response object is returned and captures
-    #   the status message and status code. In general, you can ignore the returned
-    #   result, though.
+    #   :abuse_types::
+    #     List of abuse types, specifying for which abuse types a
+    #     score should be returned (if scoring was requested).  By
+    #     default, a score is returned for every abuse type to which
+    #     you are subscribed.
     #
-    def track(event, properties = {}, timeout = nil, path = nil, return_score = false, api_key = @api_key, return_action = false)
-      warn "[WARNING] api_key cannot be empty, fallback to default api_key." if api_key.to_s.empty?
-      api_key ||= @api_key
+    #   :return_action::
+    #     If true, requests that the response include any actions
+    #     triggered as a result of the tracked event.
+    #
+    #   :return_workflow_status::
+    #     If true, requests that the response include the status of
+    #     any workflow run as a result of the tracked event.  See
+    #     https://siftscience.com/developers/docs/ruby/workflows-api/workflow-decisions
+    #
+    #   :timeout::
+    #     Overrides the timeout (in seconds) for this call.
+    #
+    #   :api_key::
+    #     Overrides the API key for this call.
+    #
+    #   :version::
+    #     Overrides the version of the Events API to call.
+    #
+    #   :path::
+    #     Overrides the URI path for this API call.
+    #
+    # ==== Returns:
+    #
+    # In the case of a connection error (timeout, broken connection,
+    # etc.), this method returns nil; otherwise, a Response object is
+    # returned that captures the status message and status code.
+    #
+    def track(event, properties = {}, opts = {})
+      api_key = opts[:api_key] || @api_key
+      version = opts[:version] || @version
+      path = opts[:path] || (version && Sift.rest_api_path(version)) || @path
+      timeout = opts[:timeout] || @timeout
+      return_score = opts[:return_score]
+      return_action = opts[:return_action]
+      return_workflow_status = opts[:return_workflow_status]
+      abuse_types = opts[:abuse_types]
+
       raise("event must be a non-empty string") if (!event.is_a? String) || event.empty?
       raise("properties cannot be empty") if properties.empty?
-      raise("Bad api_key parameter") if api_key.empty?
-      path ||= @path
-      timeout ||= @timeout
+      raise("api_key cannot be empty") if api_key.empty?
 
-      uri = URI.parse(API_ENDPOINT)      
-      uri.query = URI.encode_www_form(URI.decode_www_form(uri.query.to_s) << ["return_score", "true"]) if return_score
-      uri.query = URI.encode_www_form(URI.decode_www_form(uri.query.to_s) << ["return_action", "true"]) if return_action
-      path = path + "?" + uri.query if !uri.query.to_s.empty?
+      query = {}
+      query["return_score"] = "true" if return_score
+      query["return_action"] = "true" if return_action
+      query["return_workflow_status"] = "true" if return_workflow_status
+      query["abuse_types"] = abuse_types.join(",") if abuse_types
 
       options = {
         :body => MultiJson.dump(delete_nils(properties).merge({"$type" => event,
                                                                "$api_key" => api_key})),
-        :headers => {"User-Agent" => user_agent}
+        :headers => {"User-Agent" => user_agent},
+        :query => query
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
+
       begin
         response = self.class.post(path, options)
         Response.new(response.body, response.code, response.response)
@@ -165,91 +219,280 @@ module Sift
       end
     end
 
-    # Retrieves a user's fraud score from the Sift Science API. This call
-    # is blocking.
+
+    # Retrieves a user's fraud score from the Sift Science API.
     #
-    # == Parameters:
-    # user_id
+    # See https://siftscience.com/developers/docs/ruby/score-api/score-api .
+    #
+    # ==== Parameters:
+    #
+    # user_id::
     #   A user's id. This id should be the same as the user_id used in
     #   event calls.
     #
-    # == Returns:
-    #   A Response object is returned and captures the status message and
-    #   status code. In general, you can ignore the returned result, though.
+    # opts (optional)::
+    #   A Hash of optional parameters for the request --
     #
-    def score(user_id, timeout = nil, api_key = @api_key)
+    #   :abuse_types::
+    #     List of abuse types, specifying for which abuse types a
+    #     score should be returned.  By default, a score is returned
+    #     for every abuse type to which you are subscribed.
+    #
+    #   :api_key::
+    #     Overrides the API key for this call.
+    #
+    #   :timeout::
+    #     Overrides the timeout (in seconds) for this call.
+    #
+    #   :version::
+    #     Overrides the version of the Events API to call.
+    #
+    # ==== Returns:
+    #
+    # A Response object containing a status code, status message, and, if
+    # successful, the user's score(s).  Returns nil on a connection error
+    # (timeout, broken connection, etc.).
+    #
+    def score(user_id, opts = {})
+      abuse_types = opts[:abuse_types]
+      api_key = opts[:api_key] || @api_key
+      timeout = opts[:timeout] || @timeout
+      version = opts[:version] || @version
 
       raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
       raise("Bad api_key parameter") if api_key.empty?
-      timetout ||= @timeout
 
-      options = { :headers => {"User-Agent" => user_agent} }
+      query = {}
+      query["api_key"] = api_key
+      query["abuse_types"] = abuse_types.join(",") if abuse_types
+
+      options = {
+        :headers => {"User-Agent" => user_agent},
+        :query => query
+      }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = self.class.get("/v#{API_VERSION}/score/#{user_id}/?api_key=#{api_key}", options)
+      response = self.class.get(Sift.score_api_path(user_id, version), options)
       Response.new(response.body, response.code, response.response)
-
     end
 
-    # Labels a user as either good or bad. This call is blocking.
+
+    # Labels a user.
     #
-    # == Parameters:
-    # user_id
+    # See https://siftscience.com/developers/docs/ruby/labels-api/label-user .
+    #
+    # ==== Parameters:
+    #
+    # user_id::
     #   A user's id. This id should be the same as the user_id used in
     #   event calls.
     #
-    # properties
+    # properties::
     #   A hash of name-value pairs that specify the label attributes.
     #   This parameter must be specified.
     #
-    # timeout (optional)
-    #   The number of seconds to wait before failing the request. By default this is
-    #   configured to 2 seconds (see above). This parameter is optional.
+    # opts (optional)::
+    #   A Hash of optional parameters for the request --
     #
-    # == Returns:
-    #   A Response object is returned and captures the status message and
-    #   status code. In general, you can ignore the returned result, though.
+    #   :api_key::
+    #     Overrides the API key for this call.
     #
-    def label(user_id, properties = {}, timeout = nil, api_key = @api_key)
+    #   :timeout::
+    #     Overrides the timeout (in seconds) for this call.
+    #
+    #   :version::
+    #     Overrides the version of the Events API to call.
+    #
+    # ==== Returns:
+    #
+    # In the case of a connection error (timeout, broken connection,
+    # etc.), this method returns nil; otherwise, a Response object is
+    # returned that captures the status message and status code.
+    #
+    def label(user_id, properties = {}, opts = {})
+      api_key = opts[:api_key] || @api_key
+      timeout = opts[:timeout] || @timeout
+      version = opts[:version] || @version
+      path = Sift.users_label_api_path(user_id, version)
 
       raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
 
-      path = Sift.current_users_label_api_path(user_id)
-
-      # No return_action logic supported when using labels.
-      track("$label", delete_nils(properties), timeout, path, false, api_key, false)
+      track("$label", delete_nils(properties),
+            :path => path, :api_key => api_key, :timeout => timeout)
     end
 
-    # Unlabels a user.  This call is blocking.
+
+    # Unlabels a user.
     #
-    # == Parameters:
-    # user_id
+    # See https://siftscience.com/developers/docs/ruby/labels-api/unlabel-user .
+    #
+    # ==== Parameters:
+    #
+    # user_id::
     #   A user's id. This id should be the same as the user_id used in
     #   event calls.
     #
-    # timeout (optional)
-    #   The number of seconds to wait before failing the request. By default this is
-    #   configured to 2 seconds (see above). This parameter is optional.
+    # opts (optional)::
+    #   A Hash of optional parameters for this request --
     #
-    # == Returns:
-    #   A Response object is returned with only an http code of 204.
+    #   :abuse_type::
+    #     The abuse type for which the user should be unlabeled.  If
+    #     omitted, the user is unlabeled for all abuse types.
     #
-    def unlabel(user_id, timeout = nil)
+    #   :api_key::
+    #     Overrides the API key for this call.
+    #
+    #   :timeout::
+    #     Overrides the timeout (in seconds) for this call.
+    #
+    #   :version::
+    #     Overrides the version of the Events API to call.
+    #
+    # ==== Returns:
+    #
+    # A Response object is returned with only an http code of 204.
+    # Returns nil on a connection error (timeout, broken connection,
+    # etc.).
+    #
+    def unlabel(user_id, opts = {})
+      abuse_type = opts[:abuse_type]
+      api_key = opts[:api_key] || @api_key
+      timeout = opts[:timeout] || @timeout
+      version = opts[:version] || @version
 
       raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
-      timetout ||= @timeout
 
-      options = { :headers => {"User-Agent" => user_agent} }
+      query = {}
+      query[:api_key] = api_key
+      query[:abuse_type] = abuse_type if abuse_type
+
+      options = {
+        :headers => {},
+        :query => query
+      }
       options.merge!(:timeout => timeout) unless timeout.nil?
-      path = Sift.current_users_label_api_path(user_id)
-      response = self.class.delete(path + "?api_key=#{@api_key}", options)
+
+      response = self.class.delete(Sift.users_label_api_path(user_id, version), options)
       Response.new(response.body, response.code, response.response)
     end
 
+
+    # Gets the status of a workflow run.
+    #
+    # See https://siftscience.com/developers/docs/ruby/workflows-api/workflow-status .
+    #
+    # ==== Parameters
+    #
+    # run_id::
+    #   The ID of a workflow run.
+    #
+    # opts (optional)::
+    #   A Hash of optional parameters for this request --
+    #
+    #   :account_id::
+    #     Overrides the API key for this call.
+    #
+    #   :api_key::
+    #     Overrides the API key for this call.
+    #
+    #   :timeout::
+    #     Overrides the timeout (in seconds) for this call.
+    #
+    def get_workflow_status(run_id, opts = {})
+      account_id = opts[:account_id] || @account_id
+      api_key = opts[:api_key] || @api_key
+      timeout = opts[:timeout] || @timeout
+
+      options = {
+        :headers => { "User-Agent" => user_agent },
+        :basic_auth => { :username => api_key, :password => "" }
+      }
+      options.merge!(:timeout => timeout) unless timeout.nil?
+
+      uri = API3_ENDPOINT + Sift.workflow_status_path(account_id, run_id)
+      response = self.class.get(uri, options)
+      Response.new(response.body, response.code, response.response)
+    end
+
+
+    # Gets the decision status of a user.
+    #
+    # See https://siftscience.com/developers/docs/ruby/decisions-api/decision-status .
+    #
+    # ==== Parameters
+    #
+    # user_id::
+    #   The ID of user.
+    #
+    # opts (optional)::
+    #   A Hash of optional parameters for this request --
+    #
+    #   :account_id::
+    #     Overrides the API key for this call.
+    #
+    #   :api_key::
+    #     Overrides the API key for this call.
+    #
+    #   :timeout::
+    #     Overrides the timeout (in seconds) for this call.
+    #
+    def get_user_decisions(user_id, opts = {})
+      account_id = opts[:account_id] || @account_id
+      api_key = opts[:api_key] || @api_key
+      timeout = opts[:timeout] || @timeout
+
+      options = {
+        :headers => { "User-Agent" => user_agent },
+        :basic_auth => { :username => api_key, :password => "" }
+      }
+      options.merge!(:timeout => timeout) unless timeout.nil?
+
+      uri = API3_ENDPOINT + Sift.user_decisions_api_path(account_id, user_id)
+      response = self.class.get(uri, options)
+      Response.new(response.body, response.code, response.response)
+    end
+
+
+    # Gets the decision status of an order.
+    #
+    # See https://siftscience.com/developers/docs/ruby/decisions-api/decision-status .
+    #
+    # ==== Parameters
+    #
+    # order_id::
+    #   The ID of an order.
+    #
+    # opts (optional)::
+    #   A Hash of optional parameters for this request --
+    #
+    #   :account_id::
+    #     Overrides the API key for this call.
+    #
+    #   :api_key::
+    #     Overrides the API key for this call.
+    #
+    #   :timeout::
+    #     Overrides the timeout (in seconds) for this call.
+    #
+    def get_order_decisions(order_id, opts = {})
+      account_id = opts[:account_id] || @account_id
+      api_key = opts[:api_key] || @api_key
+      timeout = opts[:timeout] || @timeout
+
+      options = {
+        :headers => { "User-Agent" => user_agent },
+        :basic_auth => { :username => api_key, :password => "" }
+      }
+      options.merge!(:timeout => timeout) unless timeout.nil?
+
+      uri = API3_ENDPOINT + Sift.order_decisions_api_path(account_id, order_id)
+      response = self.class.get(uri, options)
+      Response.new(response.body, response.code, response.response)
+    end
+
+
     private
-    # def add_query_parameter(query_parameter)
-    #   uri = URI.parse(API_ENDPOINT)
-    # end
+
     def delete_nils(properties)
       properties.delete_if do |k, v|
         case v

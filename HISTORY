@@ -1,3 +1,10 @@
+=== 2.0.0.0 2016-07-19
+* adds support for v204 of Sift Science's APIs
+* adds Workflow Status API, User Decisions API, Order Decisions API
+* v204 APIs are now called by default -- this is an incompatible change
+  (use :version => 203 to call the previous API version)
+* uses Hash arg for optional params in Client methods -- incompatible change
+
 === 1.1.7.2 2015-04-13
 * Fixed backwards compatibility issue
 
