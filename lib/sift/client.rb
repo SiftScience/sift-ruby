@@ -249,9 +249,8 @@ module Sift
     #
     # ==== Returns:
     #
-    # A Response object containing a status code, status message, and, if
-    # successful, the user's score(s).  Returns nil on a connection error
-    # (timeout, broken connection, etc.).
+    # A Response object containing a status code, status message, and,
+    # if successful, the user's score(s).
     #
     def score(user_id, opts = {})
       abuse_types = opts[:abuse_types]
@@ -351,8 +350,6 @@ module Sift
     # ==== Returns:
     #
     # A Response object is returned with only an http code of 204.
-    # Returns nil on a connection error (timeout, broken connection,
-    # etc.).
     #
     def unlabel(user_id, opts = {})
       abuse_type = opts[:abuse_type]
