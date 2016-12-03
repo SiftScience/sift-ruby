@@ -1,5 +1,6 @@
 require 'httparty'
 require 'multi_json'
+require "sift/client/decision"
 
 module Sift
 

@@ -1,4 +1,5 @@
-require File.expand_path(File.join(File.dirname(__FILE__), "..", "spec_helper"))
+require_relative "../spec_helper"
+require "sift"
 
 describe Sift::Client do
 

@@ -1,6 +1,6 @@
+$LOAD_PATH << Dir.pwd
 
 require "bundler/setup"
-require "sift"
 require "webmock/rspec"
 
 # Setup Fakeweb

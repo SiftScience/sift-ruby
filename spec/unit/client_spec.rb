@@ -1,4 +1,5 @@
-require File.expand_path(File.join(File.dirname(__FILE__), "..", "spec_helper"))
+require_relative "../spec_helper"
+require "sift"
 
 describe Sift::Client do
 
@@ -104,7 +105,6 @@ describe Sift::Client do
 
 
   it "Cannot instantiate client with empty, non-string, or blank path" do
-    api_key = "test_local_api_key"
     expect(lambda { Sift::Client.new(:path => "") }).to raise_error(StandardError)
     expect(lambda { Sift::Client.new(:path => 123456) }).to raise_error(StandardError)
   end
@@ -373,7 +373,7 @@ describe Sift::Client do
     response = client.get_user_decisions("example_user")
 
     expect(response.ok?).to eq(true)
-    expect(response.body["decisions"]["content_abuse"]["decision"]["id"]).to eq("user_decision")    
+    expect(response.body["decisions"]["content_abuse"]["decision"]["id"]).to eq("user_decision")
   end
 
 
