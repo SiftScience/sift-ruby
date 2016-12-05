@@ -1,5 +1,9 @@
 module Sift
-  class ApiError < RuntimeError
+  # Top level Error
+  class Error < StandardError
+  end
+
+  class ApiError < Error
     attr_reader :response
 
     def initialize(message, response)
@@ -7,4 +11,11 @@ module Sift
       @response = response
     end
   end
+
+  class InvalidArgument < Error
+  end
+
+  class ValidationError < Error
+  end
+
 end
