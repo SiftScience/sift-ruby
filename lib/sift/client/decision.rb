@@ -1,18 +1,36 @@
-require "sift/router"
+require_relative "../router"
 
 module Sift
   class Client
     class Decision
-      DECISION_ATTRIBUTES = %w{ id name }
-      def self.index(api_key, account_id, options = {})
-        response = Router.decisions_index(api_key, account_id, options)
+      DECISION_ATTRIBUTES = %w{
+        id
+        name
+        description
+        entity_type
+        abuse_type
+        category
+        webhook_url
+        created_at
+        created_by
+        updated_at
+        updated_by
+       }
+
+      def self.list(api_key, account_id, options = {})
+        path = "#{index_path(account_id)}?api_key=#{api_key}"
+        response = Router.get(path)
 
         response.body["data"].map do |raw_decision|
           new(api_key, account_id, raw_decision)
         end
       end
 
-      attr_reader :account_id, :api_key
+      def self.index_path(account_id)
+        "#{Router::API3_ENDPOINT}/v3/accounts/#{account_id}/decisions"
+      end
+
+      attr_reader :account_id, :api_key, :raw
 
       def initialize(api_key, account_id, raw = {})
         @raw = raw
@@ -28,20 +46,21 @@ module Sift
         }
       end
 
-      # should have a bang method which raises and error instead of returning
-      # false
       def apply_to(configs = {})
-        if configs.has_key?(:order_id)
-          apply_to_order(configs)
-        else
-          apply_to_user(configs)
-        end
+        user_id = configs.delete(:user_id)
+        Router.post(apply_to_user_path(user_id), {
+          body: configs.merge(decision_id: id)
+        })
       end
 
-      def apply_to_order(configs)
+      private
+
+      def apply_to_user_path(user_id)
+        "#{self.class.index_path(account_id)}/users/#{user_id}"
       end
 
-      def apply_to_user(configs)
+      def apply_to_order_path(user_id, order_id)
+        "#{apply_to_user_path(user_id)}/orders/#{order_id}"
       end
     end
   end

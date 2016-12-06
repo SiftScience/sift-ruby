@@ -1,4 +1,4 @@
-require "sift/validate/primitive"
+require_relative "primitive"
 
 module Sift
   module Validate

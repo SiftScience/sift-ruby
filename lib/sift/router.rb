@@ -1,6 +1,6 @@
-require "sift/version"
-require "sift/client"
-require "sift/errors"
+require_relative "./version"
+require_relative "./client"
+require_relative "./errors"
 
 module Sift
   class Router
@@ -10,20 +10,18 @@ module Sift
     API3_ENDPOINT = 'https://api3.siftscience.com'
 
     class << self
-      def decisions_index(account_id, options = {})
-        path = decisions_path(account_id)
-        handle_response(get(path, options))
+      def get(path, options = {})
+        serialize_body(options)
+        handle_response(super(path, options))
       end
 
-      def apply_decision_to_order(api_key, account_id, options = {})
-        path = "#{API3_ENDPOINT}/v3/customers/#{account_id}/decisions"
-        options[:query] ||= {}
-        options[:query][:api_key] = api_key
-        post(path, options)
+      def post(path, options = {})
+        serialize_body(options)
+        handle_response(super(path, options))
       end
 
-      def decisions_path(account_id)
-        "#{API3_ENDPOINT}/v3/customers/#{account_id}/decisions"
+      def serialize_body(options)
+        options[:body] = MultiJson.dump(options[:body]) if options[:body]
       end
 
       def handle_response(response)
