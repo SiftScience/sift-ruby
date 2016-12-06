@@ -12,10 +12,10 @@ module Sift
 
         it "will return an error message" do
           [nil, 1, /asdfasdf/].each do |value|
-            expect(Primitive.non_empty_string(value)).to(
-              eq(Primitive::ERROR_MESSAGES[:non_empty_string]),
-              "#{value} is a valid non-empty string"
-            )
+            error_message = "#{Primitive::ERROR_MESSAGES[:non_empty_string]}" \
+                            ", got #{value.class}"
+
+            expect(Primitive.non_empty_string(value)).to eq(error_message)
           end
 
           expect(Primitive.non_empty_string("")).to(

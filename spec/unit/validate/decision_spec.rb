@@ -47,17 +47,19 @@ module Sift
         end
       end
 
-      describe "#errors" do
-        it "will return a hash describing the validation errors" do
+      describe "#error_messages" do
+        it "will return an array of error messages" do
           validator = Decision.new
 
-          error_message = "#{Primitive::ERROR_MESSAGES[:string_or_number]}, got NilClass"
+          error_message =
+            "#{Primitive::ERROR_MESSAGES[:non_empty_string]}, got NilClass"
 
           validator.valid_order?
-          expect(validator.errors).to eq({
-            order_id: ["order_id #{error_message}"],
-            user_id: ["user_id #{error_message}"]
-          })
+
+          expect(validator.error_messages).to contain_exactly(
+            "order_id #{error_message}",
+            "user_id #{error_message}"
+          )
         end
       end
     end

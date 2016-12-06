@@ -14,8 +14,4 @@ module Sift
 
   class InvalidArgument < Error
   end
-
-  class ValidationError < Error
-  end
-
 end

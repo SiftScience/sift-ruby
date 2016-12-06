@@ -10,7 +10,7 @@ module Sift
       class << self
         def non_empty_string(value)
           if !value.is_a?(String)
-            ERROR_MESSAGES[:non_empty_string]
+            "#{ERROR_MESSAGES[:non_empty_string]}, got #{value.class}"
           elsif value.empty?
             empty_string_message(:non_empty_string)
           end

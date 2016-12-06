@@ -3,40 +3,46 @@ require_relative "primitive"
 module Sift
   module Validate
     class Decision
-      attr_reader :configs, :errors
+      attr_reader :configs, :error_messages
 
       def initialize(configs = {})
         @configs = configs
       end
 
-      def valid_user?
-        clear_errors!
-        validate_key_string_or_number(:user_id)
-        errors.empty?
+      def valid_order?
+        run do
+          validate_key(:non_empty_string, :user_id, :order_id)
+        end
       end
 
-      def valid_order?
-        clear_errors!
-        validate_key_string_or_number(:user_id, :order_id)
-        errors.empty?
+      def valid_user?
+        run do
+          validate_key(:non_empty_string, :user_id)
+        end
       end
 
       private
+
+      def run
+        clear_errors!
+        yield
+        error_messages.empty?
+      end
 
       def validate_primitive
         Validate::Primitive
       end
 
-      def validate_key_string_or_number(*keys)
+      def validate_key(type, *keys)
         keys.each do |key|
-          if error_message = validate_primitive.string_or_number(configs[key])
-            errors[key] << "#{key} #{error_message}"
+          if error_message = validate_primitive.public_send(type, configs[key])
+            error_messages << "#{key} #{error_message}"
           end
         end
       end
 
       def clear_errors!
-        @errors = Hash.new { |h, k| h[k] = [] }
+        @error_messages = []
       end
     end
   end

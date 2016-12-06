@@ -59,8 +59,11 @@ module Sift
       end
 
       describe ".apply_to" do
+        let (:decision) {
+          Decision.new(api_key, account_id, { "id" => "block_user" })
+        }
+
         it "will apply a decision to an user" do
-          decision_id = "block_user"
           user_id = "bad_user"
 
           body = {
@@ -74,10 +77,8 @@ module Sift
             "error_message" => "OK"
           }
 
-          decision = Decision.new(api_key, account_id, { "id" => decision_id })
-
           stub_request(:post, decision.send(:apply_to_user_path, user_id))
-            .with(body: MultiJson.dump(body.merge(decision_id: decision_id)))
+            .with(body: MultiJson.dump(body.merge(decision_id: decision.id)))
             .to_return({
               body: MultiJson.dump(raw_response)
             })
@@ -87,6 +88,48 @@ module Sift
           }))
 
           expect(response.body).to eq(raw_response)
+        end
+
+        context "invalid configs" do
+          it "will throw an error with an invalid user_id" do
+            expect { decision.apply_to }.to raise_error(InvalidArgument)
+
+            expect { decision.apply_to(user_id: /asdfas/) }
+              .to raise_error(InvalidArgument)
+
+            expect { decision.apply_to(user_id: 14) }
+              .to raise_error(InvalidArgument)
+          end
+
+          it "will throw an error without an order_id" do
+            expect { decision.apply_to(user_id: "asdfasdf", order_id: nil) }
+              .to raise_error(InvalidArgument)
+          end
+
+          it "source is manual and analyst is null, will throw" do
+            error_message = "analyst cannot be null"
+            user_id = "bad_user"
+
+            stub_request(:post, decision.send(:apply_to_user_path, user_id))
+              .to_return({
+                body: MultiJson.dump({
+                  status: 100,
+                  error_message: error_message
+                })
+              })
+
+            expect { decision.apply_to(
+              user_id: user_id,
+              source: "manual"
+            )}.to raise_error(InvalidArgument)
+
+            begin
+              decision.apply_to(user_id: user_id, source: "manual")
+            rescue InvalidArgument => e
+              e.message
+            end
+
+          end
         end
       end
     end
