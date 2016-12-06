@@ -4,20 +4,32 @@ require "sift/router"
 
 module Sift
   describe Router do
-    describe "#handle_response" do
-      it "raises an error when response is a non 200" do
-        fake_response = double(code: 300)
+    let(:path) { "https://example.com" }
+    let(:body) { { question: "Do you wanna go ball?" } }
 
-        expect {
-          Router.handle_response(fake_response)
-        }.to raise_error(ApiError)
+    describe ".get" do
+      it "with a successful request will return a response object" do
+        stub_request(:get, path)
+          .with(body: MultiJson.dump(body))
+          .to_return(body: MultiJson.dump({ cool: true }))
 
-        begin
-          Router.handle_response(fake_response)
-        rescue ApiError => e
-          expect(e.response).to eq(fake_response)
-        end
+        response = Router.get(path, { body: body })
+
+        expect(response.ok?).to be(true)
+        expect(response.body["cool"]).to be(true)
       end
+
+      it "with an unsuccessful request will return a response object" do
+        stub_request(:get, path)
+          .with(body: MultiJson.dump(body))
+          .to_return(body: MultiJson.dump({ cool: false}), status: 403)
+
+        response = Router.get(path, { body: body })
+
+        expect(response.ok?).to be(false)
+        expect(response.body["cool"]).to be(false)
+      end
+
     end
   end
 end

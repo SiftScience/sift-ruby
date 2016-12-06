@@ -10,30 +10,31 @@ module Sift
     describe Decision do
       let(:api_key) { "test_api_key" }
       let(:account_id) { "test_account_id" }
+      let(:decision) { Decision.new(api_key, account_id) }
 
       describe "#list" do
-        it "will return a list of the customer's decisions" do
+        it "will return a response object that is ok" do
           stub_request(
             :get,
             "#{Decision.index_path(account_id)}?api_key=#{api_key}"
           ).to_return(body: MultiJson.dump(FakeDecisions.index))
 
-          result = Decision.list(api_key, account_id)
+          response = decision.list
 
-          expect(result.map(&:id)).to match_array(
-            FakeDecisions.index[:data].map { |raw_decision| raw_decision[:id] }
-          )
+          expect(response.ok?).to be(true)
+          expect(response.body["data"]).to contain_exactly(*FakeDecisions.index[:data])
         end
 
-        it "will raise error if response comes back a non 200" do
+        it "with an unsuccessful response will return a response object" do
           stub_request(
             :get,
             "#{Decision.index_path(account_id)}?api_key=#{api_key}"
-          ).to_return(status: 404)
+          ).to_return(status: 404, body: "{}")
 
-          expect { Decision.list(api_key, account_id) }.to(
-            raise_error(Sift::ApiError)
-          )
+          response = decision.list
+
+          expect(response.ok?).to be(false)
+          expect(response.http_status_code).to be(404)
         end
       end
 
@@ -59,6 +60,14 @@ module Sift
       end
 
       describe ".apply_to" do
+        context "when successful" do
+          it "will a hash with the response from server" do
+
+          end
+        end
+      end
+
+      describe ".apply_to!" do
         let (:decision) {
           Decision.new(api_key, account_id, { "id" => "block_user" })
         }
@@ -77,13 +86,15 @@ module Sift
             "error_message" => "OK"
           }
 
-          stub_request(:post, decision.send(:apply_to_user_path, user_id))
+          path = decision.send(:apply_to_user_path, user_id)
+
+          stub_request(:post, decision.send(:append_api_key, path))
             .with(body: MultiJson.dump(body.merge(decision_id: decision.id)))
             .to_return({
               body: MultiJson.dump(raw_response)
             })
 
-          response = decision.apply_to(body.merge({
+          response = decision.apply_to!(body.merge({
             user_id: user_id,
           }))
 
@@ -92,43 +103,28 @@ module Sift
 
         context "invalid configs" do
           it "will throw an error with an invalid user_id" do
-            expect { decision.apply_to }.to raise_error(InvalidArgument)
+            expect { decision.apply_to! }.to raise_error(InvalidArgument)
 
-            expect { decision.apply_to(user_id: /asdfas/) }
+            expect { decision.apply_to!(user_id: /asdfas/) }
               .to raise_error(InvalidArgument)
 
-            expect { decision.apply_to(user_id: 14) }
+            expect { decision.apply_to!(user_id: 14) }
               .to raise_error(InvalidArgument)
           end
 
           it "will throw an error without an order_id" do
-            expect { decision.apply_to(user_id: "asdfasdf", order_id: nil) }
+            error_message = "order_id " +
+              "#{Validate::Primitive::ERROR_MESSAGES[:non_empty_string]}," +
+              " got NilClass"
+
+            expect { decision.apply_to!(user_id: "asdfasdf", order_id: nil) }
               .to raise_error(InvalidArgument)
-          end
-
-          it "source is manual and analyst is null, will throw" do
-            error_message = "analyst cannot be null"
-            user_id = "bad_user"
-
-            stub_request(:post, decision.send(:apply_to_user_path, user_id))
-              .to_return({
-                body: MultiJson.dump({
-                  status: 100,
-                  error_message: error_message
-                })
-              })
-
-            expect { decision.apply_to(
-              user_id: user_id,
-              source: "manual"
-            )}.to raise_error(InvalidArgument)
 
             begin
-              decision.apply_to(user_id: user_id, source: "manual")
+              decision.apply_to!(user_id: "asdfasdf", order_id: nil)
             rescue InvalidArgument => e
-              e.message
+              expect(e.message).to eq(error_message)
             end
-
           end
         end
       end

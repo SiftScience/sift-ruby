@@ -34,12 +34,21 @@ module Sift
           "#{url_escape(account_id)}/decisions"
       end
 
+      def self.url_escape(value)
+        CGI.escape(value)
+      end
+
       attr_reader :account_id, :api_key, :raw
 
       def initialize(api_key, account_id, raw = {})
         @raw = raw
         @account_id = account_id
         @api_key = api_key
+      end
+
+      def list
+        path = append_api_key(index_path)
+        Router.get(path)
       end
 
       DECISION_ATTRIBUTES.each do |attribute|
@@ -50,7 +59,11 @@ module Sift
         }
       end
 
-      def apply_to(configs = {})
+      def apply_to(configs)
+
+      end
+
+      def apply_to!(configs = {})
         if configs.has_key?(:order_id)
           validate!(:order, configs)
           apply_to_order(configs)
@@ -61,6 +74,11 @@ module Sift
       end
 
       private
+
+      def index_path
+        "#{Router::API3_ENDPOINT}/v3/accounts/" +
+          "#{url_escape(account_id)}/decisions"
+      end
 
       def apply_to_user_path(user_id)
         "#{self.class.index_path(account_id)}/users/#{url_escape(user_id)}"
@@ -105,12 +123,12 @@ module Sift
         end
       end
 
-      def url_escape(value)
-        CGI.escape(value)
-      end
-
       def append_api_key(path)
         "#{path}?api_key=#{api_key}"
+      end
+
+      def url_escape(value)
+        self.class.url_escape(value)
       end
     end
   end

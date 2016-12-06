@@ -12,28 +12,24 @@ module Sift
     class << self
       def get(path, options = {})
         serialize_body(options)
-        handle_response(super(path, options))
+        wrap_response(super(path, options))
       end
 
       def post(path, options = {})
         serialize_body(options)
-        handle_response(super(path, options))
+        wrap_response(super(path, options))
       end
 
       def serialize_body(options)
         options[:body] = MultiJson.dump(options[:body]) if options[:body]
       end
 
-      def handle_response(response)
-        if (200..299).cover?(response.code)
-          Response.new(
-            response.body,
-            response.code,
-            response.response
-          )
-        else
-          raise ApiError.new("Response came back with a non 200", response)
-        end
+      def wrap_response(response)
+        Response.new(
+          response.body,
+          response.code,
+          response.response
+        )
       end
     end
 
