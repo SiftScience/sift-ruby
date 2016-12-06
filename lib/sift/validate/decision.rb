@@ -35,7 +35,7 @@ module Sift
 
       def validate_key(type, *keys)
         keys.each do |key|
-          if error_message = validate_primitive.public_send(type, configs[key])
+          if error_message = validate_primitive.public_send(type, get(key))
             error_messages << "#{key} #{error_message}"
           end
         end
@@ -43,6 +43,10 @@ module Sift
 
       def clear_errors!
         @error_messages = []
+      end
+
+      def get(key)
+        configs[key] || configs[key.to_s]
       end
     end
   end
