@@ -1,5 +1,4 @@
-# Sift Science Ruby bindings [![Build
-Status](https://travis-ci.org/SiftScience/sift-ruby.png?branch=master)](https://travis-ci.org/SiftScience/sift-ruby)
+# Sift Science Ruby bindings [![Build Status](https://travis-ci.org/SiftScience/sift-ruby.png?branch=master)](https://travis-ci.org/SiftScience/sift-ruby)
 
 ## Requirements
 
@@ -33,8 +32,7 @@ client = Sift::Client.new()
 
 ##### OR
 
-client = Sift::Cient.new(api_key: '<your_api_key_here>', account_id:
-'<your_account_id_here>'
+client = Sift::Cient.new(api_key: '<your_api_key_here>', account_id: '<your_account_id_here>'
 
 ```
 
@@ -43,23 +41,22 @@ client = Sift::Cient.new(api_key: '<your_api_key_here>', account_id:
 ```
 event = "$transaction"
 
-user_id = "23056"  # User ID's may only contain a-z, A-Z, 0-9, =, ., -, _, +, @,
-:, &, ^, %, !, $
+user_id = "23056"  # User ID's may only contain a-z, A-Z, 0-9, =, ., -, _, +, @, :, &, ^, %, !, $
 
 properties = {
-   "$user_id" => user_id,
-     "$user_email" => "buyer@gmail.com",
-       "$seller_user_id" => "2371",
-         "seller_user_email" => "seller@gmail.com",
-           "$transaction_id" => "573050",
-             "$payment_method" => {
-                   "$payment_type"    => "$credit_card",
-                       "$payment_gateway" => "$braintree",
-                           "$card_bin"        => "542486",
-                               "$card_last4"      => "4444"
-                                 },
-                                   "$currency_code" => "USD",
-                                     "$amount" => 15230000,
+ "$user_id" => user_id,
+  "$user_email" => "buyer@gmail.com",
+  "$seller_user_id" => "2371",
+  "seller_user_email" => "seller@gmail.com",
+  "$transaction_id" => "573050",
+  "$payment_method" => {
+    "$payment_type"    => "$credit_card",
+    "$payment_gateway" => "$braintree",
+    "$card_bin"        => "542486",
+    "$card_last4"      => "4444"
+  },
+  "$currency_code" => "USD",
+  "$amount" => 15230000,
 }
 
 response = client.track(event, properties)
@@ -76,8 +73,7 @@ response = client.score(user_id)
 
 ### Decisions
 
-To learn more about the decisions endpoint visit [developer
-docs](https://siftscience.com/developers/docs/curl/apis-overview).
+To learn more about the decisions endpoint visit [developer docs](https://siftscience.com/developers/docs/curl/apis-overview).
 
 
 ```
@@ -85,32 +81,31 @@ docs](https://siftscience.com/developers/docs/curl/apis-overview).
 response = client.decisions
 
 # Check that response is okay.
-raise "Unable to fetch decisions #{response.api_error_message}" unless
-response.ok?
+raise "Unable to fetch decisions #{response.api_error_message}" unless response.ok?
 
 # find a decisions with the id "block_bad_user"
 user_decision = response.body["data"].find do |decision|
   decision["id"] == "block_bad_user"
-  end
+end
 
 # apply decision to a user
 client.apply_decision_to(user_decision, {
-    source: "manual",
-      analyst: "bob@your_company.com",
-        user_id: "john@example.com"
+  source: "manual",
+  analyst: "bob@your_company.com",
+  user_id: "john@example.com"
 })
 
 # find a decisions with the id "block_bad_order"
 order_decision = response.body["data"].find do |decision|
   decision["id"] == "block_bad_order"
-  end
+end
 
 # apply decision to "bob@example.com"'s order
 client.apply_decision_to(user_decision, {
-    source: "manual",
-      analyst: "bob@your_company.com",
-        user_id: "john@example.com",
-          order_id: "ORDER_1234"
+  source: "manual",
+  analyst: "bob@your_company.com",
+  user_id: "john@example.com",
+  order_id: "ORDER_1234"
 })
 ```
 
@@ -119,11 +114,11 @@ client.apply_decision_to(user_decision, {
 ```
 # Label the user with user_id 23056 as Bad with all optional fields
 response = client.label(user_id, {
-    "$is_bad" => true,
-      "$abuse_type" => "payment_abuse",
-        "$description" => "Chargeback issued",
-          "$source" => "Manual Review",
-            "$analyst" => "analyst.name@your_domain.com"
+  "$is_bad" => true,
+  "$abuse_type" => "payment_abuse",
+  "$description" => "Chargeback issued",
+  "$source" => "Manual Review",
+  "$analyst" => "analyst.name@your_domain.com"
 })
 
 # Get the status of a workflow run
