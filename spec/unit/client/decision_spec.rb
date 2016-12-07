@@ -22,7 +22,8 @@ module Sift
           response = decision.list
 
           expect(response.ok?).to be(true)
-          expect(response.body["data"]).to contain_exactly(*FakeDecisions.index[:data])
+          expect(response.body["data"])
+            .to contain_exactly(*FakeDecisions.index[:data])
         end
 
         it "with an unsuccessful response will return a response object" do

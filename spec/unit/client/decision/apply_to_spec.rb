@@ -127,8 +127,39 @@ module Sift
               expect(response.body).to eq(response_body)
             end
           end
-
         end
+
+        describe "private#path" do
+          it "will construct the right path given the configs" do
+            user_id = "bad_user@example.com"
+            order_id = "ORDER_1235"
+
+            applier = ApplyTo.new(decision_id, {
+              user_id: user_id,
+              decision: decision
+            })
+
+            path = Router::API3_ENDPOINT +
+              "/v3/accounts/#{decision.account_id}/decisions/users/" +
+              "#{CGI.escape(user_id)}?api_key=#{decision.api_key}"
+
+            expect(applier.send(:path)).to eq(path)
+
+            applier = ApplyTo.new(decision_id, {
+              user_id: user_id,
+              decision: decision,
+              order_id: order_id
+            })
+
+            path = Router::API3_ENDPOINT +
+              "/v3/accounts/#{decision.account_id}/decisions/users/" +
+              "#{CGI.escape(user_id)}/orders/#{CGI.escape(order_id)}" +
+              "?api_key=#{decision.api_key}"
+
+            expect(applier.send(:path)).to eq(path)
+          end
+        end
+
       end
     end
   end

@@ -75,13 +75,13 @@ module Sift
           path = if applying_to_order?
             "#{user_path}/orders/#{CGI.escape(order_id)}"
           else
-            users_path
+            user_path
           end
 
           append_api_key(path)
         end
 
-        def users_path
+        def user_path
           "#{decision.index_path}/users/#{CGI.escape(user_id)}"
         end
 
