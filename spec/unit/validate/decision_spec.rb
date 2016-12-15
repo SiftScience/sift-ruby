@@ -7,6 +7,24 @@ module Sift
     describe Decision do
       describe "#valid_user?" do
         it "will return true" do
+          validator = Decision.new(
+            user_id: "hello world",
+            source: :hello_world,
+            analyst: "asdfsadf@heyo.com"
+          )
+
+          expect(validator.valid_user?).to be(true)
+        end
+
+        it "with invalid user_id, will return false" do
+          validator = Decision.new(order_id: "asfasdf")
+          expect(validator.valid_user?).to be(false), "nil user is valid"
+
+          validator = Decision.new(order_id: "asfasdf", user_id: {})
+          expect(validator.valid_user?).to be(false), "user hash is valid"
+
+          validator = Decision.new(order_id: "asfasdf", user_id: /werwer/)
+          expect(validator.valid_user?).to be(false), "regex user is valid"
         end
       end
 
