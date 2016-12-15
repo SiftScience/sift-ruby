@@ -1,6 +1,5 @@
 require_relative "./version"
 require_relative "./client"
-require_relative "./errors"
 
 module Sift
   class Router
