@@ -8,6 +8,7 @@ module Sift
       describe ApplyTo do
         let(:decision_id) { "block_it" }
         let(:decision) { Decision.new("api_key", "account_id") }
+        let(:append_api_key) { ->(path) { "#{path}?api_key=#{decision.api_key}" } }
 
         describe "attributes" do
           ApplyTo::PROPERTIES.each do |attribute|
@@ -53,7 +54,7 @@ module Sift
               "error_message" => "OK"
             }
 
-            stub_request(:post, applier.send(:path))
+            stub_request(:post, append_api_key.call(applier.send(:path)))
               .with(body: request_body)
               .to_return(body: MultiJson.dump(response_body))
 
@@ -117,7 +118,7 @@ module Sift
                 "error_message" => "Required field(s) not specified: analyst"
               }
 
-              stub_request(:post, applier.send(:path))
+              stub_request(:post, append_api_key.call(applier.send(:path)))
                 .with(body: request_body)
                 .to_return(body: MultiJson.dump(response_body))
 
@@ -141,7 +142,7 @@ module Sift
 
             path = Router::API3_ENDPOINT +
               "/v3/accounts/#{decision.account_id}/decisions/users/" +
-              "#{CGI.escape(user_id)}?api_key=#{decision.api_key}"
+              "#{CGI.escape(user_id)}"
 
             expect(applier.send(:path)).to eq(path)
 
@@ -153,8 +154,7 @@ module Sift
 
             path = Router::API3_ENDPOINT +
               "/v3/accounts/#{decision.account_id}/decisions/users/" +
-              "#{CGI.escape(user_id)}/orders/#{CGI.escape(order_id)}" +
-              "?api_key=#{decision.api_key}"
+              "#{CGI.escape(user_id)}/orders/#{CGI.escape(order_id)}"
 
             expect(applier.send(:path)).to eq(path)
           end

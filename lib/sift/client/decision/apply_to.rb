@@ -10,12 +10,12 @@ module Sift
       class ApplyTo
         PROPERTIES = %w{ source analyst description order_id user_id decision }
 
-        attr_reader :decision_id, :configs
+        attr_reader :decision_id, :configs, :getter
 
         PROPERTIES.each do |attribute|
           class_eval %{
             def #{attribute}
-              configs["#{attribute}"] || configs[:#{attribute}]
+              getter.get(:#{attribute})
             end
           }
         end
@@ -23,6 +23,7 @@ module Sift
         def initialize(decision_id, configs)
           @decision_id = decision_id
           @configs = configs
+          @getter = Utils::HashGetter.new(configs)
         end
 
         def run
@@ -43,7 +44,10 @@ module Sift
         private
 
         def send_request
-          Router.post(path, { body: request_body })
+          Router.post(path, {
+            body: request_body,
+            query: query_param
+          })
         end
 
         def request_body
@@ -53,6 +57,10 @@ module Sift
             analyst: analyst,
             decision_id: decision_id
           }
+        end
+
+        def query_param
+          { api_key: decision.api_key }
         end
 
         def errors
@@ -72,21 +80,15 @@ module Sift
         end
 
         def path
-          path = if applying_to_order?
+          if applying_to_order?
             "#{user_path}/orders/#{CGI.escape(order_id)}"
           else
             user_path
           end
-
-          append_api_key(path)
         end
 
         def user_path
           "#{decision.index_path}/users/#{CGI.escape(user_id)}"
-        end
-
-        def append_api_key(path)
-          decision.append_api_key(path)
         end
       end
     end

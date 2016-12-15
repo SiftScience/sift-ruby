@@ -2,11 +2,14 @@ require "cgi"
 
 require_relative "../router"
 require_relative "../validate/decision"
+require_relative "../utils/hash_getter"
 require_relative "./decision/apply_to"
 
 module Sift
   class Client
     class Decision
+      FILTER_PARAMS = %w{ limit entity_type abuse_types }
+
       attr_reader :account_id, :api_key, :raw
 
       def initialize(api_key, account_id, raw = {})
@@ -15,9 +18,24 @@ module Sift
         @api_key = api_key
       end
 
-      def list
-        path = append_api_key(index_path)
-        Router.get(path)
+      def list(options = {})
+        getter = Utils::HashGetter.new(options)
+
+        if path = getter.get(:next_ref)
+          request_next_page(path)
+        else
+          Router.get(index_path, query: build_query(getter))
+        end
+      end
+
+      def build_query(getter)
+        FILTER_PARAMS.inject({ api_key: api_key }) do |result, filter|
+          if value = getter.get(filter)
+            result[filter] = value.is_a?(Array) ? value.join(",") : value
+          end
+
+          result
+        end
       end
 
       def apply_to(decision_id, configs)
@@ -29,8 +47,10 @@ module Sift
           "#{CGI.escape(account_id)}/decisions"
       end
 
-      def append_api_key(path)
-         "#{path}?api_key=#{api_key}"
+      private
+
+      def request_next_page(path)
+        Router.get(path, query: build_query(Utils::HashGetter.new({})))
       end
     end
   end
