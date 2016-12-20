@@ -50,14 +50,15 @@ module Sift
         end
 
         it "will ignore query params if passed in" do
-          stub_request(:get, decision_index_path)
+          index_path = "#{decision.index_path}?limit=10"
+          stub_request(:get, "#{index_path}&api_key=#{api_key}")
             .to_return(body: MultiJson.dump(FakeDecisions.index))
 
           response = decision.list({
             limit: 10,
             entity_type: "user",
             abuse_types: %w{promo_abuse content_abuse},
-            next_ref: decision_index_path
+            next_ref: index_path
           })
 
           expect(response.ok?).to be(true)

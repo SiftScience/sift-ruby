@@ -488,8 +488,38 @@ module Sift
       Response.new(response.body, response.code, response.response)
     end
 
+    def decisions(opts = {})
+      decision_instance(opts).list(opts)
+    end
+
+    def decisions!(opts = {})
+      handle_response(decisions(opts))
+    end
+
+    def apply_decision(configs = {})
+      decision_instance(configs).apply_to(configs)
+    end
+
+    def apply_decision!(configs = {})
+      handle_response(apply_decision(configs))
+    end
 
     private
+
+    def handle_response(response)
+      if response.ok?
+        response.body
+      else
+        raise ApiError.new(response.api_error_message, response)
+      end
+    end
+
+    def decision_instance(opts = {})
+      account_id = opts[:account_id] || @account_id
+      api_key = opts[:api_key] || @api_key
+
+      Decision.new(api_key, account_id)
+    end
 
     def delete_nils(properties)
       properties.delete_if do |k, v|

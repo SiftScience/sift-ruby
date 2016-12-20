@@ -8,12 +8,11 @@ require_relative "./decision/apply_to"
 module Sift
   class Client
     class Decision
-      FILTER_PARAMS = %w{ limit entity_type abuse_types }
+      FILTER_PARAMS = %w{ limit entity_type abuse_types from }
 
-      attr_reader :account_id, :api_key, :raw
+      attr_reader :account_id, :api_key
 
-      def initialize(api_key, account_id, raw = {})
-        @raw = raw
+      def initialize(api_key, account_id)
         @account_id = account_id
         @api_key = api_key
       end
@@ -38,8 +37,10 @@ module Sift
         end
       end
 
-      def apply_to(decision_id, configs)
-        ApplyTo.new(decision_id, configs).run
+      def apply_to(configs = {})
+        getter = Utils::HashGetter.new(configs)
+
+        ApplyTo.new(getter.get(:decision_id), configs).run
       end
 
       def index_path
