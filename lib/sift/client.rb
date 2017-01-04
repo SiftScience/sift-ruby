@@ -7,12 +7,14 @@ module Sift
   # Represents the payload returned from a call through the track API
   #
   class Response
-    attr_reader :body
-    attr_reader :http_class
-    attr_reader :http_status_code
-    attr_reader :api_status
-    attr_reader :api_error_message
-    attr_reader :request
+    attr_reader :body,
+      :http_class,
+      :http_status_code,
+      :api_status,
+      :api_error_message,
+      :request,
+      :api_error_description,
+      :api_error_issues
 
     # Constructor
     #
@@ -32,7 +34,13 @@ module Sift
         @body = MultiJson.load(http_response) unless http_response.nil?
         @request = MultiJson.load(@body["request"].to_s) if @body["request"]
         @api_status = @body["status"].to_i if @body["status"]
-        @api_error_message = @body["error_message"].to_s if @body["error_message"]
+        @api_error_message = @body["error_message"]
+
+        if @body["error"]
+          @api_error_message = @body["error"]
+          @api_error_description = @body["description"]
+          @api_error_issues = @body["issues"] || {}
+        end
       end
     end
 

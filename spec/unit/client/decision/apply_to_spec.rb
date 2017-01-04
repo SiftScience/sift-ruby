@@ -49,9 +49,14 @@ module Sift
             request_body = MultiJson.dump(applier.send(:request_body))
 
             response_body = {
-              "time" => Time.now.to_i,
-              "status" => 0,
-              "error_message" => "OK"
+              "entity" => {
+                "id" => "USER_ID",
+                "type" => "user"
+              },
+              "decision" => {
+                "id" => decision_id
+              },
+              "time" => Time.now.to_i
             }
 
             stub_request(:post, append_api_key.call(applier.send(:path)))
@@ -113,14 +118,13 @@ module Sift
               request_body = MultiJson.dump(applier.send(:request_body))
 
               response_body = {
-                "time" => Time.now.to_i,
-                "status" => 100,
-                "error_message" => "Required field(s) not specified: analyst"
+                "error" => "not_found",
+                "description" => "No decision with id non_existent_decision_id"
               }
 
               stub_request(:post, append_api_key.call(applier.send(:path)))
                 .with(body: request_body)
-                .to_return(body: MultiJson.dump(response_body))
+                .to_return(body: MultiJson.dump(response_body), status: 404)
 
               response = applier.run
 
