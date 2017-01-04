@@ -1,6 +1,7 @@
 require 'httparty'
 require 'multi_json'
 require_relative "./client/decision"
+require_relative "./error"
 
 module Sift
 

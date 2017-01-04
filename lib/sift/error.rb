@@ -1,8 +1,8 @@
 module Sift
-  class Errors < StandardError
+  class Error < StandardError
   end
 
-  class ApiError < StandardError
+  class ApiError < Error
     attr_reader :message, :response
 
     def initialize(message, response)
