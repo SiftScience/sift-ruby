@@ -10,7 +10,7 @@ module Sift
       class ApplyTo
         PROPERTIES = %w{ source analyst description order_id user_id decision }
 
-        attr_reader :decision_id, :configs, :getter
+        attr_reader :decision_id, :configs, :getter, :api_key
 
         PROPERTIES.each do |attribute|
           class_eval %{
@@ -20,7 +20,8 @@ module Sift
           }
         end
 
-        def initialize(decision_id, configs)
+        def initialize(api_key, decision_id, configs)
+          @api_key = api_key
           @decision_id = decision_id
           @configs = configs
           @getter = Utils::HashGetter.new(configs)
@@ -31,10 +32,10 @@ module Sift
             send_request
           else
             Response.new(
-              MultiJson.dump(
+              MultiJson.dump({
                 status: 55,
                 error_message: errors.join(", ")
-              ),
+              }),
               400,
               nil
             )
@@ -46,7 +47,7 @@ module Sift
         def send_request
           Router.post(path, {
             body: request_body,
-            query: query_param
+            headers: auth_header
           })
         end
 
@@ -89,6 +90,10 @@ module Sift
 
         def user_path
           "#{decision.index_path}/users/#{CGI.escape(user_id)}"
+        end
+
+        def auth_header
+          Client.build_auth_header(api_key)
         end
       end
     end

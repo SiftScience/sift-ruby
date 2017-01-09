@@ -5,9 +5,6 @@ module Sift
   class Router
     include HTTParty
 
-    API_ENDPOINT = 'https://api.siftscience.com'
-    API3_ENDPOINT = 'https://api3.siftscience.com'
-
     class << self
       def get(path, options = {})
         serialize_body(options)

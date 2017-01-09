@@ -7,8 +7,8 @@ module Sift
     class Decision
       describe ApplyTo do
         let(:decision_id) { "block_it" }
-        let(:decision) { Decision.new("api_key", "account_id") }
-        let(:append_api_key) { ->(path) { "#{path}?api_key=#{decision.api_key}" } }
+        let(:api_key) { "customer_key" }
+        let(:decision) { Decision.new(api_key, "account_id") }
 
         describe "attributes" do
           ApplyTo::PROPERTIES.each do |attribute|
@@ -17,7 +17,7 @@ module Sift
               string_hash = {}
               string_hash[attribute] = expected_value
 
-              applier = ApplyTo.new("id", string_hash)
+              applier = ApplyTo.new(api_key, "id", string_hash)
               expect(applier.public_send(attribute)).to(
                 eq(expected_value),
                 "#{attribute} did not read the right string value"
@@ -26,7 +26,7 @@ module Sift
               symbol_hash = {}
               symbol_hash[attribute.to_sym] = expected_value
 
-              applier = ApplyTo.new("id", symbol_hash)
+              applier = ApplyTo.new(api_key, "id", symbol_hash)
               expect(applier.public_send(attribute)).to(
                 eq(expected_value),
                 "#{attribute} did not read the right symbol value"
@@ -45,7 +45,7 @@ module Sift
               user_id: "user_1234"
             }
 
-            applier = ApplyTo.new(decision_id, configs)
+            applier = ApplyTo.new(api_key, decision_id, configs)
             request_body = MultiJson.dump(applier.send(:request_body))
 
             response_body = {
@@ -59,7 +59,7 @@ module Sift
               "time" => Time.now.to_i
             }
 
-            stub_request(:post, append_api_key.call(applier.send(:path)))
+            stub_request(:post, put_auth_in_url(api_key, applier.send(:path)))
               .with(body: request_body)
               .to_return(body: MultiJson.dump(response_body))
 
@@ -80,7 +80,7 @@ module Sift
                 "order_id" => nil
               }
 
-              applier = ApplyTo.new(decision_id, configs)
+              applier = ApplyTo.new(api_key, decision_id, configs)
 
               response = applier.run
               non_empty_string_error =
@@ -95,7 +95,7 @@ module Sift
               configs.delete(:user_id)
               configs.delete("order_id")
 
-              applier = ApplyTo.new(decision_id, configs)
+              applier = ApplyTo.new(api_key, decision_id, configs)
 
               response = applier.run
               error_message = "user_id #{non_empty_string_error}, got NilClass"
@@ -114,7 +114,7 @@ module Sift
                 user_id: "user_1234"
               }
 
-              applier = ApplyTo.new(decision_id, configs)
+              applier = ApplyTo.new(api_key, decision_id, configs)
               request_body = MultiJson.dump(applier.send(:request_body))
 
               response_body = {
@@ -122,7 +122,7 @@ module Sift
                 "description" => "No decision with id non_existent_decision_id"
               }
 
-              stub_request(:post, append_api_key.call(applier.send(:path)))
+              stub_request(:post, put_auth_in_url(api_key, applier.send(:path)))
                 .with(body: request_body)
                 .to_return(body: MultiJson.dump(response_body), status: 404)
 
@@ -139,24 +139,24 @@ module Sift
             user_id = "bad_user@example.com"
             order_id = "ORDER_1235"
 
-            applier = ApplyTo.new(decision_id, {
+            applier = ApplyTo.new(api_key, decision_id, {
               user_id: user_id,
               decision: decision
             })
 
-            path = Router::API3_ENDPOINT +
+            path = Client::API3_ENDPOINT +
               "/v3/accounts/#{decision.account_id}/decisions/users/" +
               "#{CGI.escape(user_id)}"
 
             expect(applier.send(:path)).to eq(path)
 
-            applier = ApplyTo.new(decision_id, {
+            applier = ApplyTo.new(api_key, decision_id, {
               user_id: user_id,
               decision: decision,
               order_id: order_id
             })
 
-            path = Router::API3_ENDPOINT +
+            path = Client::API3_ENDPOINT +
               "/v3/accounts/#{decision.account_id}/decisions/users/" +
               "#{CGI.escape(user_id)}/orders/#{CGI.escape(order_id)}"
 
@@ -164,6 +164,16 @@ module Sift
           end
         end
 
+        # TODO(Kaoru): When we move to webmock 2 we won't need to do this
+        # hackery
+        #
+        # https://github.com/bblimke/webmock/blob/master/CHANGELOG.md#200
+        #
+        def put_auth_in_url(api_key, url)
+          protocal, uri = url.split(/(?<=https\:\/\/)/)
+
+          protocal + api_key + "@" + uri
+        end
       end
     end
   end

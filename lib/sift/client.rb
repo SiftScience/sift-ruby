@@ -1,5 +1,6 @@
 require 'httparty'
 require 'multi_json'
+
 require_relative "./client/decision"
 require_relative "./error"
 
@@ -79,12 +80,17 @@ module Sift
   # This class wraps accesses through the API
   #
   class Client
-    API_ENDPOINT = 'https://api.siftscience.com'
-    API3_ENDPOINT = 'https://api3.siftscience.com'
+    API_ENDPOINT = ENV["SIFT_RUBY_API_URL"] || 'https://api.siftscience.com'
+    API3_ENDPOINT = ENV["SIFT_RUBY_API3_URL"] || 'https://api3.siftscience.com'
 
     include HTTParty
     base_uri API_ENDPOINT
 
+    attr_reader :api_key, :account_id
+
+    def self.build_auth_header(api_key)
+      { "Authorization" => "Basic #{Base64.encode64(api_key)}" }
+    end
 
     # Constructor
     #
@@ -123,10 +129,6 @@ module Sift
 
       raise("api_key must be a non-empty string") if !@api_key.is_a?(String) || @api_key.empty?
       raise("path must be a non-empty string") if !@path.is_a?(String) || @path.empty?
-    end
-
-    def api_key
-      @api_key
     end
 
     def user_agent
@@ -498,7 +500,7 @@ module Sift
     end
 
     def decisions(opts = {})
-      decision_instance(opts).list(opts)
+      decision_instance.list(opts)
     end
 
     def decisions!(opts = {})
@@ -506,7 +508,7 @@ module Sift
     end
 
     def apply_decision(configs = {})
-      decision_instance(configs).apply_to(configs)
+      decision_instance.apply_to(configs)
     end
 
     def apply_decision!(configs = {})
@@ -523,11 +525,8 @@ module Sift
       end
     end
 
-    def decision_instance(opts = {})
-      account_id = opts[:account_id] || @account_id
-      api_key = opts[:api_key] || @api_key
-
-      Decision.new(api_key, account_id)
+    def decision_instance
+      @decision_instance ||= Decision.new(api_key, account_id)
     end
 
     def delete_nils(properties)

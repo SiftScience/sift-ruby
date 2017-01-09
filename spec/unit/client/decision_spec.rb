@@ -11,8 +11,16 @@ module Sift
       let(:api_key) { "test_api_key" }
       let(:account_id) { "test_account_id" }
       let(:decision) { Decision.new(api_key, account_id) }
+
       let(:decision_index_path) {
-        "#{decision.index_path}?api_key=#{decision.api_key}"
+        # TODO(Kaoru): When we move to webmock 2 we won't need to do this
+        # hackery
+        #
+        # https://github.com/bblimke/webmock/blob/master/CHANGELOG.md#200
+        #
+        protocal, uri = decision.index_path.split(/(?<=https\:\/\/)/)
+
+        protocal + api_key + "@" + uri
       }
 
       describe "#list" do
@@ -30,9 +38,9 @@ module Sift
         it "will pass on query params" do
           query_param = {
             abuse_types: %w{promo_abuse content_abuse},
-            limit: 10,
-            entity_type: "user"
-          }.inject("")  do |result, (key, value)|
+            entity_type: "user",
+            limit: 10
+          }.inject("?")  do |result, (key, value)|
             value = value.join(",") if value.is_a? Array
             "#{result}&#{key}=#{CGI.escape(value.to_s)}"
           end
@@ -44,21 +52,6 @@ module Sift
             limit: 10,
             entity_type: "user",
             abuse_types: %w{promo_abuse content_abuse}
-          })
-
-          expect(response.ok?).to be(true)
-        end
-
-        it "will ignore query params if passed in" do
-          index_path = "#{decision.index_path}?limit=10"
-          stub_request(:get, "#{index_path}&api_key=#{api_key}")
-            .to_return(body: MultiJson.dump(FakeDecisions.index))
-
-          response = decision.list({
-            limit: 10,
-            entity_type: "user",
-            abuse_types: %w{promo_abuse content_abuse},
-            next_ref: index_path
           })
 
           expect(response.ok?).to be(true)
