@@ -141,24 +141,27 @@ module Sift
 
             applier = ApplyTo.new(api_key, decision_id, {
               user_id: user_id,
-              decision: decision
+              account_id: decision.account_id,
             })
 
             path = Client::API3_ENDPOINT +
-              "/v3/accounts/#{decision.account_id}/decisions/users/" +
-              "#{CGI.escape(user_id)}"
+              "/v3/accounts/#{decision.account_id}" +
+              "/users/#{CGI.escape(user_id)}" +
+              "/decisions"
+
 
             expect(applier.send(:path)).to eq(path)
 
             applier = ApplyTo.new(api_key, decision_id, {
               user_id: user_id,
-              decision: decision,
+              account_id: decision.account_id,
               order_id: order_id
             })
 
             path = Client::API3_ENDPOINT +
-              "/v3/accounts/#{decision.account_id}/decisions/users/" +
-              "#{CGI.escape(user_id)}/orders/#{CGI.escape(order_id)}"
+              "/v3/accounts/#{decision.account_id}/users/" +
+              "#{CGI.escape(user_id)}/orders/#{CGI.escape(order_id)}" +
+              "/decisions"
 
             expect(applier.send(:path)).to eq(path)
           end
