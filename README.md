@@ -81,7 +81,10 @@ To learn more about the decisions endpoint visit [developer docs](https://siftsc
 response = client.decisions
 
 # Check that response is okay.
-raise "Unable to fetch decisions #{response.api_error_message}" unless response.ok?
+unless response.ok?
+  raise "Unable to fetch decisions #{response.api_error_message} " +
+    "#{response.api_error_description}"
+end
 
 # find a decisions with the id "block_bad_user"
 user_decision = response.body["data"].find do |decision|
@@ -89,7 +92,7 @@ user_decision = response.body["data"].find do |decision|
 end
 
 # apply decision to a user
-client.apply_decision_to({
+response = client.apply_decision_to({
   decision_id: "block_bad_user",
   source: "manual",
   analyst: "bob@your_company.com",
@@ -97,13 +100,30 @@ client.apply_decision_to({
 })
 
 # apply decision to "bob@example.com"'s order
-client.apply_decision_to({
+response = client.apply_decision_to({
   decision_id: "block_bad_order",
   source: "manual",
   analyst: "bob@your_company.com",
   user_id: "john@example.com",
   order_id: "ORDER_1234"
 })
+
+# Make sure you handle the response after applying a decision:
+
+if response.ok?
+  # do stuff
+else
+  # Error message
+  response.api_error_message
+
+  # Summary of the error
+  response.api_error_description
+
+  # hash of errors:
+  #  key: field in question
+  #  value: description of the issue
+  response.api_error_issues
+end
 ```
 
 ### Sending a Label
