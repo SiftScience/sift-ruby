@@ -89,19 +89,16 @@ user_decision = response.body["data"].find do |decision|
 end
 
 # apply decision to a user
-client.apply_decision_to(user_decision, {
+client.apply_decision_to({
+  decision_id: "block_bad_user",
   source: "manual",
   analyst: "bob@your_company.com",
   user_id: "john@example.com"
 })
 
-# find a decisions with the id "block_bad_order"
-order_decision = response.body["data"].find do |decision|
-  decision["id"] == "block_bad_order"
-end
-
 # apply decision to "bob@example.com"'s order
-client.apply_decision_to(user_decision, {
+client.apply_decision_to({
+  decision_id: "block_bad_order",
   source: "manual",
   analyst: "bob@your_company.com",
   user_id: "john@example.com",
