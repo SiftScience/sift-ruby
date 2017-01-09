@@ -8,7 +8,7 @@ module Sift
   class Client
     class Decision
       class ApplyTo
-        PROPERTIES = %w{ source analyst description order_id user_id decision }
+        PROPERTIES = %w{ source analyst description order_id user_id account_id }
 
         attr_reader :decision_id, :configs, :getter, :api_key
 
@@ -47,7 +47,7 @@ module Sift
         def send_request
           Router.post(path, {
             body: request_body,
-            headers: auth_header
+            headers: headers
           })
         end
 
@@ -58,10 +58,6 @@ module Sift
             analyst: analyst,
             decision_id: decision_id
           }
-        end
-
-        def query_param
-          { api_key: decision.api_key }
         end
 
         def errors
@@ -82,18 +78,27 @@ module Sift
 
         def path
           if applying_to_order?
-            "#{user_path}/orders/#{CGI.escape(order_id)}"
+            "#{user_path}/orders/#{CGI.escape(order_id)}/decisions"
           else
-            user_path
+            "#{user_path}/decisions"
           end
         end
 
         def user_path
-          "#{decision.index_path}/users/#{CGI.escape(user_id)}"
+          "#{base_path}/users/#{CGI.escape(user_id)}"
+        end
+
+        def base_path
+          "#{Client::API3_ENDPOINT}/v3/accounts/#{account_id}"
+        end
+
+        def headers
+          {
+            "Content-type" => "application/json"
+          }.merge(Client.build_auth_header(api_key))
         end
 
         def auth_header
-          Client.build_auth_header(api_key)
         end
       end
     end

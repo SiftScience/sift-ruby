@@ -43,6 +43,7 @@ module Sift
 
       def apply_to(configs = {})
         getter = Utils::HashGetter.new(configs)
+        configs[:account_id] = account_id
 
         ApplyTo.new(api_key, getter.get(:decision_id), configs).run
       end
