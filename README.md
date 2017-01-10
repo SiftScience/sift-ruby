@@ -71,14 +71,30 @@ response.api_error_message  # Error message associated with status Error Code
 response = client.score(user_id)
 ```
 
-### Decisions
+## Decisions
 
-To learn more about the decisions endpoint visit [developer docs](https://siftscience.com/developers/docs/curl/apis-overview).
+To learn more about the decisions endpoint visit our [developer docs](https://siftscience.com/developers/docs/ruby/decisions-api/get-decisions).
 
+### List of Configured Decisions
 
+Get a list of your decisions.
+
+**Optional Params**
+ - `entity_type`: `:user` or `:order`
+ - `abuse_types`: `["payment_abuse", "content_abuse", "content_abuse",
+   "account_abuse", "legacy"]`
+
+**Returns**
+
+A `Response` object
+
+**Example:**
 ```
 # fetch a list of all your decisions
-response = client.decisions
+response = client.decisions({
+  entity_type: :user,
+  abuse_types: ["payment_abuse", "content_abuse"]
+})
 
 # Check that response is okay.
 unless response.ok?
@@ -90,11 +106,29 @@ end
 user_decision = response.body["data"].find do |decision|
   decision["id"] == "block_bad_user"
 end
+```
 
+
+### Apply a decision
+
+Applies a decision to an entity. Visit our [developer docs](http://siftscience.com/developers/docs/ruby/decisions-api/apply-decision) for more information.
+
+**Required Params:**
+- `decision_id`, `source`, `user_id`
+
+**Other Params**
+- `order_id`: when applying a decision to an order, you must pass in the `order_id`
+- `analyst`: when `source` is set to `manual_review`, this field *is required*
+
+**Returns**
+`Response` object.
+
+**Examples:**
+```
 # apply decision to a user
 response = client.apply_decision_to({
   decision_id: "block_bad_user",
-  source: "manual",
+  source: "manual_review",
   analyst: "bob@your_company.com",
   user_id: "john@example.com"
 })
@@ -102,7 +136,7 @@ response = client.apply_decision_to({
 # apply decision to "bob@example.com"'s order
 response = client.apply_decision_to({
   decision_id: "block_bad_order",
-  source: "manual",
+  source: "manual_review",
   analyst: "bob@your_company.com",
   user_id: "john@example.com",
   order_id: "ORDER_1234"
@@ -126,7 +160,7 @@ else
 end
 ```
 
-### Sending a Label
+## Sending a Label
 
 ```
 # Label the user with user_id 23056 as Bad with all optional fields
@@ -147,6 +181,18 @@ response = client.get_user_decisions('example_user_id')
 # Get the latest decisions for an order
 response = client.get_order_decisions('example_order_id')
 ```
+
+## Response Object
+
+All requests to our apis will return a `Response` instance.
+
+### Public Methods:
+- `ok?` returns `true` when the response is a `200`-`299`, `false` if it isn't
+- `body` returns a hash representation of the json body returned.
+- `api_error_message` returns a string describing the api error code.
+- `api_error_description` a summary of the error that occured.
+- `api_error_issues` a hash describing the items the error occured. The `key` is the item and the `value` is the description of the error.
+
 
 ## Building
 
