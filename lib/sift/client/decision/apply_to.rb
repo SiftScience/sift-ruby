@@ -1,8 +1,9 @@
 require "multi_json"
 
-require_relative "../../validate/primitive"
+require_relative "../../validate/decision"
 require_relative "../../client"
 require_relative "../../router"
+require_relative "../../utils/hash_getter"
 
 module Sift
   class Client
@@ -96,9 +97,6 @@ module Sift
           {
             "Content-type" => "application/json"
           }.merge(Client.build_auth_header(api_key))
-        end
-
-        def auth_header
         end
       end
     end

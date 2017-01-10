@@ -56,7 +56,7 @@ module Sift
       private
 
       def request_next_page(path)
-        Router.get(path, query: build_query(Utils::HashGetter.new({})))
+        Router.get(path)
       end
 
       def auth_header
