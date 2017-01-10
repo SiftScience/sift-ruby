@@ -56,7 +56,7 @@ module Sift
       private
 
       def request_next_page(path)
-        Router.get(path)
+        Router.get(path, headers: auth_header)
       end
 
       def auth_header

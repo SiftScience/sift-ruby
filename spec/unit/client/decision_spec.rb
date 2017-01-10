@@ -66,6 +66,17 @@ module Sift
           expect(response.ok?).to be(false)
           expect(response.http_status_code).to be(404)
         end
+
+        it "will fetch next page" do
+          next_page = "#{decision.index_path}?from=100"
+
+          stub_request(:get, "#{decision_index_path}?from=100")
+            .to_return(body: MultiJson.dump(FakeDecisions.index))
+
+          response = decision.list({ "next_ref" => next_page })
+
+          expect(response.ok?).to be(true)
+        end
       end
     end
   end
