@@ -106,6 +106,12 @@ end
 user_decision = response.body["data"].find do |decision|
   decision["id"] == "block_bad_user"
 end
+
+# Get the next page
+
+if response.body["has_more"]
+  client.decisions(response.body)
+end
 ```
 
 
