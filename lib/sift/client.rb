@@ -92,6 +92,10 @@ module Sift
       { "Authorization" => "Basic #{Base64.encode64(api_key)}" }
     end
 
+    def self.user_agent
+      "sift-ruby/#{VERSION}"
+    end
+
     # Constructor
     #
     # ==== Parameters:
