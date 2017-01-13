@@ -1,17 +1,22 @@
 require 'httparty'
 require 'multi_json'
 
+require_relative "./client/decision"
+require_relative "./error"
+
 module Sift
 
   # Represents the payload returned from a call through the track API
   #
   class Response
-    attr_reader :body
-    attr_reader :http_class
-    attr_reader :http_status_code
-    attr_reader :api_status
-    attr_reader :api_error_message
-    attr_reader :request
+    attr_reader :body,
+      :http_class,
+      :http_status_code,
+      :api_status,
+      :api_error_message,
+      :request,
+      :api_error_description,
+      :api_error_issues
 
     # Constructor
     #
@@ -31,7 +36,13 @@ module Sift
         @body = MultiJson.load(http_response) unless http_response.nil?
         @request = MultiJson.load(@body["request"].to_s) if @body["request"]
         @api_status = @body["status"].to_i if @body["status"]
-        @api_error_message = @body["error_message"].to_s if @body["error_message"]
+        @api_error_message = @body["error_message"]
+
+        if @body["error"]
+          @api_error_message = @body["error"]
+          @api_error_description = @body["description"]
+          @api_error_issues = @body["issues"] || {}
+        end
       end
     end
 
@@ -69,12 +80,17 @@ module Sift
   # This class wraps accesses through the API
   #
   class Client
-    API_ENDPOINT = 'https://api.siftscience.com'
-    API3_ENDPOINT = 'https://api3.siftscience.com'
+    API_ENDPOINT = ENV["SIFT_RUBY_API_URL"] || 'https://api.siftscience.com'
+    API3_ENDPOINT = ENV["SIFT_RUBY_API3_URL"] || 'https://api3.siftscience.com'
 
     include HTTParty
     base_uri API_ENDPOINT
 
+    attr_reader :api_key, :account_id
+
+    def self.build_auth_header(api_key)
+      { "Authorization" => "Basic #{Base64.encode64(api_key)}" }
+    end
 
     # Constructor
     #
@@ -113,10 +129,6 @@ module Sift
 
       raise("api_key must be a non-empty string") if !@api_key.is_a?(String) || @api_key.empty?
       raise("path must be a non-empty string") if !@path.is_a?(String) || @path.empty?
-    end
-
-    def api_key
-      @api_key
     end
 
     def user_agent
@@ -487,8 +499,35 @@ module Sift
       Response.new(response.body, response.code, response.response)
     end
 
+    def decisions(opts = {})
+      decision_instance.list(opts)
+    end
+
+    def decisions!(opts = {})
+      handle_response(decisions(opts))
+    end
+
+    def apply_decision(configs = {})
+      decision_instance.apply_to(configs)
+    end
+
+    def apply_decision!(configs = {})
+      handle_response(apply_decision(configs))
+    end
 
     private
+
+    def handle_response(response)
+      if response.ok?
+        response.body
+      else
+        raise ApiError.new(response.api_error_message, response)
+      end
+    end
+
+    def decision_instance
+      @decision_instance ||= Decision.new(api_key, account_id)
+    end
 
     def delete_nils(properties)
       properties.delete_if do |k, v|

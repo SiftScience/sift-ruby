@@ -1,4 +1,5 @@
-require File.expand_path(File.join(File.dirname(__FILE__), "..", "spec_helper"))
+require_relative "../spec_helper"
+require "sift"
 
 describe Sift::Client do
 
@@ -41,7 +42,6 @@ describe Sift::Client do
 
 
   it "Successfully handles an $unlabel and returns OK" do
-    response_json = { :status => 0, :error_message => "OK" }
     user_id = "frodo_baggins"
 
     stub_request(:delete,
@@ -77,7 +77,6 @@ describe Sift::Client do
 
 
   it "Successfully handles an $unlabel with the v203 API endpoing and returns OK" do
-    response_json = { :status => 0, :error_message => "OK" }
     user_id = "frodo_baggins"
 
     stub_request(:delete,

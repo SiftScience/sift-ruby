@@ -1,5 +1,5 @@
-require "sift/version"
-require "sift/client"
+require_relative "./sift/version"
+require_relative "./sift/client"
 
 module Sift
 
