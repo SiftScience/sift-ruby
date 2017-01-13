@@ -2,7 +2,7 @@
 
 ## Requirements
 
-  * Ruby 1.9.3 or above. (Ruby 1.8.6 might work if you load ActiveSupport.)
+  * Ruby 1.9.3 or above.
 
 
 ## Installation
