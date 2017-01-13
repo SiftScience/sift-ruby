@@ -2,7 +2,7 @@
 
 ## Requirements
 
-  * Ruby 1.8.7 or above. (Ruby 1.8.6 might work if you load ActiveSupport.)
+  * Ruby 1.9.3 or above. (Ruby 1.8.6 might work if you load ActiveSupport.)
 
 
 ## Installation
@@ -23,7 +23,7 @@ gem install sift
 
 ### Creating a Client:
 
-```
+```ruby
 require "sift"
 
 Sift.api_key = '<your_api_key_here>'
@@ -38,7 +38,7 @@ client = Sift::Cient.new(api_key: '<your_api_key_here>', account_id: '<your_acco
 
 ### Sending a transaction event
 
-```
+```ruby
 event = "$transaction"
 
 user_id = "23056"  # User ID's may only contain a-z, A-Z, 0-9, =, ., -, _, +, @, :, &, ^, %, !, $
@@ -89,7 +89,7 @@ Get a list of your decisions.
 A `Response` object
 
 **Example:**
-```
+```ruby
 # fetch a list of all your decisions
 response = client.decisions({
   entity_type: :user,
@@ -130,7 +130,7 @@ Applies a decision to an entity. Visit our [developer docs](http://siftscience.c
 `Response` object.
 
 **Examples:**
-```
+```ruby
 # apply decision to a user
 response = client.apply_decision_to({
   decision_id: "block_bad_user",
@@ -168,7 +168,7 @@ end
 
 ## Sending a Label
 
-```
+```ruby
 # Label the user with user_id 23056 as Bad with all optional fields
 response = client.label(user_id, {
   "$is_bad" => true,
@@ -204,7 +204,7 @@ All requests to our apis will return a `Response` instance.
 
 Building and publishing the gem is captured by the following steps:
 
-```
+```ruby
 $ gem build sift.gemspec
 $ gem push sift-<current version>.gem
 
@@ -220,6 +220,6 @@ $ rake release
 
 To run the various tests use the rake command as follows:
 
-```
+```ruby
 $ rake spec
 ```

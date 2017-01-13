@@ -49,8 +49,7 @@ module Sift
       end
 
       def index_path
-        "#{Client::API3_ENDPOINT}/v3/accounts/" +
-          "#{CGI.escape(account_id)}/decisions"
+        "#{Client::API3_ENDPOINT}/v3/accounts/#{account_id}/decisions"
       end
 
       private
