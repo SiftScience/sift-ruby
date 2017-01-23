@@ -1,5 +1,6 @@
-require 'httparty'
-require 'multi_json'
+require "httparty"
+require "multi_json"
+require "base64"
 
 require_relative "./client/decision"
 require_relative "./error"
