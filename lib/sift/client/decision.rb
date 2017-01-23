@@ -1,5 +1,5 @@
 require "cgi"
-require "Base64"
+require "base64"
 
 require_relative "../router"
 require_relative "../validate/decision"
