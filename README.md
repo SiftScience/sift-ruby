@@ -132,7 +132,7 @@ Applies a decision to an entity. Visit our [developer docs](http://siftscience.c
 **Examples:**
 ```ruby
 # apply decision to a user
-response = client.apply_decision_to({
+response = client.apply_decision({
   decision_id: "block_bad_user",
   source: "manual_review",
   analyst: "bob@your_company.com",
@@ -140,7 +140,7 @@ response = client.apply_decision_to({
 })
 
 # apply decision to "bob@example.com"'s order
-response = client.apply_decision_to({
+response = client.apply_decision({
   decision_id: "block_bad_order",
   source: "manual_review",
   analyst: "bob@your_company.com",
