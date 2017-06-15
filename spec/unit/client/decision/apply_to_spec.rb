@@ -41,12 +41,19 @@ module Sift
               source: "manual",
               analyst: "foobar@example.com",
               description: "be blocking errrday allday",
-              decision: decision,
-              user_id: "user_1234"
+              user_id: "user_1234",
+              time: 1234,
+              fake_param: "this should not exist"
             }
 
             applier = ApplyTo.new(api_key, decision_id, configs)
-            request_body = MultiJson.dump(applier.send(:request_body))
+            request_body = MultiJson.dump({
+              source: configs[:source],
+              description: configs[:description],
+              analyst: configs[:analyst],
+              decision_id: decision_id,
+              time: 1234
+            })
 
             response_body = {
               "entity" => {
