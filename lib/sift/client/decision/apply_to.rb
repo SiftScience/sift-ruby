@@ -9,7 +9,15 @@ module Sift
   class Client
     class Decision
       class ApplyTo
-        PROPERTIES = %w{ source analyst description order_id user_id account_id }
+        PROPERTIES = %w{
+          source
+          analyst
+          description
+          order_id
+          user_id
+          account_id
+          time
+        }
 
         attr_reader :decision_id, :configs, :getter, :api_key
 
@@ -57,7 +65,8 @@ module Sift
             source: source,
             description: description,
             analyst: analyst,
-            decision_id: decision_id
+            decision_id: decision_id,
+            time: time
           }
         end
 
