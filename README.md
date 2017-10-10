@@ -32,7 +32,7 @@ client = Sift::Client.new()
 
 ##### OR
 
-client = Sift::Cient.new(api_key: '<your_api_key_here>', account_id: '<your_account_id_here>'
+client = Sift::Client.new(api_key: '<your_api_key_here>', account_id: '<your_account_id_here>'
 
 ```
 
