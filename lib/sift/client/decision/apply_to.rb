@@ -14,9 +14,10 @@ module Sift
           analyst
           description
           order_id
+          session_id
           user_id
           account_id
-          time
+          time 
         }
 
         attr_reader :decision_id, :configs, :getter, :api_key
@@ -75,6 +76,8 @@ module Sift
 
           if applying_to_order?
             validator.valid_order?
+          elsif applying_to_session?
+            validator.valid_session?
           else
             validator.valid_user?
           end
@@ -86,9 +89,15 @@ module Sift
           configs.has_key?("order_id") || configs.has_key?(:order_id)
         end
 
+        def applying_to_session?
+          configs.has_key?("session_id") || configs.has_key?(:session_id)
+        end
+
         def path
           if applying_to_order?
             "#{user_path}/orders/#{CGI.escape(order_id)}/decisions"
+          elsif applying_to_session?
+            "#{user_path}/sessions/#{CGI.escape(session_id)}/decisions"
           else
             "#{user_path}/decisions"
           end
