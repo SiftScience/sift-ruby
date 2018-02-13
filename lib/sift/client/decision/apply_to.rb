@@ -17,7 +17,7 @@ module Sift
           session_id
           user_id
           account_id
-          time 
+          time
         }
 
         attr_reader :decision_id, :configs, :getter, :api_key
