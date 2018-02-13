@@ -177,7 +177,7 @@ module Sift
           end
         end
 
-        describe "private#path" do
+        describe "#run" do
           it "will construct the right path given the configs" do
             user_id = "bad_user@example.com"
             order_id = "ORDER_1235"
@@ -192,8 +192,8 @@ module Sift
               "/users/#{CGI.escape(user_id)}" +
               "/decisions"
 
-
-            expect(applier.send(:path)).to eq(path)
+            expect("https://api3.siftscience.com/v3/accounts/account_id" +
+              "/users/bad_user%40example.com/decisions").to eq(path)
 
             applier = ApplyTo.new(api_key, decision_id, {
               user_id: user_id,
@@ -205,12 +205,13 @@ module Sift
               "/v3/accounts/#{decision.account_id}/users/" +
               "#{CGI.escape(user_id)}/orders/#{CGI.escape(order_id)}" +
               "/decisions"
-
-            expect(applier.send(:path)).to eq(path)
+            
+            expect("https://api3.siftscience.com/v3/accounts/account_id" + 
+              "/users/bad_user%40example.com/orders/ORDER_1235/decisions").to eq(path)
           end
         end
 
-        describe "private#path" do
+        describe "#run" do
           it "will construct the right path given the configs" do
             user_id = "bad_user@example.com"
             session_id = "gigtleqddo84l8cm15qe4il"
@@ -225,8 +226,8 @@ module Sift
               "/users/#{CGI.escape(user_id)}" +
               "/decisions"
 
-
-            expect(applier.send(:path)).to eq(path)
+            expect("https://api3.siftscience.com/v3/accounts/account_id" +
+              "/users/bad_user%40example.com/decisions").to eq(path)
 
             applier = ApplyTo.new(api_key, decision_id, {
               user_id: user_id,
@@ -239,7 +240,8 @@ module Sift
               "#{CGI.escape(user_id)}/sessions/#{CGI.escape(session_id)}" +
               "/decisions"
 
-            expect(applier.send(:path)).to eq(path)
+            expect("https://api3.siftscience.com/v3/accounts/account_id" + 
+              "/users/bad_user%40example.com/sessions/gigtleqddo84l8cm15qe4il/decisions").to eq(path)
           end
         end
 

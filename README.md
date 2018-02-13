@@ -80,7 +80,7 @@ To learn more about the decisions endpoint visit our [developer docs](https://si
 Get a list of your decisions.
 
 **Optional Params**
- - `entity_type`: `:user` or `:order`
+ - `entity_type`: `:user` or `:order` or `:session`
  - `abuse_types`: `["payment_abuse", "content_abuse", "content_abuse",
    "account_abuse", "legacy"]`
 
@@ -124,6 +124,7 @@ Applies a decision to an entity. Visit our [developer docs](http://siftscience.c
 
 **Other Params**
 - `order_id`: when applying a decision to an order, you must pass in the `order_id`
+- `session_id`: when applying a decision to a session, you must pass in the `session_id`
 - `analyst`: when `source` is set to `manual_review`, this field *is required*
 
 **Returns**
@@ -146,6 +147,15 @@ response = client.apply_decision({
   analyst: "bob@your_company.com",
   user_id: "john@example.com",
   order_id: "ORDER_1234"
+})
+
+# apply decision to "bob@example.com"'s session
+response = client.apply_decision({
+  decision_id: "block_bad_session",
+  source: "manual_review",
+  analyst: "bob@your_company.com",
+  user_id: "john@example.com",
+  session_id: "SESSION_ID_1234"
 })
 
 # Make sure you handle the response after applying a decision:
