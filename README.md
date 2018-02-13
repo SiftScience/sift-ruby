@@ -82,7 +82,7 @@ Get a list of your decisions.
 **Optional Params**
  - `entity_type`: `:user` or `:order` or `:session`
  - `abuse_types`: `["payment_abuse", "content_abuse", "content_abuse",
-   "account_abuse", "legacy"]`
+   "account_abuse", "legacy", "account_takeover"]`
 
 **Returns**
 
