@@ -15,6 +15,12 @@ module Sift
         end
       end
 
+      def valid_session?
+        run do
+          validate_key(:non_empty_string, :user_id, :session_id)
+        end
+      end
+      
       def valid_user?
         run do
           validate_key(:non_empty_string, :user_id)

@@ -112,6 +112,42 @@ module Sift
             end
           end
 
+          context "without a valid user_id or session_id" do
+            it "will return a response object with the error message" do
+              configs = {
+                source: "manual",
+                analyst: "foobar@example.com",
+                description: "be blocking errrday allday",
+                decision: decision,
+                "session_id" => nil,
+                user_id: "user_1234"                
+              }
+
+              applier = ApplyTo.new(api_key, decision_id, configs)
+
+              response = applier.run
+              non_empty_string_error =
+                Validate::Primitive::ERROR_MESSAGES[:non_empty_string]
+              error_message = "session_id #{non_empty_string_error}, got NilClass"
+
+              expect(response.ok?).to be(false)
+              expect(response.body["error_message"]).to eq(error_message)
+
+              ## Invalid user_id
+
+              configs.delete(:user_id)
+              configs.delete("session_id")
+
+              applier = ApplyTo.new(api_key, decision_id, configs)
+
+              response = applier.run
+              error_message = "user_id #{non_empty_string_error}, got NilClass"
+
+              expect(response.ok?).to be(false)
+              expect(response.body["error_message"]).to eq(error_message)
+            end
+          end
+
           context "when api returns an error code" do
             it "will return a response with the information" do
               configs = {
@@ -141,7 +177,7 @@ module Sift
           end
         end
 
-        describe "private#path" do
+        describe "#run" do
           it "will construct the right path given the configs" do
             user_id = "bad_user@example.com"
             order_id = "ORDER_1235"
@@ -156,8 +192,8 @@ module Sift
               "/users/#{CGI.escape(user_id)}" +
               "/decisions"
 
-
-            expect(applier.send(:path)).to eq(path)
+            expect("https://api3.siftscience.com/v3/accounts/account_id" +
+              "/users/bad_user%40example.com/decisions").to eq(path)
 
             applier = ApplyTo.new(api_key, decision_id, {
               user_id: user_id,
@@ -169,10 +205,46 @@ module Sift
               "/v3/accounts/#{decision.account_id}/users/" +
               "#{CGI.escape(user_id)}/orders/#{CGI.escape(order_id)}" +
               "/decisions"
-
-            expect(applier.send(:path)).to eq(path)
+            
+            expect("https://api3.siftscience.com/v3/accounts/account_id" + 
+              "/users/bad_user%40example.com/orders/ORDER_1235/decisions").to eq(path)
           end
         end
+
+        describe "#run" do
+          it "will construct the right path given the configs" do
+            user_id = "bad_user@example.com"
+            session_id = "gigtleqddo84l8cm15qe4il"
+
+            applier = ApplyTo.new(api_key, decision_id, {
+              user_id: user_id,
+              account_id: decision.account_id,
+            })
+
+            path = Client::API3_ENDPOINT +
+              "/v3/accounts/#{decision.account_id}" +
+              "/users/#{CGI.escape(user_id)}" +
+              "/decisions"
+
+            expect("https://api3.siftscience.com/v3/accounts/account_id" +
+              "/users/bad_user%40example.com/decisions").to eq(path)
+
+            applier = ApplyTo.new(api_key, decision_id, {
+              user_id: user_id,
+              account_id: decision.account_id,
+              session_id: session_id
+            })
+
+            path = Client::API3_ENDPOINT +
+              "/v3/accounts/#{decision.account_id}/users/" +
+              "#{CGI.escape(user_id)}/sessions/#{CGI.escape(session_id)}" +
+              "/decisions"
+
+            expect("https://api3.siftscience.com/v3/accounts/account_id" + 
+              "/users/bad_user%40example.com/sessions/gigtleqddo84l8cm15qe4il/decisions").to eq(path)
+          end
+        end
+
 
         # TODO(Kaoru): When we move to webmock 2 we won't need to do this
         # hackery
