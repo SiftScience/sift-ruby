@@ -1,3 +1,9 @@
+=== 3.0.0.0 2018-03-05
+* adds support for v205 of Sift Science's APIs
+* v205 APIs are now called by default -- this is an incompatible change
+  (use :version => 204 to call the previous API version)
+* Add content level decisions in Apply Decisions APIs.
+
 === 2.2.1.0 2018-02-12
 * Add session level decisions in Apply Decisions APIs.
 

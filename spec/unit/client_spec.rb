@@ -169,7 +169,7 @@ describe Sift::Client do
   it "Successfuly handles an event and returns OK" do
     response_json = { :status => 0, :error_message => "OK" }
 
-    stub_request(:post, "https://api.siftscience.com/v204/events").
+    stub_request(:post, "https://api.siftscience.com/v205/events").
       with { |request|
         parsed_body = JSON.parse(request.body)
         expect(parsed_body).to include("$buyer_user_id" => "123456")
@@ -190,7 +190,7 @@ describe Sift::Client do
 
   it "Successfully submits event with overridden key" do
     response_json = { :status => 0, :error_message => "OK"}
-    stub_request(:post, "https://api.siftscience.com/v204/events").
+    stub_request(:post, "https://api.siftscience.com/v205/events").
       with { | request|
         parsed_body = JSON.parse(request.body)
         expect(parsed_body).to include("$buyer_user_id" => "123456")
@@ -212,7 +212,7 @@ describe Sift::Client do
   it "Successfully scrubs nils" do
     response_json = { :status => 0, :error_message => "OK" }
 
-    stub_request(:post, "https://api.siftscience.com/v204/events")
+    stub_request(:post, "https://api.siftscience.com/v205/events")
       .with { |request|
         parsed_body = JSON.parse(request.body)
         expect(parsed_body).not_to include("fake_property")
@@ -241,7 +241,7 @@ describe Sift::Client do
     api_key = "foobar"
     response_json = score_response_json
 
-    stub_request(:get, "https://api.siftscience.com/v204/score/247019/?api_key=foobar")
+    stub_request(:get, "https://api.siftscience.com/v205/score/247019/?api_key=foobar")
       .to_return(:status => 200, :body => MultiJson.dump(response_json),
                  :headers => {"content-type"=>"application/json; charset=UTF-8",
                               "content-length"=> "74"})
@@ -259,7 +259,7 @@ describe Sift::Client do
     api_key = "foobar"
     response_json = score_response_json
 
-    stub_request(:get, "https://api.siftscience.com/v204/score/247019/?api_key=overridden")
+    stub_request(:get, "https://api.siftscience.com/v205/score/247019/?api_key=overridden")
       .to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
 
     response = Sift::Client.new(:api_key => api_key)
@@ -280,7 +280,7 @@ describe Sift::Client do
       :score_response => score_response_json
     }
 
-    stub_request(:post, "https://api.siftscience.com/v204/events?return_score=true")
+    stub_request(:post, "https://api.siftscience.com/v205/events?return_score=true")
       .to_return(:status => 200, :body => MultiJson.dump(response_json),
                  :headers => {"content-type"=>"application/json; charset=UTF-8",
                               "content-length"=> "74"})
@@ -304,7 +304,7 @@ describe Sift::Client do
       :score_response => action_response_json
     }
 
-    stub_request(:post, "https://api.siftscience.com/v204/events?return_action=true")
+    stub_request(:post, "https://api.siftscience.com/v205/events?return_action=true")
       .to_return(:status => 200, :body => MultiJson.dump(response_json),
                  :headers => {"content-type"=>"application/json; charset=UTF-8",
                               "content-length"=> "74"})
@@ -332,7 +332,7 @@ describe Sift::Client do
     }
 
     stub_request(:post,
-                 "https://api.siftscience.com/v204/events?return_workflow_status=true&abuse_types=legacy,payment_abuse")
+                 "https://api.siftscience.com/v205/events?return_workflow_status=true&abuse_types=legacy,payment_abuse")
       .to_return(:status => 200, :body => MultiJson.dump(response_json),
                  :headers => {"content-type"=>"application/json; charset=UTF-8",
                               "content-length"=> "74"})

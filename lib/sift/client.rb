@@ -118,7 +118,7 @@ module Sift
     #
     #   :version::
     #     The version of the Events API, Score API, and Labels API to call.
-    #     By default, version 204.
+    #     By default, version 205.
     #
     #   :path::
     #     The URL path to use for Events API path.  By default, the
@@ -132,7 +132,7 @@ module Sift
       @timeout = opts[:timeout] || 2  # 2-second timeout by default
       @path = opts[:path] || Sift.rest_api_path(@version)
 
-      raise("api_key must be a non-empty string") if !@api_key.is_a?(String) || @api_key.empty?
+      raise("api_key") if !@api_key.is_a?(String) || @api_key.empty?
       raise("path must be a non-empty string") if !@path.is_a?(String) || @path.empty?
     end
 

@@ -25,7 +25,7 @@ describe Sift::Client do
     response_json = { :status => 0, :error_message => "OK" }
     user_id = "frodo_baggins"
 
-    stub_request(:post, "https://api.siftscience.com/v204/users/frodo_baggins/labels")
+    stub_request(:post, "https://api.siftscience.com/v205/users/frodo_baggins/labels")
       .with(:body => ('{"$abuse_type":"content_abuse","$is_bad":true,"$description":"Listed a fake item","$type":"$label","$api_key":"foobar"}'))
       .to_return(:body => MultiJson.dump(response_json), :status => 200,
                  :headers => {"content-type"=>"application/json; charset=UTF-8",
@@ -45,8 +45,8 @@ describe Sift::Client do
     user_id = "frodo_baggins"
 
     stub_request(:delete,
-                 "https://api.siftscience.com/v204/users/frodo_baggins/labels?api_key=foobar&abuse_type=payment_abuse")
-      .to_return(:status => 204)
+                 "https://api.siftscience.com/v205/users/frodo_baggins/labels?api_key=foobar&abuse_type=payment_abuse")
+      .to_return(:status => 205)
 
     api_key = "foobar"
 
@@ -81,7 +81,7 @@ describe Sift::Client do
 
     stub_request(:delete,
                  "https://api.siftscience.com/v203/users/frodo_baggins/labels?api_key=foobar")
-      .to_return(:status => 204)
+      .to_return(:status => 205)
 
     api_key = "foobar"
 
