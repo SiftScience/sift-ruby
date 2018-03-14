@@ -504,6 +504,47 @@ module Sift
       Response.new(response.body, response.code, response.response)
     end
 
+
+    # Gets the decision status of a piece of content.
+    #
+    # See https://siftscience.com/developers/docs/ruby/decisions-api/decision-status .
+    #
+    # ==== Parameters
+    #
+    # user_id::
+    #   The ID of the owner of the content.
+    #
+    # content_id::
+    #   The ID of a piece of content.
+    #
+    # opts (optional)::
+    #   A Hash of optional parameters for this request --
+    #
+    #   :account_id::
+    #     Overrides the API key for this call.
+    #
+    #   :api_key::
+    #     Overrides the API key for this call.
+    #
+    #   :timeout::
+    #     Overrides the timeout (in seconds) for this call.
+    #
+    def get_content_decisions(user_id, content_id, opts = {})
+      account_id = opts[:account_id] || @account_id
+      api_key = opts[:api_key] || @api_key
+      timeout = opts[:timeout] || @timeout
+
+      options = {
+        :headers => { "User-Agent" => user_agent },
+        :basic_auth => { :username => api_key, :password => "" }
+      }
+      options.merge!(:timeout => timeout) unless timeout.nil?
+
+      uri = API3_ENDPOINT + Sift.content_decisions_api_path(account_id, user_id, content_id)
+      response = self.class.get(uri, options)
+      Response.new(response.body, response.code, response.response)
+    end
+
     def decisions(opts = {})
       decision_instance.list(opts)
     end

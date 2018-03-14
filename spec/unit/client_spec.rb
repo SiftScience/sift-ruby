@@ -390,4 +390,18 @@ describe Sift::Client do
     expect(response.body["decisions"]["payment_abuse"]["decision"]["id"]).to eq("decision7")
   end
 
+
+  it "Successfully make an content decisions request" do
+    response_text = '{"decisions":{"content_abuse":{"decision":{"id":"decision7"},"time":1468599638005,"webhook_succeeded":false}}}'
+
+    stub_request(:get, "https://foobar:@api3.siftscience.com/v3/accounts/ACCT/users/USER/content/example_content/decisions")
+      .to_return(:status => 200, :body => response_text, :headers => {})
+
+    client = Sift::Client.new(:api_key => "foobar", :account_id => "ACCT")
+    response = client.get_content_decisions("USER", "example_order", :timeout => 3)
+
+    expect(response.ok?).to eq(true)
+    expect(response.body["decisions"]["content_abuse"]["decision"]["id"]).to eq("decision7")
+  end
+
 end

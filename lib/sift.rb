@@ -34,8 +34,8 @@ module Sift
   end
 
   # Returns the path for Content Decisions API
-  def self.content_decisions_api_path(account_id, content_id)
-    "/v3/accounts/#{account_id}/content/#{content_id}/decisions"
+  def self.content_decisions_api_path(account_id, user_id, content_id)
+    "/v3/accounts/#{account_id}/users/#{user_id}/content/#{content_id}/decisions"
   end
 
   # Module-scoped public API key
