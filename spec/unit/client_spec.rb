@@ -398,7 +398,7 @@ describe Sift::Client do
       .to_return(:status => 200, :body => response_text, :headers => {})
 
     client = Sift::Client.new(:api_key => "foobar", :account_id => "ACCT")
-    response = client.get_content_decisions("USER", "example_order", :timeout => 3)
+    response = client.get_content_decisions("USER", "example_content", :timeout => 3)
 
     expect(response.ok?).to eq(true)
     expect(response.body["decisions"]["content_abuse"]["decision"]["id"]).to eq("decision7")
