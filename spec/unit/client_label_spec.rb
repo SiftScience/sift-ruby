@@ -46,7 +46,7 @@ describe Sift::Client do
 
     stub_request(:delete,
                  "https://api.siftscience.com/v205/users/frodo_baggins/labels?api_key=foobar&abuse_type=payment_abuse")
-      .to_return(:status => 205)
+      .to_return(:status => 204)
 
     api_key = "foobar"
 
@@ -81,7 +81,7 @@ describe Sift::Client do
 
     stub_request(:delete,
                  "https://api.siftscience.com/v203/users/frodo_baggins/labels?api_key=foobar")
-      .to_return(:status => 205)
+      .to_return(:status => 204)
 
     api_key = "foobar"
 
