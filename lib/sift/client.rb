@@ -118,7 +118,7 @@ module Sift
     #
     #   :version::
     #     The version of the Events API, Score API, and Labels API to call.
-    #     By default, version 204.
+    #     By default, version 205.
     #
     #   :path::
     #     The URL path to use for Events API path.  By default, the
@@ -132,7 +132,7 @@ module Sift
       @timeout = opts[:timeout] || 2  # 2-second timeout by default
       @path = opts[:path] || Sift.rest_api_path(@version)
 
-      raise("api_key must be a non-empty string") if !@api_key.is_a?(String) || @api_key.empty?
+      raise("api_key") if !@api_key.is_a?(String) || @api_key.empty?
       raise("path must be a non-empty string") if !@path.is_a?(String) || @path.empty?
     end
 
@@ -500,6 +500,47 @@ module Sift
       options.merge!(:timeout => timeout) unless timeout.nil?
 
       uri = API3_ENDPOINT + Sift.order_decisions_api_path(account_id, order_id)
+      response = self.class.get(uri, options)
+      Response.new(response.body, response.code, response.response)
+    end
+
+
+    # Gets the decision status of a piece of content.
+    #
+    # See https://siftscience.com/developers/docs/ruby/decisions-api/decision-status .
+    #
+    # ==== Parameters
+    #
+    # user_id::
+    #   The ID of the owner of the content.
+    #
+    # content_id::
+    #   The ID of a piece of content.
+    #
+    # opts (optional)::
+    #   A Hash of optional parameters for this request --
+    #
+    #   :account_id::
+    #     Overrides the API key for this call.
+    #
+    #   :api_key::
+    #     Overrides the API key for this call.
+    #
+    #   :timeout::
+    #     Overrides the timeout (in seconds) for this call.
+    #
+    def get_content_decisions(user_id, content_id, opts = {})
+      account_id = opts[:account_id] || @account_id
+      api_key = opts[:api_key] || @api_key
+      timeout = opts[:timeout] || @timeout
+
+      options = {
+        :headers => { "User-Agent" => user_agent },
+        :basic_auth => { :username => api_key, :password => "" }
+      }
+      options.merge!(:timeout => timeout) unless timeout.nil?
+
+      uri = API3_ENDPOINT + Sift.content_decisions_api_path(account_id, user_id, content_id)
       response = self.class.get(uri, options)
       Response.new(response.body, response.code, response.response)
     end

@@ -33,6 +33,11 @@ module Sift
     "/v3/accounts/#{account_id}/orders/#{order_id}/decisions"
   end
 
+  # Returns the path for Content Decisions API
+  def self.content_decisions_api_path(account_id, user_id, content_id)
+    "/v3/accounts/#{account_id}/users/#{user_id}/content/#{content_id}/decisions"
+  end
+
   # Module-scoped public API key
   class << self
     attr_accessor :api_key

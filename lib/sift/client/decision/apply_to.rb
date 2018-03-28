@@ -15,6 +15,7 @@ module Sift
           description
           order_id
           session_id
+          content_id
           user_id
           account_id
           time
@@ -93,11 +94,17 @@ module Sift
           configs.has_key?("session_id") || configs.has_key?(:session_id)
         end
 
+        def applying_to_content?
+          configs.has_key?("content_id") || configs.has_key?(:content_id)
+        end
+
         def path
           if applying_to_order?
             "#{user_path}/orders/#{CGI.escape(order_id)}/decisions"
           elsif applying_to_session?
             "#{user_path}/sessions/#{CGI.escape(session_id)}/decisions"
+          elsif applying_to_content?
+            "#{user_path}/content/#{CGI.escape(content_id)}/decisions"
           else
             "#{user_path}/decisions"
           end

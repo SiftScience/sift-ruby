@@ -140,7 +140,7 @@ response = client.apply_decision({
   user_id: "john@example.com"
 })
 
-# apply decision to "bob@example.com"'s order
+# apply decision to "john@example.com"'s order
 response = client.apply_decision({
   decision_id: "block_bad_order",
   source: "manual_review",
@@ -149,7 +149,7 @@ response = client.apply_decision({
   order_id: "ORDER_1234"
 })
 
-# apply decision to "bob@example.com"'s session
+# apply decision to "john@example.com"'s session
 response = client.apply_decision({
   decision_id: "block_bad_session",
   source: "manual_review",
@@ -157,6 +157,16 @@ response = client.apply_decision({
   user_id: "john@example.com",
   session_id: "SESSION_ID_1234"
 })
+
+# apply decision to "john@example.com"'s content
+response = client.apply_decision({
+  decision_id: "block_bad_session",
+  source: "manual_review",
+  analyst: "bob@your_company.com",
+  user_id: "john@example.com",
+  content_id: "CONTENT_ID_1234"
+})
+
 
 # Make sure you handle the response after applying a decision:
 
@@ -196,6 +206,9 @@ response = client.get_user_decisions('example_user_id')
 
 # Get the latest decisions for an order
 response = client.get_order_decisions('example_order_id')
+
+# Get the latest decisions for an content
+response = client.get_content_decisions('example_user_id', 'example_order_id')
 ```
 
 ## Response Object
