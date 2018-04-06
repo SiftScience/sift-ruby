@@ -80,7 +80,7 @@ To learn more about the decisions endpoint visit our [developer docs](https://si
 Get a list of your decisions.
 
 **Optional Params**
- - `entity_type`: `:user` or `:order` or `:session`
+ - `entity_type`: `:user` or `:order` or `:session` or `:content`
  - `abuse_types`: `["payment_abuse", "content_abuse", "content_abuse",
    "account_abuse", "legacy", "account_takeover"]`
 
