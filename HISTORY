@@ -1,4 +1,7 @@
-=== 3.0.0.0 2018-03-05
+=== 3.0.1 2018-03-05
+- Improved documentation on HISTORY and README.MD
+
+=== 3.0.0 2018-03-05
 - Adds support for Sift Science API Version 205, including new [`$create_content`](https://siftscience.com/developers/docs/curl/events-api/reserved-events/create-content) and [`$update_content`](https://siftscience.com/developers/docs/curl/events-api/reserved-events/update-content) formats
 - V205 APIs are now called -- **this is an incompatible change**
    - (use `:version => 204` to call the previous API version)
