@@ -363,7 +363,7 @@ describe Sift::Client do
   end
 
 
-    it "Successfully make a user decisions request" do
+  it "Successfully make a user decisions request" do
     response_text = '{"decisions":{"content_abuse":{"decision":{"id":"user_decision"},"time":1468707128659,"webhook_succeeded":false}}}'
 
     stub_request(:get, "https://foobar:@api3.siftscience.com/v3/accounts/ACCT/users/example_user/decisions")
@@ -390,6 +390,18 @@ describe Sift::Client do
     expect(response.body["decisions"]["payment_abuse"]["decision"]["id"]).to eq("decision7")
   end
 
+  it "Successfully make a session decisions request" do
+    response_text = '{"decisions":{"account_abuse":{"decision":{"id":"session_decision"},"time":1468707128659,"webhook_succeeded":false}}}'
+
+    stub_request(:get, "https://foobar:@api3.siftscience.com/v3/accounts/ACCT/users/example_user/sessions/example_session/decisions")
+      .to_return(:status => 200, :body => response_text, :headers => {})
+
+    client = Sift::Client.new(:api_key => "foobar", :account_id => "ACCT")
+    response = client.get_session_decisions("example_user", "example_session")
+
+    expect(response.ok?).to eq(true)
+    expect(response.body["decisions"]["account_abuse"]["decision"]["id"]).to eq("session_decision")
+  end
 
   it "Successfully make an content decisions request" do
     response_text = '{"decisions":{"content_abuse":{"decision":{"id":"decision7"},"time":1468599638005,"webhook_succeeded":false}}}'

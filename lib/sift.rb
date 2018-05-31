@@ -33,6 +33,11 @@ module Sift
     "/v3/accounts/#{account_id}/orders/#{order_id}/decisions"
   end
 
+  # Returns the path for Session Decisions API
+  def self.session_decisions_api_path(account_id, user_id, session_id)
+    "/v3/accounts/#{account_id}/users/#{user_id}/sessions/#{session_id}/decisions"
+  end
+
   # Returns the path for Content Decisions API
   def self.content_decisions_api_path(account_id, user_id, content_id)
     "/v3/accounts/#{account_id}/users/#{user_id}/content/#{content_id}/decisions"
