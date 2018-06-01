@@ -391,7 +391,7 @@ describe Sift::Client do
   end
 
   it "Successfully make a session decisions request" do
-    response_text = '{"decisions":{"account_abuse":{"decision":{"id":"session_decision"},"time":1468707128659,"webhook_succeeded":false}}}'
+    response_text = '{"decisions":{"account_takeover":{"decision":{"id":"session_decision"},"time":1468707128659,"webhook_succeeded":false}}}'
 
     stub_request(:get, "https://foobar:@api3.siftscience.com/v3/accounts/ACCT/users/example_user/sessions/example_session/decisions")
       .to_return(:status => 200, :body => response_text, :headers => {})
@@ -400,7 +400,7 @@ describe Sift::Client do
     response = client.get_session_decisions("example_user", "example_session")
 
     expect(response.ok?).to eq(true)
-    expect(response.body["decisions"]["account_abuse"]["decision"]["id"]).to eq("session_decision")
+    expect(response.body["decisions"]["account_takeover"]["decision"]["id"]).to eq("session_decision")
   end
 
   it "Successfully make an content decisions request" do
