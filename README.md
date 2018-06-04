@@ -207,6 +207,9 @@ response = client.get_user_decisions('example_user_id')
 # Get the latest decisions for an order
 response = client.get_order_decisions('example_order_id')
 
+# Get the latest decisions for a session
+response = client.get_session_decisions('example_user_id', 'example_session_id')
+
 # Get the latest decisions for an content
 response = client.get_content_decisions('example_user_id', 'example_order_id')
 ```
