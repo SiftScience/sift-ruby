@@ -520,7 +520,7 @@ module Sift
     #   A Hash of optional parameters for this request --
     #
     #   :account_id::
-    #     Overrides the API key for this call.
+    #     Overrides the account id for this call.
     #
     #   :api_key::
     #     Overrides the API key for this call.
