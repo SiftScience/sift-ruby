@@ -1,5 +1,5 @@
 === 3.1.1 2018-07-05
-- added new query parameter force_workflow_run
+- Add new query parameter force_workflow_run
 
 === 3.1.0 2018-06-04
 - Adds support for get session decisions to [Decisions API](https://siftscience.com/developers/docs/curl/decisions-api)
