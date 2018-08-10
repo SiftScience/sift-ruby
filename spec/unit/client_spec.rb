@@ -43,6 +43,38 @@ describe Sift::Client do
     }
   end
 
+  def user_score_response_json
+    {
+      :entity_type => "user",
+      :entity_id => "247019",
+      :scores => {
+        :payment_abuse => {
+          :score => 0.78
+        },
+        :content_abuse => {
+          :score => 0.11
+        }
+      },
+      :latest_decisions => {
+        :payment_abuse => {
+          :id => "user_looks_bad_payment_abuse",
+          :category => "block",
+          :source => "AUTOMATED_RULE",
+          :time => 1352201880,
+          :description => "Bad Fraudster"
+        }
+      },
+      :latest_labels => {
+        :payment_abuse => {
+          :is_bad => true,
+          :time => 1352201880
+        }
+      },
+      :status => 0,
+      :error_message => "OK"
+    }
+  end
+
   def action_response_json
     {
       :user_id => "247019",
@@ -269,6 +301,88 @@ describe Sift::Client do
     expect(response.api_error_message).to eq("OK")
 
     expect(response.body["score"]).to eq(0.93)
+  end
+
+
+  it "Successfully executes client.get_user_score()" do
+    api_key = "foobar"
+    response_json = user_score_response_json
+
+    stub_request(:get, "https://api.siftscience.com/v205/users/247019/score?api_key=foobar")
+      .to_return(:status => 200, :body => MultiJson.dump(response_json),
+                 :headers => {"content-type"=>"application/json; charset=UTF-8",
+                              "content-length"=> "74"})
+
+    response = Sift::Client.new(:api_key => api_key).get_user_score(user_score_response_json[:entity_id])
+    expect(response.ok?).to eq(true)
+    expect(response.api_status).to eq(0)
+    expect(response.api_error_message).to eq("OK")
+
+    expect(response.body["entity_id"]).to eq("247019")
+    expect(response.body["scores"]["payment_abuse"]["score"]).to eq(0.78)
+  end
+
+
+  it "Successfully executes client.get_user_score() with abuse types specified" do
+    api_key = "foobar"
+    response_json = user_score_response_json
+
+    stub_request(:get, "https://api.siftscience.com/v205/users/247019/score" +
+                 "?api_key=foobar&abuse_types=content_abuse,payment_abuse")
+      .to_return(:status => 200, :body => MultiJson.dump(response_json),
+                 :headers => {"content-type"=>"application/json; charset=UTF-8",
+                              "content-length"=> "74"})
+
+    response = Sift::Client.new(:api_key => api_key).get_user_score(user_score_response_json[:entity_id],
+                                                                    :abuse_types => ["content_abuse",
+                                                                                     "payment_abuse"])
+    expect(response.ok?).to eq(true)
+    expect(response.api_status).to eq(0)
+    expect(response.api_error_message).to eq("OK")
+
+    expect(response.body["entity_id"]).to eq("247019")
+    expect(response.body["scores"]["payment_abuse"]["score"]).to eq(0.78)
+  end
+
+
+  it "Successfully executes client.rescore_user()" do
+    api_key = "foobar"
+    response_json = user_score_response_json
+
+    stub_request(:post, "https://api.siftscience.com/v205/users/247019/score?api_key=foobar")
+      .to_return(:status => 200, :body => MultiJson.dump(response_json),
+                 :headers => {"content-type"=>"application/json; charset=UTF-8",
+                              "content-length"=> "74"})
+
+    response = Sift::Client.new(:api_key => api_key).rescore_user(user_score_response_json[:entity_id])
+    expect(response.ok?).to eq(true)
+    expect(response.api_status).to eq(0)
+    expect(response.api_error_message).to eq("OK")
+
+    expect(response.body["entity_id"]).to eq("247019")
+    expect(response.body["scores"]["payment_abuse"]["score"]).to eq(0.78)
+  end
+
+
+  it "Successfully executes client.rescore_user() with abuse types specified" do
+    api_key = "foobar"
+    response_json = user_score_response_json
+
+    stub_request(:post, "https://api.siftscience.com/v205/users/247019/score" +
+                 "?api_key=foobar&abuse_types=content_abuse,payment_abuse")
+      .to_return(:status => 200, :body => MultiJson.dump(response_json),
+                 :headers => {"content-type"=>"application/json; charset=UTF-8",
+                              "content-length"=> "74"})
+
+    response = Sift::Client.new(:api_key => api_key).rescore_user(user_score_response_json[:entity_id],
+                                                                  :abuse_types => ["content_abuse",
+                                                                                   "payment_abuse"])
+    expect(response.ok?).to eq(true)
+    expect(response.api_status).to eq(0)
+    expect(response.api_error_message).to eq("OK")
+
+    expect(response.body["entity_id"]).to eq("247019")
+    expect(response.body["scores"]["payment_abuse"]["score"]).to eq(0.78)
   end
 
 

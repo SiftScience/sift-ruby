@@ -295,6 +295,114 @@ module Sift
     end
 
 
+    # Fetches the latest score(s) computed for the specified user and abuse types.
+    #
+    # As opposed to client.score() and client.rescore_user(), this *does not* compute
+    # a new score for the user; it simply fetches the latest score(s) which have computed.
+    # These scores may be arbitrarily old.
+    #
+    # See https://siftscience.com/developers/docs/ruby/score-api/get-score for more details.
+    #
+    # ==== Parameters:
+    #
+    # user_id::
+    #   A user's id. This id should be the same as the user_id used in
+    #   event calls.
+    #
+    # opts (optional)::
+    #   A Hash of optional parameters for the request --
+    #
+    #   :abuse_types::
+    #     List of abuse types, specifying for which abuse types a
+    #     score should be returned.  By default, a score is returned
+    #     for every abuse type to which you are subscribed.
+    #
+    #   :api_key::
+    #     Overrides the API key for this call.
+    #
+    #   :timeout::
+    #     Overrides the timeout (in seconds) for this call.
+    #
+    # ==== Returns:
+    #
+    # A Response object containing a status code, status message, and,
+    # if successful, the user's score(s).
+    #
+    def get_user_score(user_id, opts = {})
+      abuse_types = opts[:abuse_types]
+      api_key = opts[:api_key] || @api_key
+      timeout = opts[:timeout] || @timeout
+
+      raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
+      raise("Bad api_key parameter") if api_key.empty?
+
+      query = {}
+      query["api_key"] = api_key
+      query["abuse_types"] = abuse_types.join(",") if abuse_types
+
+      options = {
+        :headers => {"User-Agent" => user_agent},
+        :query => query
+      }
+      options.merge!(:timeout => timeout) unless timeout.nil?
+
+      response = self.class.get(Sift.user_score_api_path(user_id, @version), options)
+      Response.new(response.body, response.code, response.response)
+    end
+
+
+    # Rescores the specified user for the specified abuse types and returns the resulting score(s).
+    #
+    # See https://siftscience.com/developers/docs/ruby/score-api/rescore for more details.
+    #
+    # ==== Parameters:
+    #
+    # user_id::
+    #   A user's id. This id should be the same as the user_id used in
+    #   event calls.
+    #
+    # opts (optional)::
+    #   A Hash of optional parameters for the request --
+    #
+    #   :abuse_types::
+    #     List of abuse types, specifying for which abuse types a
+    #     score should be returned.  By default, a score is returned
+    #     for every abuse type to which you are subscribed.
+    #
+    #   :api_key::
+    #     Overrides the API key for this call.
+    #
+    #   :timeout::
+    #     Overrides the timeout (in seconds) for this call.
+    #
+    # ==== Returns:
+    #
+    # A Response object containing a status code, status message, and,
+    # if successful, the user's score(s).
+    #
+    def rescore_user(user_id, opts = {})
+      abuse_types = opts[:abuse_types]
+      api_key = opts[:api_key] || @api_key
+      timeout = opts[:timeout] || @timeout
+
+      raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
+      raise("Bad api_key parameter") if api_key.empty?
+
+      query = {}
+      query["api_key"] = api_key
+      query["abuse_types"] = abuse_types.join(",") if abuse_types
+
+      options = {
+        :headers => {"User-Agent" => user_agent},
+        :query => query
+      }
+      options.merge!(:timeout => timeout) unless timeout.nil?
+
+      response = self.class.post(Sift.user_score_api_path(user_id, @version), options)
+      Response.new(response.body, response.code, response.response)
+    end
+
+
     # Labels a user.
     #
     # See https://siftscience.com/developers/docs/ruby/labels-api/label-user .

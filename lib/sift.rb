@@ -13,6 +13,11 @@ module Sift
     "/v#{version}/score/#{URI.encode(user_id)}/"
   end
 
+  # Returns the User Score API path for the specified user ID and API version
+  def self.user_score_api_path(user_id, version=API_VERSION)
+    "/v#{version}/users/#{URI.encode(user_id)}/score"
+  end
+
   # Returns the users API path for the specified user ID and API version
   def self.users_label_api_path(user_id, version=API_VERSION)
     "/v#{version}/users/#{URI.encode(user_id)}/labels"
