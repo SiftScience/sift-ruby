@@ -1,4 +1,4 @@
-# Sift Science Ruby bindings [![Build Status](https://travis-ci.org/SiftScience/sift-ruby.png?branch=master)](https://travis-ci.org/SiftScience/sift-ruby)
+# Sift bindings [![Build Status](https://travis-ci.org/SiftScience/sift-ruby.png?branch=master)](https://travis-ci.org/SiftScience/sift-ruby)
 
 ## Requirements
 
@@ -73,7 +73,7 @@ response = client.score(user_id)
 
 ## Decisions
 
-To learn more about the decisions endpoint visit our [developer docs](https://siftscience.com/developers/docs/ruby/decisions-api/get-decisions).
+To learn more about the decisions endpoint visit our [developer docs](https://sift.com/developers/docs/ruby/decisions-api/get-decisions).
 
 ### List of Configured Decisions
 
@@ -117,7 +117,7 @@ end
 
 ### Apply a decision
 
-Applies a decision to an entity. Visit our [developer docs](http://siftscience.com/developers/docs/ruby/decisions-api/apply-decision) for more information.
+Applies a decision to an entity. Visit our [developer docs](http://sift.com/developers/docs/ruby/decisions-api/apply-decision) for more information.
 
 **Required Params:**
 - `decision_id`, `source`, `user_id`
