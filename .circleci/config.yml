@@ -1,0 +1,42 @@
+version: 2
+jobs:
+  build:
+    parallelism: 3 # run three instances of this job in parallel
+    docker:
+      - image: circleci/ruby:2.4.2-jessie-node
+        environment:
+          BUNDLE_JOBS: 3
+          BUNDLE_RETRY: 3
+          BUNDLE_PATH: vendor/bundle
+    steps:
+      - checkout
+
+      - run:
+          name: Which bundler?
+          command: bundle -v
+
+      - restore_cache:
+          keys:
+            - sift-bundle-{{ checksum "sift.gemspec" }}
+            - sift-bundle-
+
+      - run:
+          name: Bundle Install
+          command: bundle check || bundle install
+
+      - save_cache:
+          key: sift-bundle-{{ checksum "sift.gemspec" }}
+          paths:
+            - vendor/bundle
+
+      - run:
+          name: Run rspec in parallel
+          command: |
+            bundle exec rspec --profile 10 \
+                              --format RspecJunitFormatter \
+                              --out test_results/rspec.xml \
+                              --format progress \
+                              $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+
+      - store_test_results:
+          path: test_results

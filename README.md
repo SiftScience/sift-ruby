@@ -1,8 +1,8 @@
-# Sift Ruby bindings [![Build Status](https://travis-ci.org/SiftScience/sift-ruby.png?branch=master)](https://travis-ci.org/SiftScience/sift-ruby)
+# Sift Ruby bindings [![CircleCI](https://circleci.com/gh/SiftScience/sift-ruby.svg?style=svg)](https://circleci.com/gh/SiftScience/sift-ruby)
 
 ## Requirements
 
-  * Ruby 1.9.3 or above.
+  * Ruby 2.0.0 or above.
 
 
 ## Installation

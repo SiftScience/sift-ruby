@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
 
   # Gems that must be intalled for sift to compile and build
   s.add_development_dependency "rspec", "~> 3.5"
+  s.add_development_dependency "rspec_junit_formatter"
   s.add_development_dependency "pry"
   s.add_development_dependency "webmock", ">= 1.16.0", "< 2"
 
