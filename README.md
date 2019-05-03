@@ -1,4 +1,5 @@
-# Sift Ruby bindings [![CircleCI](https://circleci.com/gh/SiftScience/sift-ruby.svg?style=svg)](https://circleci.com/gh/SiftScience/sift-ruby)
+# Sift Ruby bindings
+[![CircleCI](https://circleci.com/gh/SiftScience/sift-ruby.svg?style=svg)](https://circleci.com/gh/SiftScience/sift-ruby)
 
 ## Requirements
 
