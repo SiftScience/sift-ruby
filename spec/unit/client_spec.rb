@@ -172,7 +172,7 @@ describe Sift::Client do
   end
 
 
-  it "Doesn't raise an exception on Net/HTTP errors" do
+  it "Preserves response on HTTP errors but does not raise an exception" do
     api_key = "foobar"
     event = "$transaction"
     properties = valid_transaction_properties
@@ -192,7 +192,6 @@ describe Sift::Client do
 
     stub_request(:any, /.*/).to_raise(StandardError)
 
-    # This method should propagate the StandardError exception
     expect { Sift::Client.new(:api_key => api_key).track(event, properties) }.to raise_error(StandardError)
   end
 
