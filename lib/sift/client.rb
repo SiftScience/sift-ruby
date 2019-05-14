@@ -194,8 +194,8 @@ module Sift
     #
     # ==== Returns:
     #
-    # In the case of a connection error (timeout, broken connection,
-    # etc.), this method returns nil; otherwise, a Response object is
+    # In the case of a network error (timeout, broken connection, etc.),
+    # this method propagates the exception, otherwise, a Response object is
     # returned that captures the status message and status code.
     #
     def track(event, properties = {}, opts = {})
@@ -228,14 +228,8 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      begin
-        response = self.class.post(path, options)
-        Response.new(response.body, response.code, response.response)
-      rescue StandardError => e
-        Sift.warn("Failed to track event: " + e.to_s)
-        Sift.warn(e.backtrace)
-        nil
-      end
+      response = self.class.post(path, options)
+      Response.new(response.body, response.code, response.response)
     end
 
 
