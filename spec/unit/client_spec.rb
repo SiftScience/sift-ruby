@@ -176,25 +176,24 @@ describe Sift::Client do
     api_key = "foobar"
     event = "$transaction"
     properties = valid_transaction_properties
+    res = nil
 
     stub_request(:any, /.*/).to_return(:status => 401)
 
-    # This method should just return nil -- the track call failed because
-    # of an HTTP error
-    expect(Sift::Client.new(:api_key => api_key).track(event, properties)).to eq(nil)
+    expect { res = Sift::Client.new(:api_key => api_key).track(event, properties) }.not_to raise_error
+    expect(res.http_status_code).to eq(401)
   end
 
 
-  it "Returns nil when a StandardError occurs within the request" do
+  it "Propagates exception when a StandardError occurs within the request" do
     api_key = "foobar"
     event = "$transaction"
     properties = valid_transaction_properties
 
     stub_request(:any, /.*/).to_raise(StandardError)
 
-    # This method should just return nil -- the track call failed because
-    # a StandardError exception was thrown
-    expect(Sift::Client.new(:api_key => api_key).track(event, properties)).to eq(nil)
+    # This method should propagate the StandardError exception
+    expect { Sift::Client.new(:api_key => api_key).track(event, properties) }.to raise_error(StandardError)
   end
 
 
