@@ -1,6 +1,6 @@
 === 4.0.0 2019-05-15
+- Breaking change: Propagate exception in Client.track() – previously we were silently swallowing exceptions and now we are bubbling them up. You will need to add exception handling code.
 - Fix URL encoding
-- Propagate exception in Client.track
 - Add Circle build
 
 === 3.3.0 2018-07-31
