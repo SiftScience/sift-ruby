@@ -1,4 +1,6 @@
-# Sift Ruby bindings
+# sift-ruby
+
+The official Ruby bindings for the latest version (v205) of the [Sift API](https://sift.com/developers/docs/java/apis-overview).
 
 ## Requirements
 
