@@ -1,3 +1,8 @@
+=== 4.0.0 2018-07-31
+- Fix URL encoding
+- Propagate exception in Client.track
+- Add Circle build
+
 === 3.3.0 2018-07-31
 - Add support for rescore_user and get_user_score APIs
 
