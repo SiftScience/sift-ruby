@@ -3,7 +3,6 @@ require_relative './sift/client'
 require 'erb'
 
 module Sift
-  include ERB::Util
 
   # Returns the path for the specified API version
   def self.rest_api_path(version=API_VERSION)
@@ -12,49 +11,49 @@ module Sift
 
   # Returns the Score API path for the specified user ID and API version
   def self.score_api_path(user_id, version=API_VERSION)
-    "/v#{version}/score/#{url_encode(user_id)}/"
+    "/v#{version}/score/#{ERB::Util.url_encode(user_id)}/"
   end
 
   # Returns the User Score API path for the specified user ID and API version
   def self.user_score_api_path(user_id, version=API_VERSION)
-    "/v#{version}/users/#{url_encode(user_id)}/score"
+    "/v#{version}/users/#{ERB::Util.url_encode(user_id)}/score"
   end
 
   # Returns the users API path for the specified user ID and API version
   def self.users_label_api_path(user_id, version=API_VERSION)
-    "/v#{version}/users/#{url_encode(user_id)}/labels"
+    "/v#{version}/users/#{ERB::Util.url_encode(user_id)}/labels"
   end
 
   # Returns the path for the Workflow Status API
   def self.workflow_status_path(account_id, run_id)
-    "/v3/accounts/#{url_encode(account_id)}" \
-      "/workflows/runs/#{url_encode(run_id)}"
+    "/v3/accounts/#{ERB::Util.url_encode(account_id)}" \
+      "/workflows/runs/#{ERB::Util.url_encode(run_id)}"
   end
 
   # Returns the path for User Decisions API
   def self.user_decisions_api_path(account_id, user_id)
-    "/v3/accounts/#{url_encode(account_id)}" \
-      "/users/#{url_encode(user_id)}/decisions"
+    "/v3/accounts/#{ERB::Util.url_encode(account_id)}" \
+      "/users/#{ERB::Util.url_encode(user_id)}/decisions"
   end
 
   # Returns the path for Orders Decisions API
   def self.order_decisions_api_path(account_id, order_id)
-    "/v3/accounts/#{url_encode(account_id)}" \
-      "/orders/#{url_encode(order_id)}/decisions"
+    "/v3/accounts/#{ERB::Util.url_encode(account_id)}" \
+      "/orders/#{ERB::Util.url_encode(order_id)}/decisions"
   end
 
   # Returns the path for Session Decisions API
   def self.session_decisions_api_path(account_id, user_id, session_id)
-    "/v3/accounts/#{url_encode(account_id)}" \
-      "/users/#{url_encode(user_id)}" \
-      "/sessions/#{url_encode(session_id)}/decisions"
+    "/v3/accounts/#{ERB::Util.url_encode(account_id)}" \
+      "/users/#{ERB::Util.url_encode(user_id)}" \
+      "/sessions/#{ERB::Util.url_encode(session_id)}/decisions"
   end
 
   # Returns the path for Content Decisions API
   def self.content_decisions_api_path(account_id, user_id, content_id)
-    "/v3/accounts/#{url_encode(account_id)}" \
-      "/users/#{url_encode(user_id)}" \
-      "/content/#{url_encode(content_id)}/decisions"
+    "/v3/accounts/#{ERB::Util.url_encode(account_id)}" \
+      "/users/#{ERB::Util.url_encode(user_id)}" \
+      "/content/#{ERB::Util.url_encode(content_id)}/decisions"
   end
 
   # Module-scoped public API key

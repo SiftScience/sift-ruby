@@ -172,29 +172,52 @@ describe Sift::Client do
   end
 
 
-  it "Doesn't raise an exception on Net/HTTP errors" do
+  it "Handles parse exceptions for 500 status" do
     api_key = "foobar"
     event = "$transaction"
     properties = valid_transaction_properties
+    res = nil
 
-    stub_request(:any, /.*/).to_return(:status => 401)
+    stub_request(:any, /.*/).to_return(:body => "{123", :status => 500)
 
-    # This method should just return nil -- the track call failed because
-    # of an HTTP error
-    expect(Sift::Client.new(:api_key => api_key).track(event, properties)).to eq(nil)
+    expect { res = Sift::Client.new(:api_key => api_key).track(event, properties) }.not_to raise_error
+    expect(res.http_status_code).to eq(500)
   end
 
 
-  it "Returns nil when a StandardError occurs within the request" do
+  it "Handles parse exceptions for 200 status" do
+    api_key = "foobar"
+    event = "$transaction"
+    properties = valid_transaction_properties
+    res = nil
+
+    stub_request(:any, /.*/).to_return(:body => "{123", :status => 200)
+
+    expect { res = Sift::Client.new(:api_key => api_key).track(event, properties) }.to raise_error(TypeError)
+  end
+
+
+  it "Preserves response on HTTP errors but does not raise an exception" do
+    api_key = "foobar"
+    event = "$transaction"
+    properties = valid_transaction_properties
+    res = nil
+
+    stub_request(:any, /.*/).to_return(:status => 401)
+
+    expect { res = Sift::Client.new(:api_key => api_key).track(event, properties) }.not_to raise_error
+    expect(res.http_status_code).to eq(401)
+  end
+
+
+  it "Propagates exception when a StandardError occurs within the request" do
     api_key = "foobar"
     event = "$transaction"
     properties = valid_transaction_properties
 
     stub_request(:any, /.*/).to_raise(StandardError)
 
-    # This method should just return nil -- the track call failed because
-    # a StandardError exception was thrown
-    expect(Sift::Client.new(:api_key => api_key).track(event, properties)).to eq(nil)
+    expect { Sift::Client.new(:api_key => api_key).track(event, properties) }.to raise_error(StandardError)
   end
 
 
