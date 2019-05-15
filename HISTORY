@@ -1,4 +1,4 @@
-=== 4.0.0 2018-07-31
+=== 4.0.0 2019-05-15
 - Fix URL encoding
 - Propagate exception in Client.track
 - Add Circle build
