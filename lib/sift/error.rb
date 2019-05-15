@@ -10,7 +10,4 @@ module Sift
       @response = response
     end
   end
-
-  class ParseError < Error
-  end
 end

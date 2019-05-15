@@ -193,7 +193,7 @@ describe Sift::Client do
 
     stub_request(:any, /.*/).to_return(:body => "{123", :status => 200)
 
-    expect { res = Sift::Client.new(:api_key => api_key).track(event, properties) }.to raise_error
+    expect { res = Sift::Client.new(:api_key => api_key).track(event, properties) }.to raise_error(TypeError)
   end
 
 
