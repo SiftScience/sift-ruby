@@ -34,7 +34,14 @@ module Sift
 
       # only set these variables if a message-body is expected.
       if not @http_raw_response.kind_of? Net::HTTPNoContent
-        @body = MultiJson.load(http_response) unless http_response.nil?
+
+        begin
+          @body = MultiJson.load(http_response) unless http_response.nil?
+        rescue
+          if @http_status_code == 200
+            raise("unable to parse response body")
+          end
+        end
 
         if not @body.nil?
           @request = MultiJson.load(@body["request"].to_s) if @body["request"]

@@ -172,6 +172,31 @@ describe Sift::Client do
   end
 
 
+  it "Handles parse exceptions for 500 status" do
+    api_key = "foobar"
+    event = "$transaction"
+    properties = valid_transaction_properties
+    res = nil
+
+    stub_request(:any, /.*/).to_return(:body => "{123", :status => 500)
+
+    expect { res = Sift::Client.new(:api_key => api_key).track(event, properties) }.not_to raise_error
+    expect(res.http_status_code).to eq(500)
+  end
+
+
+  it "Handles parse exceptions for 200 status" do
+    api_key = "foobar"
+    event = "$transaction"
+    properties = valid_transaction_properties
+    res = nil
+
+    stub_request(:any, /.*/).to_return(:body => "{123", :status => 200)
+
+    expect { res = Sift::Client.new(:api_key => api_key).track(event, properties) }.to raise_error
+  end
+
+
   it "Preserves response on HTTP errors but does not raise an exception" do
     api_key = "foobar"
     event = "$transaction"
