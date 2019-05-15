@@ -39,7 +39,7 @@ module Sift
           @body = MultiJson.load(http_response) unless http_response.nil?
         rescue
           if @http_status_code == 200
-            raise("unable to parse response body")
+            raise ParseError.new
           end
         end
 
