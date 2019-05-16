@@ -1,4 +1,5 @@
 # sift-ruby
+[![CircleCI](https://circleci.com/gh/SiftScience/sift-ruby.svg?style=svg)](https://circleci.com/gh/SiftScience/sift-ruby)
 
 The official Ruby bindings for the latest version (v205) of the [Sift API](https://sift.com/developers/docs/java/apis-overview).
 
