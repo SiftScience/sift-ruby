@@ -216,6 +216,7 @@ module Sift
       return_score = opts[:return_score]
       return_action = opts[:return_action]
       return_workflow_status = opts[:return_workflow_status]
+      return_route_info = opts[:return_route_info]
       force_workflow_run = opts[:force_workflow_run]
       abuse_types = opts[:abuse_types]
 
@@ -227,6 +228,7 @@ module Sift
       query["return_score"] = "true" if return_score
       query["return_action"] = "true" if return_action
       query["return_workflow_status"] = "true" if return_workflow_status
+      query["return_route_info"] = "true" if return_route_info
       query["force_workflow_run"] = "true" if force_workflow_run
       query["abuse_types"] = abuse_types.join(",") if abuse_types
 
