@@ -469,7 +469,7 @@ describe Sift::Client do
     }
 
     stub_request(:post,
-                 "https://api.siftscience.com/v205/events?return_workflow_status=true&return_route_info&abuse_types=legacy,payment_abuse")
+                 "https://api.siftscience.com/v205/events?return_workflow_status=true&return_route_info=true&abuse_types=legacy,payment_abuse")
       .to_return(:status => 200, :body => MultiJson.dump(response_json),
                  :headers => {"content-type"=>"application/json; charset=UTF-8",
                               "content-length"=> "74"})
