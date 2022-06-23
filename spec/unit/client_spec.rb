@@ -469,7 +469,7 @@ describe Sift::Client do
     }
 
     stub_request(:post,
-                 "https://api.siftscience.com/v205/events?return_workflow_status=true&abuse_types=legacy,payment_abuse")
+                 "https://api.siftscience.com/v205/events?return_workflow_status=true&return_route_info=true&abuse_types=legacy,payment_abuse")
       .to_return(:status => 200, :body => MultiJson.dump(response_json),
                  :headers => {"content-type"=>"application/json; charset=UTF-8",
                               "content-length"=> "74"})
@@ -478,7 +478,8 @@ describe Sift::Client do
     properties = valid_transaction_properties
     response = Sift::Client.new(:api_key => api_key)
                .track(event, properties,
-                      :return_workflow_status => true, :abuse_types => ['legacy', 'payment_abuse'])
+                      :return_workflow_status => true, :return_route_info => true,
+                      :abuse_types => ['legacy', 'payment_abuse'])
     expect(response.ok?).to eq(true)
     expect(response.api_status).to eq(0)
     expect(response.api_error_message).to eq("OK")
