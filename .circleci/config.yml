@@ -1,4 +1,40 @@
-version: 2
+version: 2.1
+
+orbs:
+  slack: circleci/slack@4.4.2
+
+commands:
+  export_slack_id:
+    steps:
+      - run:
+          name  : Exporting circleci username as slack id.
+          command: echo 'export SLACK_PARAM_MENTIONS="$CIRCLE_USERNAME"' >> "$BASH_ENV"
+      - run:
+          name : CircleCi To Slack user mapping.
+          command: |
+            echo $GITHUB_SLACK_USERMAPPING | base64 --decode > github_slack
+            while read -r line || [[ -n $line ]];
+            do
+              [[ ${line//[[:space:]]/} =~ ^#.* || -z "$line" ]] && continue
+              echo "$line" | tr "=" "\n" | while read -r key; do
+              read -r value
+              if [ "$CIRCLE_USERNAME" = "${key}" ]; then
+                echo "export SLACK_PARAM_MENTIONS='<@${value}>'" >> $BASH_ENV
+              fi
+              done
+            done < github_slack
+            rm github_slack
+
+slack/notify: &slack_notify
+  branch_pattern: master
+  event: fail
+  channel: ci-build-status
+  template: SLACK_TAG_CI_FAILURE_TEMPLATE
+
+context: &context
+  - slack-templates
+  - slack_Oauth
+  - Github_Slack_UserMapping
 
 jobs:
   build:
@@ -11,6 +47,7 @@ jobs:
           BUNDLE_PATH: vendor/bundle
     steps:
       - checkout
+      - export_slack_id
 
       - run:
           name: Which bundler?
@@ -41,3 +78,11 @@ jobs:
 
       - store_test_results:
           path: test_results
+      - slack/notify:
+          <<: *slack_notify
+
+workflows:
+  ruby-test:
+    jobs:
+      - build:
+          context: *context
