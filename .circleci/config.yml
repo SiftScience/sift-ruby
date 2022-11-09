@@ -26,7 +26,7 @@ commands:
             rm github_slack
 
 slack/notify: &slack_notify
-  branch_pattern: CI-10268-build-failure
+  branch_pattern: master
   event: fail
   channel: ci-build-status
   template: SLACK_TAG_CI_FAILURE_TEMPLATE
@@ -82,7 +82,7 @@ jobs:
           <<: *slack_notify
 
 workflows:
-  beacon-test:
+  ruby-test:
     jobs:
       - build:
           context: *context
