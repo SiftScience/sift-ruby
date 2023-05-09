@@ -85,4 +85,7 @@ workflows:
   ruby-test:
     jobs:
       - build:
-          context: *context
+          context:
+              - slack-templates
+              - slack_Oauth
+              - Github_Slack_UserMapping
