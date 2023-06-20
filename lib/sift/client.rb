@@ -233,7 +233,6 @@ module Sift
       query["force_workflow_run"] = "true" if force_workflow_run
       query["abuse_types"] = abuse_types.join(",") if abuse_types
       if include_score_percentiles == "true"
-        query["return_score"] = "true"
         query["fields"] =  "SCORE_PERCENTILES"
       end
 
