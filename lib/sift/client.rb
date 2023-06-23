@@ -219,6 +219,7 @@ module Sift
       return_route_info = opts[:return_route_info]
       force_workflow_run = opts[:force_workflow_run]
       abuse_types = opts[:abuse_types]
+      include_score_percentiles = opts[:include_score_percentiles]
 
       raise("event must be a non-empty string") if (!event.is_a? String) || event.empty?
       raise("properties cannot be empty") if properties.empty?
@@ -231,6 +232,9 @@ module Sift
       query["return_route_info"] = "true" if return_route_info
       query["force_workflow_run"] = "true" if force_workflow_run
       query["abuse_types"] = abuse_types.join(",") if abuse_types
+      if include_score_percentiles == "true"
+        query["fields"] =  "SCORE_PERCENTILES"
+      end
 
       options = {
         :body => MultiJson.dump(delete_nils(properties).merge({"$type" => event,
