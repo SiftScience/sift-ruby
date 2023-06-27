@@ -721,14 +721,14 @@ module Sift
     end
 
     def build_default_headers_post(api_key)
-      { 
+      {
         "Authorization" => "Basic #{Base64.encode64(api_key+":")}",
         "User-Agent" => "SiftScience/v#{@version} sift-ruby/#{VERSION}",
         "Content-Type" => "application/json"
-      }      
+      }
     end
 
-    def validation_send(properties = {}, opts = {})
+    def verification_send(properties = {}, opts = {})
       api_key = opts[:api_key] || @api_key
       version = opts[:version] || @version
       timeout = opts[:timeout] || @timeout
@@ -747,7 +747,7 @@ module Sift
       Response.new(response.body, response.code, response.response)
     end
 
-    def validation_resend(properties = {}, opts = {})
+    def verification_resend(properties = {}, opts = {})
       api_key = opts[:api_key] || @api_key
       version = opts[:version] || @version
       timeout = opts[:timeout] || @timeout
@@ -766,7 +766,7 @@ module Sift
       Response.new(response.body, response.code, response.response)
     end
 
-    def validation_check(properties = {}, opts = {})
+    def verification_check(properties = {}, opts = {})
       api_key = opts[:api_key] || @api_key
       version = opts[:version] || @version
       timeout = opts[:timeout] || @timeout
