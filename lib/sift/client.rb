@@ -724,7 +724,7 @@ module Sift
       }      
     end
 
-    def send(properties = {}, opts = {})
+    def validation_send(properties = {}, opts = {})
       api_key = opts[:api_key] || @api_key
       version = opts[:version] || @version
       timeout = opts[:timeout] || @timeout
@@ -743,7 +743,7 @@ module Sift
       Response.new(response.body, response.code, response.response)
     end
 
-    def resend(properties = {}, opts = {})
+    def validation_resend(properties = {}, opts = {})
       api_key = opts[:api_key] || @api_key
       version = opts[:version] || @version
       timeout = opts[:timeout] || @timeout
@@ -762,7 +762,7 @@ module Sift
       Response.new(response.body, response.code, response.response)
     end
 
-    def check(properties = {}, opts = {})
+    def validation_check(properties = {}, opts = {})
       api_key = opts[:api_key] || @api_key
       version = opts[:version] || @version
       timeout = opts[:timeout] || @timeout

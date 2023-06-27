@@ -49,7 +49,7 @@ describe Sift::Client do
     stub_request(:post, "https://foobar1:@api.siftscience.com/v1.1/verification/send")
       .to_return(:status => 200, :body => MultiJson.dump(response_json))
 
-    response = Sift::Client.new(:api_key => api_key,:user_id => user_id,:version=>1.1).send(valid_send_properties,:version => 205)
+    response = Sift::Client.new(:api_key => api_key,:user_id => user_id,:version=>1.1).validation_send(valid_send_properties,:version => 205)
     expect(response.ok?).to eq(true)
     expect(response.api_status).to eq(0)
     expect(response.api_error_message).to eq("OK")
@@ -65,7 +65,7 @@ describe Sift::Client do
     stub_request(:post, "https://foobar1:@api.siftscience.com/v1.1/verification/resend")
       .to_return(:status => 200, :body => MultiJson.dump(response_json))
 
-    response = Sift::Client.new(:api_key => api_key,:user_id => user_id,:version=>1.1).resend(valid_resend_properties,:version => 205)
+    response = Sift::Client.new(:api_key => api_key,:user_id => user_id,:version=>1.1).validation_resend(valid_resend_properties,:version => 205)
     expect(response.ok?).to eq(true)
     expect(response.api_status).to eq(0)
     expect(response.api_error_message).to eq("OK")
@@ -81,7 +81,7 @@ describe Sift::Client do
     stub_request(:post, "https://foobar1:@api.siftscience.com/v1.1/verification/check")
       .to_return(:status => 200, :body => MultiJson.dump(response_json))
 
-    response = Sift::Client.new(:api_key => api_key,:user_id => user_id,:version=>1.1).check(valid_check_properties,:version => 205)
+    response = Sift::Client.new(:api_key => api_key,:user_id => user_id,:version=>1.1).validation_check(valid_check_properties,:version => 205)
     expect(response.ok?).to eq(true)
     expect(response.api_status).to eq(0)
     expect(response.api_error_message).to eq("OK")

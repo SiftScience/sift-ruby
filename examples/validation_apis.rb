@@ -37,10 +37,10 @@ def valid_check_properties
     }
 end
 
-  #response = Sift::Client.new(:api_key => $api_key,:user_id => $user_id,:version=>1.1).send(valid_send_properties)
+  #response = Sift::Client.new(:api_key => $api_key,:user_id => $user_id,:version=>1.1).validation_send(valid_send_properties)
 
-  #response = Sift::Client.new(:api_key => $api_key,:user_id => $user_id,:version=>1.1).resend(valid_resend_properties)
-  response = Sift::Client.new(:api_key => $api_key,:user_id => $user_id,:version=>1.1).check(valid_check_properties)
+  #response = Sift::Client.new(:api_key => $api_key,:user_id => $user_id,:version=>1.1).validation_resend(valid_resend_properties)
+  response = Sift::Client.new(:api_key => $api_key,:user_id => $user_id,:version=>1.1).validation_check(valid_check_properties)
 
   p response
 
