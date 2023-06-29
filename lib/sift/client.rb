@@ -720,6 +720,71 @@ module Sift
       handle_response(apply_decision(configs))
     end
 
+    def build_default_headers_post(api_key)
+      {
+        "Authorization" => "Basic #{Base64.encode64(api_key+":")}",
+        "User-Agent" => "SiftScience/v#{@version} sift-ruby/#{VERSION}",
+        "Content-Type" => "application/json"
+      }
+    end
+
+    def verification_send(properties = {}, opts = {})
+      api_key = opts[:api_key] || @api_key
+      version = opts[:version] || @version
+      timeout = opts[:timeout] || @timeout
+
+      raise("properties cannot be empty") if properties.empty?
+      raise("api_key cannot be empty") if api_key.empty?
+
+
+      options = {
+        :body => MultiJson.dump(delete_nils(properties)),
+        :headers => build_default_headers_post(api_key)
+      }
+      options.merge!(:timeout => timeout) unless timeout.nil?
+
+      response = self.class.post(Sift.verification_api_send_path(@version), options)
+      Response.new(response.body, response.code, response.response)
+    end
+
+    def verification_resend(properties = {}, opts = {})
+      api_key = opts[:api_key] || @api_key
+      version = opts[:version] || @version
+      timeout = opts[:timeout] || @timeout
+
+      raise("properties cannot be empty") if properties.empty?
+      raise("api_key cannot be empty") if api_key.empty?
+
+
+      options = {
+        :body => MultiJson.dump(delete_nils(properties)),
+        :headers => build_default_headers_post(api_key)
+      }
+      options.merge!(:timeout => timeout) unless timeout.nil?
+
+      response = self.class.post(Sift.verification_api_resend_path(@version), options)
+      Response.new(response.body, response.code, response.response)
+    end
+
+    def verification_check(properties = {}, opts = {})
+      api_key = opts[:api_key] || @api_key
+      version = opts[:version] || @version
+      timeout = opts[:timeout] || @timeout
+
+      raise("properties cannot be empty") if properties.empty?
+      raise("api_key cannot be empty") if api_key.empty?
+
+
+      options = {
+        :body => MultiJson.dump(delete_nils(properties)),
+        :headers => build_default_headers_post(api_key)
+      }
+      options.merge!(:timeout => timeout) unless timeout.nil?
+
+      response = self.class.post(Sift.verification_api_check_path(@version), options)
+      Response.new(response.body, response.code, response.response)
+    end
+
     private
 
     def handle_response(response)
