@@ -81,8 +81,41 @@ jobs:
       - slack/notify:
           <<: *slack_notify
 
+  build_publish:
+    docker:
+      - image: cimg/ruby:2.7
+    steps:
+      - checkout
+      - export_slack_id
+      - run:
+          name: Install dependencies
+          command: |
+            sudo gem install bundler
+            sudo bundle install
+      - run:
+          name: Build and push gem
+          command: |
+            version=$(awk -F'"' '/ VERSION = /  {print $2}' < lib/sift/version.rb)
+            if [[ -z $(gem list -r -e sift -v $version --no-verbose) ]]; then
+                echo "Gem version does not exists on RubyGems."
+                gem build sift.gemspec
+                gem push sift-$version.gem
+            else
+                echo "Gem version $version exists on RubyGems"
+            fi
+      - run:
+          name: Run Rake tasks
+          command: |
+            sudo bundle exec rake -T
+            sudo bundle exec rake build
+            sudo bundle exec rake install
+#             sudo bundle exec rake release
+
+
 workflows:
   ruby-test:
     jobs:
       - build:
+          context: *context
+      - build_publish:
           context: *context
