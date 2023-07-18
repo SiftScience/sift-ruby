@@ -97,7 +97,7 @@ jobs:
           command: |
             version=$(awk -F'"' '/ VERSION = /  {print $2}' < lib/sift/version.rb)
             if [[ -z $(gem list -r -e sift -v $version --no-verbose) ]]; then
-                echo "Gem version does not exists on RubyGems."
+                echo "Gem version does not exists on RubyGems. Building and pushing.!"
                 gem build sift.gemspec
                 gem push sift-$version.gem
             else
@@ -109,8 +109,7 @@ jobs:
             sudo bundle exec rake -T
             sudo bundle exec rake build
             sudo bundle exec rake install
-#             sudo bundle exec rake release
-
+#             sudo bundle exec rake release - Uncomment this line when release is available.
 
 workflows:
   ruby-test:
@@ -118,4 +117,8 @@ workflows:
       - build:
           context: *context
       - build_publish:
+          filters:
+            branches:
+              only:
+                - master
           context: *context
