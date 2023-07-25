@@ -1,0 +1,44 @@
+name: Build and Publish Gem
+on:
+  release:
+    types: [published]
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  RUBYGEMS_API_KEY: ${{secrets.RUBYGEMS_API_KEY}}
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+
+      - name: Install Bundler
+        run: |
+          sudo gem install bundler
+          bundle install
+
+      - name: Build and push gem
+        run: |
+          version=$(awk -F'"' '/ VERSION = / {print $2}' < lib/sift/version.rb)
+          if [[ -z $(gem list -r -e sift -v $version --no-verbose) ]]; then
+              echo "Gem version does not exist on RubyGems. Building and pushing!"
+              gem build sift.gemspec
+              gem push sift-$version.gem --api-key $RUBYGEMS_API_KEY
+          else
+              echo "Gem version $version exists on RubyGems"
+          fi
+
+      - name: Run Rake tasks
+        run: |
+          bundle exec rake -T
+          bundle exec rake build
+          bundle exec rake install
+          # Uncomment the line below when release is available.
+          # bundle exec rake release
