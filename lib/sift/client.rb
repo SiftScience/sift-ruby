@@ -785,6 +785,111 @@ module Sift
       Response.new(response.body, response.code, response.response)
     end
 
+    def create_psp_merchant_profile(properties = {}, opts = {})
+      # Create a new PSP Merchant profile
+      # Args:
+      #   properties: A dict of merchant profile data.
+      # Returns
+      #   A sift.client.Response object if the call succeeded, else raises an ApiException
+
+      account_id = opts[:account_id] || @account_id
+      api_key = opts[:api_key] || @api_key
+      timeout = opts[:timeout] || @timeout
+
+      raise("api_key cannot be empty") if api_key.empty?
+      raise("account_id cannot be empty") if account_id.empty?
+      raise("properties cannot be empty") if properties.empty?
+
+      options = {
+        :body => MultiJson.dump(delete_nils(properties)),
+        :headers => { "User-Agent" => user_agent, "Content-Type" => "application/json" },
+        :basic_auth => { :username => api_key, :password => "" }
+      }
+      options.merge!(:timeout => timeout) unless timeout.nil?
+      response = self.class.post(API_ENDPOINT + Sift.psp_merchant_api_path(account_id), options)
+      Response.new(response.body, response.code, response.response)
+    end
+
+    def update_psp_merchant_profile(merchant_id, properties = {}, opts = {})
+      # Update an existing PSP Merchant profile
+      #  Args:
+      #      merchant_id: id of merchant
+      #      properties: A dict of merchant profile data.
+      #  Returns
+      #      A sift.client.Response object if the call succeeded, else raises an ApiException
+
+      account_id = opts[:account_id] || @account_id
+      api_key = opts[:api_key] || @api_key
+      timeout = opts[:timeout] || @timeout
+
+      raise("api_key cannot be empty") if api_key.empty?
+      raise("account_id cannot be empty") if account_id.empty?
+      raise("merchant_id cannot be empty") if merchant_id.empty?
+      raise("properties cannot be empty") if properties.empty?
+
+      options = {
+        :body => MultiJson.dump(delete_nils(properties)),
+        :headers => { "User-Agent" => user_agent, "Content-Type" => "application/json" },
+        :basic_auth => { :username => api_key, :password => "" }
+      }
+      options.merge!(:timeout => timeout) unless timeout.nil?
+      response = self.class.put(API_ENDPOINT + Sift.psp_merchant_id_api_path(account_id, merchant_id), options)
+      Response.new(response.body, response.code, response.response)
+    end
+
+  def get_a_psp_merchant_profile(merchant_id, opts = {})
+    # Gets a PSP merchant profile using merchant id.
+    #  Args:
+    #      merchant_id: id of merchant
+    #  Returns
+    #      A sift.client.Response object if the call succeeded, else raises an ApiException
+
+    account_id = opts[:account_id] || @account_id
+    api_key = opts[:api_key] || @api_key
+    timeout = opts[:timeout] || @timeout
+    
+    raise("api_key cannot be empty") if api_key.empty?
+    raise("account_id cannot be empty") if account_id.empty?
+    raise("merchant_id cannot be empty") if merchant_id.empty?
+
+    options = {
+      :headers => { "User-Agent" => user_agent, "Content-Type" => "application/json" },
+      :basic_auth => { :username => api_key, :password => "" }
+    }
+    options.merge!(:timeout => timeout) unless timeout.nil?
+    response = self.class.get(API_ENDPOINT + Sift.psp_merchant_id_api_path(account_id, merchant_id), options)
+    Response.new(response.body, response.code, response.response)
+  end
+
+  def get_psp_merchant_profiles(batch_size = nil, batch_token = nil, opts = {})
+    # Get all PSP merchant profiles.
+    # Args:
+    #  batch_size : Batch or page size of the paginated sequence.
+    #  batch_token : Batch or page position of the paginated sequence.
+    #  Returns
+    #      A sift.client.Response object if the call succeeded, else raises an ApiException
+
+    account_id = opts[:account_id] || @account_id
+    api_key = opts[:api_key] || @api_key
+    timeout = opts[:timeout] || @timeout
+
+    raise("api_key cannot be empty") if api_key.empty?
+    raise("account_id cannot be empty") if account_id.empty?
+
+    query = {}
+    query["batch_size"] = batch_size if batch_size
+    query["batch_token"] = batch_token if batch_token
+
+    options = {
+      :headers => { "User-Agent" => user_agent, "Content-Type" => "application/json" },
+      :basic_auth => { :username => api_key, :password => "" },
+      :query => query
+    }
+    options.merge!(:timeout => timeout) unless timeout.nil?
+    response = self.class.get(API_ENDPOINT + Sift.psp_merchant_api_path(account_id), options)
+    Response.new(response.body, response.code, response.response)
+  end
+
     private
 
     def handle_response(response)
