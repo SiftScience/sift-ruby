@@ -217,6 +217,72 @@ response = client.get_session_decisions('example_user_id', 'example_session_id')
 response = client.get_content_decisions('example_user_id', 'example_order_id')
 ```
 
+## PSP Merchant Management API
+
+To learn more about the decisions endpoint visit our [developer docs](https://sift.com/developers/docs/ruby/psp-merchant-management-api).
+
+```ruby
+# On-board a PSP merchant summary to Sift Platform.
+# Sample psp_merchant_profile
+  properties = {
+    "id": "merchant_id_01000",
+    "name": "Wonderful Payments Inc.",
+    "description": "Wonderful Payments payment provider.",
+    "address": {
+      "name": "Alany",
+      "address_1": "Big Payment blvd, 22",
+      "address_2": "apt, 8",
+      "city": "New Orleans",
+      "region": "NA",
+      "country": "US",
+      "zipcode": "76830",
+      "phone": "0394888320"
+    },
+    "category": "1002",
+    "service_level": "Platinum",
+    "status": "active",
+    "risk_profile": {
+      "level": "low",
+      "score": 10
+    }
+  }
+response = client.create_psp_merchant_profile(properties)
+
+# Update a merchant summary to reflect changes in the status or service level or address etc.
+  properties = {
+    "id": "merchant_id_01000",
+    "name": "Wonderful Payments Inc.",
+    "description": "Wonderful Payments payment provider.",
+    "address": {
+      "name": "Alany",
+      "address_1": "Big Payment blvd, 22",
+      "address_2": "apt, 8",
+      "city": "New Orleans",
+      "region": "NA",
+      "country": "US",
+      "zipcode": "76830",
+      "phone": "0394888320"
+    },
+    "category": "1002",
+    "service_level": "Platinum",
+    "status": "active",
+    "risk_profile": {
+      "level": "low",
+      "score": 10
+    }
+  }
+response = client.update_psp_merchant_profile('merchant_id', properties)
+
+# Get the existing PSP merchant summaries.
+response = client.get_a_psp_merchant_profile('merchant_id')
+
+# Get all PSP merchant summaries
+response = client.get_psp_merchant_profiles()
+
+# Get PSP merchant summaries paginated 
+response = client.get_psp_merchant_profiles('batch_size', 'batch_token')
+```
+
 ## Response Object
 
 All requests to our apis will return a `Response` instance.
