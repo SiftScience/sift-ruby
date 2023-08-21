@@ -40,5 +40,4 @@ jobs:
           bundle exec rake -T
           bundle exec rake build
           bundle exec rake install
-          # Uncomment the line below when release is available.
-          # bundle exec rake release
+          bundle exec rake release
