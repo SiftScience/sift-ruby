@@ -18,11 +18,12 @@ jobs:
         run: |
           user=${{ github.actor }}
           user_info=$(gh api -H "Accept: application/vnd.github+json" /users/$user)
-          user_email=$(echo $user_info | grep email | cut -d' ' -f 2 | cut -d'"' -f2)
+          user_email=$(echo $user_info | grep email | cut -d' ' -f 2 | cut -d'"' -f1)
           echo $user
           echo $user_email
           git config --global user.email "$user_email"
           git config --global user.name "$user"
+          exit 1
           
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
