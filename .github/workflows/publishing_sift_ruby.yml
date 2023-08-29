@@ -16,8 +16,8 @@ jobs:
         
       - name: Set GH config
         run: |
-          user=echo $(${{ github.actor }} | cut -d'-' f1)
-          user_email=echo "$user"'@siftscience.com'
+          user=$(echo ${{ github.actor }} | cut -d'-' f1))
+          user_email=$(echo "$user"'@siftscience.com')
           echo $user
           echo $user_email
           git config --global user.email "$user_email"
