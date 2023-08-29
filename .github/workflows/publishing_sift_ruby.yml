@@ -5,7 +5,6 @@ on:
 
 env:
   GH_TOKEN: ${{ github.token }}
-  RUBYGEMS_API_KEY: ${{secrets.RUBYGEMS_API_KEY}}
 
 jobs:
   build_and_publish:
@@ -32,7 +31,7 @@ jobs:
           if [[ $all_versions != *"$version"* ]]; then
               echo "Gem version does not exist on RubyGems. Building and pushing!"
               gem build sift.gemspec
-              gem push sift-$version.gem --key $RUBYGEMS_API_KEY
+              gem push sift-$version.gem --key ${{secrets.RUBYGEMS_API_KEY}}
           else
               echo "Gem version $version exists on RubyGems"
           fi
