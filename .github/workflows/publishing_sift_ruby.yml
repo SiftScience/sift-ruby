@@ -18,7 +18,8 @@ jobs:
         run: |
           user=${{ github.actor }}
           user_info=$(gh api -H "Accept: application/vnd.github+json" /users/$user)
-          user_email=$(echo $user_info | grep email | cut -d' ' -f2)
+          echo '${{ fromJson($user_info).emai }}'
+          user_email=$(echo '${{ fromJson($user_info).emai }}')
           echo $user
           echo $user_email
           git config --global user.email "$user_email"
