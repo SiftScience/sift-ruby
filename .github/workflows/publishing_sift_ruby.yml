@@ -26,12 +26,17 @@ jobs:
 
       - name: Build and push gem
         run: |
+          mkdir -p $HOME/.gem
+          touch $HOME/.gem/credentials
+          chmod 0600 $HOME/.gem/credentials
+          printf -- "---\n:rubygems_api_key: ${{ secrets.GH_RGEMS_KEY }}\n" > $HOME/.gem/credentials
           version=$(awk -F'"' '/ VERSION = / {print $2}' < lib/sift/version.rb)
           all_versions=$(gem list -r -e --all sift --no-verbose)
           if [[ $all_versions != *"$version"* ]]; then
               echo "Gem version does not exist on RubyGems. Building and pushing!"
               gem build sift.gemspec
-              gem push sift-$version.gem --key ${{ secrets.GH_RGEMS_KEY }}
+              gem push sift-$version.gem --key rubygems_api_key
+              rm -rf $HOME/.gem
           else
               echo "Gem version $version exists on RubyGems"
           fi
