@@ -35,8 +35,9 @@ jobs:
           if [[ $all_versions != *"$version"* ]]; then
               echo "Gem version does not exist on RubyGems. Building and pushing!"
               gem build sift.gemspec
-              gem push sift-$version.gem --key rubygems_api_key
+              gem push sift-$version.gem
               rm -rf $HOME/.gem
+              ls -la $HOME/
           else
               echo "Gem version $version exists on RubyGems"
           fi
