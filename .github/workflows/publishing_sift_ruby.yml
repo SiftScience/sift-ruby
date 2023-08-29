@@ -28,7 +28,8 @@ jobs:
       - name: Build and push gem
         run: |
           version=$(awk -F'"' '/ VERSION = / {print $2}' < lib/sift/version.rb)
-          if [[ -z $(gem list -r -e sift -v $version --no-verbose) ]]; then
+          all_versions=$(gem list -r -e --all sift --no-verbose)
+          if [[ $all_versions != *"$version"* ]]; then
               echo "Gem version does not exist on RubyGems. Building and pushing!"
               gem build sift.gemspec
               gem push sift-$version.gem --api-key $RUBYGEMS_API_KEY
