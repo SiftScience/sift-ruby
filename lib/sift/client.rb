@@ -201,6 +201,9 @@ module Sift
     #
     #   :path::
     #     Overrides the URI path for this API call.
+    # 
+    #   :include_score_percentiles::
+    #     include_score_percentiles(optional) : Whether to add new parameter in the query parameter.
     #
     # ==== Returns:
     #
@@ -275,6 +278,9 @@ module Sift
     #
     #   :version::
     #     Overrides the version of the Events API to call.
+    # 
+    #   :include_score_percentiles::
+    #     include_score_percentiles(optional) : Whether to add new parameter in the query parameter.
     #
     # ==== Returns:
     #
@@ -286,6 +292,7 @@ module Sift
       api_key = opts[:api_key] || @api_key
       timeout = opts[:timeout] || @timeout
       version = opts[:version] || @version
+      include_score_percentiles = opts[:include_score_percentiles]
 
       raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
       raise("Bad api_key parameter") if api_key.empty?
@@ -293,6 +300,9 @@ module Sift
       query = {}
       query["api_key"] = api_key
       query["abuse_types"] = abuse_types.join(",") if abuse_types
+      if include_score_percentiles == "true"
+        query["fields"] =  "SCORE_PERCENTILES"
+      end
 
       options = {
         :headers => {"User-Agent" => user_agent},
@@ -332,6 +342,9 @@ module Sift
     #
     #   :timeout::
     #     Overrides the timeout (in seconds) for this call.
+    # 
+    #   :include_score_percentiles::
+    #     include_score_percentiles(optional) : Whether to add new parameter in the query parameter.
     #
     # ==== Returns:
     #
@@ -342,6 +355,7 @@ module Sift
       abuse_types = opts[:abuse_types]
       api_key = opts[:api_key] || @api_key
       timeout = opts[:timeout] || @timeout
+      include_score_percentiles = opts[:include_score_percentiles]
 
       raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
       raise("Bad api_key parameter") if api_key.empty?
@@ -349,6 +363,9 @@ module Sift
       query = {}
       query["api_key"] = api_key
       query["abuse_types"] = abuse_types.join(",") if abuse_types
+      if include_score_percentiles == "true"
+        query["fields"] =  "SCORE_PERCENTILES"
+      end
 
       options = {
         :headers => {"User-Agent" => user_agent},
