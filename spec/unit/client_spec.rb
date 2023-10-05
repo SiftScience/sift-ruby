@@ -110,6 +110,60 @@ describe Sift::Client do
     }
   end
 
+  def percentile_response_json
+    {
+      :user_id => 'billy_jones_301',
+      :latest_labels => {},
+      :workflow_statuses => [],
+      :scores => {
+        :account_abuse => {
+          :score => 0.32787917675535705,
+          :reasons => [{
+            :name => 'Latest item product title',
+            :value => 'The Slanket Blanket-Texas Tea'
+          }],
+          :percentiles => {
+            :last_7_days => -1.0, :last_1_days => -1.0, :last_10_days => -1.0, :last_5_days => -1.0
+          }
+        },
+        :acontent_abuse => {
+          :score => 0.28056292905897995,
+          :reasons => [{
+            :name => 'timeSinceFirstEvent',
+            :value => '13.15 minutes'
+          }],
+          :percentiles => {
+            :last_7_days => -1.0, :last_1_days => -1.0, :last_10_days => -1.0, :last_5_days => -1.0
+          }
+        },
+        :payment_abuse => {
+          :score => 0.28610507028376797,
+          :reasons => [{
+            :name => 'Latest item currency code',
+            :value => 'USD'
+          }, {
+            :name => 'Latest item item ID',
+            :value => 'B004834GQO'
+          }, {
+            :name => 'Latest item product title',
+            :value => 'The Slanket Blanket-Texas Tea'
+          }],
+          :percentiles => {
+            :last_7_days => -1.0, :last_1_days => -1.0, :last_10_days => -1.0, :last_5_days => -1.0
+          }
+        },
+        :promotion_abuse => {
+          :score => 0.05731508921450917,
+          :percentiles => {
+            :last_7_days => -1.0, :last_1_days => -1.0, :last_10_days => -1.0, :last_5_days => -1.0
+          }
+        }
+      },
+      :status => 0,
+      :error_message => 'OK'
+    }
+  end
+
   def fully_qualified_api_endpoint
     Sift::Client::API_ENDPOINT + Sift.rest_api_path
   end
@@ -552,6 +606,87 @@ describe Sift::Client do
 
     expect(response.ok?).to eq(true)
     expect(response.body["decisions"]["content_abuse"]["decision"]["id"]).to eq("decision7")
+  end
+
+  it "Successfully submits a v205 event with SCORE_PERCENTILES" do
+    response_json =
+    { :status => 0, :error_message => "OK",  :score_response => percentile_response_json}
+    stub_request(:post, "https://api.siftscience.com/v205/events?fields=SCORE_PERCENTILES&return_score=true").
+      with { | request|
+        parsed_body = JSON.parse(request.body)
+        expect(parsed_body).to include("$api_key" => "overridden")
+      }.to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
+
+    api_key = "foobar"
+    event = "$transaction"
+    properties = valid_transaction_properties
+
+    response = Sift::Client.new(:api_key => api_key, :version => "205")
+              .track(event, properties, :api_key => "overridden", :include_score_percentiles => "true", :return_score => "true")
+    expect(response.ok?).to eq(true)
+    expect(response.api_status).to eq(0)
+    expect(response.api_error_message).to eq("OK")
+    expect(response.body["score_response"]["scores"]["account_abuse"]["percentiles"]["last_7_days"]).to eq(-1.0)
+  end
+
+  it "Successfully submits a v205 event with SCORE_PERCENTILES" do
+    response_json =
+    { :status => 0, :error_message => "OK",  :score_response => percentile_response_json}
+    stub_request(:post, "https://api.siftscience.com/v205/events?fields=SCORE_PERCENTILES&return_score=true").
+      with { | request|
+        parsed_body = JSON.parse(request.body)
+        expect(parsed_body).to include("$api_key" => "overridden")
+      }.to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
+
+    api_key = "foobar"
+    event = "$transaction"
+    properties = valid_transaction_properties
+
+    response = Sift::Client.new(:api_key => api_key, :version => "205")
+              .track(event, properties, :api_key => "overridden", :include_score_percentiles => "true", :return_score => "true")
+    expect(response.ok?).to eq(true)
+    expect(response.api_status).to eq(0)
+    expect(response.api_error_message).to eq("OK")
+    expect(response.body["score_response"]["scores"]["account_abuse"]["percentiles"]["last_7_days"]).to eq(-1.0)
+  end
+
+  it "Successfully fetches a v205 score with SCORE_PERCENTILES" do
+
+    api_key = "foobar"
+    response_json = score_response_json
+
+    stub_request(:get, "https://api.siftscience.com/v205/score/247019/?api_key=foobar&fields=SCORE_PERCENTILES")
+      .to_return(:status => 200, :body => MultiJson.dump(response_json),
+                 :headers => {"content-type"=>"application/json; charset=UTF-8",
+                              "content-length"=> "74"})
+
+    response = Sift::Client.new(:api_key => api_key)
+               .score(score_response_json[:user_id], :version => 205, :include_score_percentiles => "true")
+    expect(response.ok?).to eq(true)
+    expect(response.api_status).to eq(0)
+    expect(response.api_error_message).to eq("OK")
+
+    expect(response.body["score"]).to eq(0.93)
+  end
+
+  it "Successfully executes client.get_user_score() with SCORE_PERCENTILES" do
+
+    api_key = "foobar"
+    response_json = user_score_response_json
+
+    stub_request(:get, "https://api.siftscience.com/v205/users/247019/score?api_key=foobar&fields=SCORE_PERCENTILES")
+      .to_return(:status => 200, :body => MultiJson.dump(response_json),
+                 :headers => {"content-type"=>"application/json; charset=UTF-8",
+                              "content-length"=> "74"})
+
+    response = Sift::Client.new(:api_key => api_key)
+               .get_user_score(user_score_response_json[:entity_id], :include_score_percentiles => "true")
+    expect(response.ok?).to eq(true)
+    expect(response.api_status).to eq(0)
+    expect(response.api_error_message).to eq("OK")
+
+    expect(response.body["entity_id"]).to eq("247019")
+    expect(response.body["scores"]["payment_abuse"]["score"]).to eq(0.78)
   end
 
 end
