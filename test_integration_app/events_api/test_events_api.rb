@@ -2,7 +2,7 @@ require "sift"
 
 class EventsAPI
 
-    @@client = Sift::Client.new(:api_key => ENV["api_key"])
+    @@client = Sift::Client.new(:api_key => ENV["API_KEY"])
     
     def login()
     

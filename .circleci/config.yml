@@ -81,8 +81,25 @@ jobs:
       - slack/notify:
           <<: *slack_notify
 
+  run_integration_tests:
+    docker:
+        - image: circleci/ruby:2.4.2-jessie-node
+    steps:
+      - checkout
+      - run:
+          name: Install bundle and run the tests
+          command: | 
+            bundle check || bundle install
+            bundle exec ruby test_integration_app/main.rb      
+
 workflows:
   ruby-test:
     jobs:
       - build:
           context: *context
+  ruby-integration-tests:
+    jobs:
+      - run_integration_tests:
+          filters:
+            branches:
+              only: master
