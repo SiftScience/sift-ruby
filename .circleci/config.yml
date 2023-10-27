@@ -102,4 +102,4 @@ workflows:
       - run_integration_tests:
           filters:
             branches:
-              only: API-7366-ci-for-testing-app
+              only: master
