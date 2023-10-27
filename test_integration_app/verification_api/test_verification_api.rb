@@ -2,18 +2,15 @@ require "sift"
 
 class VerificationAPI
 
-    @@client = Sift::Client.new(:api_key => ENV["api_key"],  :version=>1.1)
-  
-    def send()   
-        
-        # Sample $verification event
+    @@client = Sift::Client.new(:api_key => ENV["API_KEY"],  :version=>1.1)
+
+    def send()
         properties = {
-            # Required Fields
-            "$user_id"               => $user_id,
+            "$user_id"            => $user_id,
             "$send_to"            => $user_email,
             "$verification_type"            => "$email",
             "$brand_name"         => "MyTopBrand",
-            "$language"             => "en",
+            "$language"           => "en",
             "$site_country" => "IN",
             "$event" => {
                 "$session_id" => "SOME_SESSION_ID",

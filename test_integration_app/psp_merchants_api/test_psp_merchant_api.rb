@@ -2,13 +2,13 @@ require "sift"
 
 class PSPMerchantAPI
 
-    @@client = Sift::Client.new(:api_key => ENV["api_key"], :account_id => ENV["account_id"])
+    @@client = Sift::Client.new(:api_key => ENV["API_KEY"], :account_id => ENV["ACCOUNT_ID"])
 
-    def create_psp_merchant_profile()
-           
-        # Sample psp_merchant_profile  
+    def create_psp_merchant_profile(merchant_id)
+
+        # Sample psp_merchant_profile
         properties={
-            "id": "merchant_id-"<< rand.to_s[5..10],
+            "id": merchant_id,
             "name": "Wonderful Payments Inc.",
             "description": "Wonderful Payments payment provider.",
             "address": {
@@ -29,12 +29,12 @@ class PSPMerchantAPI
                 "score": 10
             }
         }
-        
+
         return @@client.create_psp_merchant_profile(properties)
     end
-    
-    def get_psp_merchant_profile()        
-        return @@client.get_a_psp_merchant_profile("api-key1-2")
+
+    def get_psp_merchant_profile(merchant_id)
+        return @@client.get_a_psp_merchant_profile(merchant_id)
     end
     
     def get_all_psp_merchant_profiles(batch_size = nil, batch_token = nil)       
