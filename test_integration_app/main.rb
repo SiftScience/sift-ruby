@@ -28,37 +28,37 @@ class Main
         objPSPMerchant = PSPMerchantAPI.new()
 
         raise "Failed - Events $login" unless objUtils.isOk(objEvents.login())
-#         raise "Failed - Events $transaction" unless objUtils.isOk(objEvents.transaction())
-#         raise "Failed - Events $create_order" unless objUtils.isOk(objEvents.create_order())
-#         raise "Failed - Events $create_content" unless objUtils.isOk(objEvents.create_content())
-#         raise "Failed - Events $create_content - listing" unless objUtils.isOk(objEvents.create_content_listing())
-#         raise "Failed - Events $create_content - message" unless objUtils.isOk(objEvents.create_content_message())
-#         raise "Failed - Events $update_account" unless objUtils.isOk(objEvents.update_account())
-#         raise "Failed - Events $update_content - listing" unless objUtils.isOk(objEvents.update_content_listing())
-#         raise "Failed - Events $create_account" unless objUtils.isOk(objEvents.create_account())
-#         raise "Failed - Events $verification" unless objUtils.isOk(objEvents.verification())
-#         raise "Failed - Events $add_item_to_cart" unless objUtils.isOk(objEvents.add_item_to_cart())
-#         raise "Failed - Events $order_status" unless objUtils.isOk(objEvents.order_status())
-#         raise "Failed - Events $link_session_to_user" unless objUtils.isOk(objEvents.link_session_to_user())
-#         raise "Failed - Events $content_status" unless objUtils.isOk(objEvents.content_status())
-#         raise "Failed - Events $update_order" unless objUtils.isOk(objEvents.update_order())
+        raise "Failed - Events $transaction" unless objUtils.isOk(objEvents.transaction())
+        raise "Failed - Events $create_order" unless objUtils.isOk(objEvents.create_order())
+        raise "Failed - Events $create_content" unless objUtils.isOk(objEvents.create_content())
+        raise "Failed - Events $create_content - listing" unless objUtils.isOk(objEvents.create_content_listing())
+        raise "Failed - Events $create_content - message" unless objUtils.isOk(objEvents.create_content_message())
+        raise "Failed - Events $update_account" unless objUtils.isOk(objEvents.update_account())
+        raise "Failed - Events $update_content - listing" unless objUtils.isOk(objEvents.update_content_listing())
+        raise "Failed - Events $create_account" unless objUtils.isOk(objEvents.create_account())
+        raise "Failed - Events $verification" unless objUtils.isOk(objEvents.verification())
+        raise "Failed - Events $add_item_to_cart" unless objUtils.isOk(objEvents.add_item_to_cart())
+        raise "Failed - Events $order_status" unless objUtils.isOk(objEvents.order_status())
+        raise "Failed - Events $link_session_to_user" unless objUtils.isOk(objEvents.link_session_to_user())
+        raise "Failed - Events $content_status" unless objUtils.isOk(objEvents.content_status())
+        raise "Failed - Events $update_order" unless objUtils.isOk(objEvents.update_order())
         puts "Events API Tested"
 
-#         raise "Failed - User Score" unless objUtils.isOk(objScore.user_score())
-#         puts "Score API Tested"
-#
-#         raise "Failed - Apply decision on user" unless objUtils.isOk(objDecision.apply_user_decision())
-#         raise "Failed - Apply decision on order" unless objUtils.isOk(objDecision.apply_order_decision())
-#         puts "Decisions API Tested"
-#
-#         raise "Failed - Verification Send" unless objUtils.isOk(objVerification.send())
-#         puts "Verifications API Tested"
-#
-#         merchant_id = "merchant_id_test_sift_ruby_"<< rand.to_s[5..10]
-#         raise "Failed - Merchants API - Create" unless objUtils.isOk(objPSPMerchant.create_psp_merchant_profile(merchant_id))
-#         raise "Failed - Merchants API - Get Profile" unless objUtils.isOk(objPSPMerchant.get_psp_merchant_profile(merchant_id))
-#         raise "Failed -  Merchants API - Get Profiles" unless objUtils.isOk(objPSPMerchant.get_all_psp_merchant_profiles())
-#         puts "PSP Merchant API Tested"
+        raise "Failed - User Score" unless objUtils.isOk(objScore.user_score())
+        puts "Score API Tested"
+
+        raise "Failed - Apply decision on user" unless objUtils.isOk(objDecision.apply_user_decision())
+        raise "Failed - Apply decision on order" unless objUtils.isOk(objDecision.apply_order_decision())
+        puts "Decisions API Tested"
+
+        raise "Failed - Verification Send" unless objUtils.isOk(objVerification.send())
+        puts "Verifications API Tested"
+
+        merchant_id = "merchant_id_test_sift_ruby_"<< rand.to_s[5..10]
+        raise "Failed - Merchants API - Create" unless objUtils.isOk(objPSPMerchant.create_psp_merchant_profile(merchant_id))
+        raise "Failed - Merchants API - Get Profile" unless objUtils.isOk(objPSPMerchant.get_psp_merchant_profile(merchant_id))
+        raise "Failed -  Merchants API - Get Profiles" unless objUtils.isOk(objPSPMerchant.get_all_psp_merchant_profiles())
+        puts "PSP Merchant API Tested"
 
     end
 end
