@@ -102,6 +102,4 @@ workflows:
       - run_integration_tests:
           filters:
             branches:
-              only:
-                - master
-                - add-jenkins-pipeline
+              only: master
