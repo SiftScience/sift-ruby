@@ -11,8 +11,8 @@ def defaultStatusContext = 'Jenkins:auto'
 
 // Pod template file for Jenkins agent pod
 // Pod template yaml file is defined in https://github.com/SiftScience/jenkins/tree/master/resources/jenkins-k8s-pod-templates
-def ruby3PodTemplateFile = 'ruby-3-0-6-pod-template.yaml'
-def ruby3PodLabel = "ruby3-${BUILD_TAG}"
+def ruby2PodTemplateFile = 'ruby-2-4-2-pod-template.yaml'
+def ruby2PodLabel = "ruby2-${BUILD_TAG}"
 
 
 // GitHub repo name
@@ -53,7 +53,7 @@ pipeline {
                             if (env.GIT_BRANCH.equals('master')) {
                                 ciUtil.updateGithubCommitStatus(repoName, stage1, 'Started', 'pending', commitSha)
                                 try {
-                                    siftRubyWorkflow.runSiftRubyIntegration(ruby3PodTemplateFile, ruby3PodLabel)
+                                    siftRubyWorkflow.runSiftRubyIntegration(ruby2PodTemplateFile, ruby2PodLabel)
                                     ciUtil.updateGithubCommitStatus(repoName, stage1, 'SUCCESS', 'success', commitSha)
                                 } catch (Exception e) {
                                     ciUtil.updateGithubCommitStatus(repoName, stage1, 'FAILURE', 'failure', commitSha)
@@ -68,7 +68,7 @@ pipeline {
                         stage(stage2) {
                             ciUtil.updateGithubCommitStatus(repoName, stage2, 'Started', 'pending', commitSha)
                             try {
-                                siftRubyWorkflow.runSiftRubyTest(ruby3PodTemplateFile, ruby3PodLabel)
+                                siftRubyWorkflow.runSiftRubyTest(ruby2PodTemplateFile, ruby2PodLabel)
                                 ciUtil.updateGithubCommitStatus(repoName, stage2, 'SUCCESS', 'success', commitSha)
                             } catch (Exception e) {
                                 ciUtil.updateGithubCommitStatus(repoName, stage2, 'FAILURE', 'failure', commitSha)
