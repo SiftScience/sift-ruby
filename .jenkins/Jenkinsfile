@@ -1,0 +1,103 @@
+// Load Jenkins shared library
+jenkinsBranch = 'v0.12.0'
+sharedLib = library("shared-lib@${jenkinsBranch}")
+
+def siftRubyWorkflow = sharedLib.com.sift.ci.SiftRubyWorkflow.new()
+def ciUtil = sharedLib.com.sift.ci.CIUtil.new()
+def stackdriver = sharedLib.com.sift.ci.StackDriverMetrics.new()
+
+// Default GitHub status context for automatically triggered builds
+def defaultStatusContext = 'Jenkins:auto'
+
+// Pod template file for Jenkins agent pod
+// Pod template yaml file is defined in https://github.com/SiftScience/jenkins/tree/master/resources/jenkins-k8s-pod-templates
+def ruby2PodTemplateFile = 'ruby-2-4-2-pod-template.yaml'
+def ruby2PodLabel = "ruby2-${BUILD_TAG}"
+
+
+// GitHub repo name
+def repoName = 'sift-ruby'
+
+pipeline {
+    agent none
+    options {
+        timestamps()
+        skipDefaultCheckout()
+        disableConcurrentBuilds()
+        disableRestartFromStage()
+        parallelsAlwaysFailFast()
+        buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '30', numToKeepStr: '')
+        timeout(time: 1, unit: 'HOURS')
+    }
+    environment {
+        GIT_BRANCH = "${env.CHANGE_BRANCH != null? env.CHANGE_BRANCH : env.BRANCH_NAME}"
+    }
+    stages {
+        stage('Initialize') {
+            steps {
+                script {
+                    statusContext = defaultStatusContext
+                    // Get the commit sha for the build
+                    commitSha = ciUtil.commitHashForBuild()
+                    ciUtil.updateGithubCommitStatus(repoName, statusContext, 'Started', 'pending', commitSha)
+                }
+            }
+        }
+        stage ('Build and Test Workflows') {
+            steps {
+                script {
+                    def workflows = [:]
+                    def stage1 = 'Run Integration Tests - ruby'
+                    workflows[stage1] = {
+                        stage(stage1) {
+                            if (env.GIT_BRANCH.equals('master')) {
+                                ciUtil.updateGithubCommitStatus(repoName, stage1, 'Started', 'pending', commitSha)
+                                try {
+                                    siftRubyWorkflow.runSiftRubyIntegration(ruby2PodTemplateFile, ruby2PodLabel)
+                                    ciUtil.updateGithubCommitStatus(repoName, stage1, 'SUCCESS', 'success', commitSha)
+                                } catch (Exception e) {
+                                    ciUtil.updateGithubCommitStatus(repoName, stage1, 'FAILURE', 'failure', commitSha)
+                                    print("${stage1} failed")
+                                    throw e
+                                }
+                            }
+                        }
+                    }
+                    def stage2 = 'Test - ruby'
+                    workflows[stage2] = {
+                        stage(stage2) {
+                            ciUtil.updateGithubCommitStatus(repoName, stage2, 'Started', 'pending', commitSha)
+                            try {
+                                siftRubyWorkflow.runSiftRubyTest(ruby2PodTemplateFile, ruby2PodLabel)
+                                ciUtil.updateGithubCommitStatus(repoName, stage2, 'SUCCESS', 'success', commitSha)
+                            } catch (Exception e) {
+                                ciUtil.updateGithubCommitStatus(repoName, stage2, 'FAILURE', 'failure', commitSha)
+                                print("${stage2} failed")
+                                throw e
+                            }
+                        }
+                    }
+                    parallel workflows
+                }
+            }
+        }
+    }
+    post {
+        success {
+            script {
+                ciUtil.updateGithubCommitStatus(repoName, statusContext, currentBuild.currentResult, 'success', commitSha)
+            }
+        }
+        unsuccessful {
+            script {
+                ciUtil.updateGithubCommitStatus(repoName, statusContext, currentBuild.currentResult, 'failure', commitSha)
+                ciUtil.notifySlack(repoName, commitSha)
+            }
+        }
+        always {
+            script {
+                stackdriver.updatePipelineStatistics(this)
+            }
+        }
+    }
+}
