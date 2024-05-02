@@ -1,5 +1,5 @@
 // Load Jenkins shared library
-jenkinsBranch = 'CI-15822-sift-ruby-pipe-resource-request'
+jenkinsBranch = 'v0.16.0'
 sharedLib = library("shared-lib@${jenkinsBranch}")
 
 def siftRubyWorkflow = sharedLib.com.sift.ci.SiftRubyWorkflow.new()
