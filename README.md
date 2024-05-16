@@ -1,5 +1,4 @@
 # sift-ruby
-[![CircleCI](https://circleci.com/gh/SiftScience/sift-ruby.svg?style=svg)](https://circleci.com/gh/SiftScience/sift-ruby)
 
 The official Ruby bindings for the latest version (v205) of the [Sift API](https://sift.com/developers/docs/java/apis-overview).
 
@@ -39,8 +38,22 @@ client = Sift::Client.new(api_key: '<your_api_key_here>', account_id: '<your_acc
 
 ```
 
-### Sending a transaction event
+### Sending an event
+Send event to Sift.
+To learn more about the Events API visit our [developer docs](https://developers.sift.com/docs/ruby/events-api/overview).
 
+
+**Optional Params**
+- `return_score`: `:true` or `:false`
+- `return_action`: `:true` or `:false`
+- `return_workflow_status`: `:true` or `:false`
+- `return_route_info`: `:true` or `:false`
+- `force_workflow_run`: `:true` or `:false`
+- `include_score_percentiles`: `:true` or `:false`
+- `warnings`: `:true` or `:false`
+- `abuse_types`: `["payment_abuse", "content_abuse", "content_abuse", "account_abuse", "legacy", "account_takeover"]`
+
+**Example:**
 ```ruby
 event = "$transaction"
 
@@ -293,7 +306,7 @@ All requests to our apis will return a `Response` instance.
 - `api_error_message` returns a string describing the api error code.
 - `api_error_description` a summary of the error that occured.
 - `api_error_issues` a hash describing the items the error occured. The `key` is the item and the `value` is the description of the error.
-
+- `warnings` returns list of warnings if requested.
 
 ## Building
 

@@ -205,6 +205,9 @@ module Sift
     #   :include_score_percentiles::
     #     include_score_percentiles(optional) : Whether to add new parameter in the query parameter.
     #
+    #   :warnings::
+    #     warnings(optional) : Whether to add list of warnings (if any) to response.
+    #
     # ==== Returns:
     #
     # In the case of a network error (timeout, broken connection, etc.),
@@ -223,6 +226,7 @@ module Sift
       force_workflow_run = opts[:force_workflow_run]
       abuse_types = opts[:abuse_types]
       include_score_percentiles = opts[:include_score_percentiles]
+      warnings = opts[:warnings]
 
       raise("event must be a non-empty string") if (!event.is_a? String) || event.empty?
       raise("properties cannot be empty") if properties.empty?
@@ -235,8 +239,12 @@ module Sift
       query["return_route_info"] = "true" if return_route_info
       query["force_workflow_run"] = "true" if force_workflow_run
       query["abuse_types"] = abuse_types.join(",") if abuse_types
-      if include_score_percentiles == "true"
-        query["fields"] =  "SCORE_PERCENTILES"
+
+      if include_score_percentiles == "true" || warnings == "true"
+        fields = []
+        fields << "SCORE_PERCENTILES" if include_score_percentiles == "true"
+        fields << "WARNINGS" if warnings == "true"
+        query["fields"] = fields.join(",")
       end
 
       options = {
