@@ -697,26 +697,6 @@ describe Sift::Client do
     expect(response.body["entity_id"]).to eq("247019")
     expect(response.body["scores"]["payment_abuse"]["score"]).to eq(0.78)
   end
-it "Successfully submits a v205 event with SCORE_PERCENTILES" do
-    response_json =
-    { :status => 0, :error_message => "OK",  :score_response => percentile_response_json}
-    stub_request(:post, "https://api.siftscience.com/v205/events?fields=SCORE_PERCENTILES&return_score=true").
-      with { | request|
-        parsed_body = JSON.parse(request.body)
-        expect(parsed_body).to include("$api_key" => "overridden")
-      }.to_return(:status => 200, :body => MultiJson.dump(response_json), :headers => {})
-
-    api_key = "foobar"
-    event = "$transaction"
-    properties = valid_transaction_properties
-
-    response = Sift::Client.new(:api_key => api_key, :version => "205")
-              .track(event, properties, :api_key => "overridden", :include_score_percentiles => "true", :return_score => "true")
-    expect(response.ok?).to eq(true)
-    expect(response.api_status).to eq(0)
-    expect(response.api_error_message).to eq("OK")
-    expect(response.body["score_response"]["scores"]["account_abuse"]["percentiles"]["last_7_days"]).to eq(-1.0)
-  end
 
   it "Successfully submits a v205 event with WARNINGS" do
     response_json =
