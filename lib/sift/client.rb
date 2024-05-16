@@ -17,7 +17,8 @@ module Sift
       :api_error_message,
       :request,
       :api_error_description,
-      :api_error_issues
+      :api_error_issues,
+      :api_warnings
 
     # Constructor
     #
@@ -47,6 +48,7 @@ module Sift
           @request = MultiJson.load(@body["request"].to_s) if @body["request"]
           @api_status = @body["status"].to_i if @body["status"]
           @api_error_message = @body["error_message"]
+          @api_warnings = MultiJson.load(@body["warnings"].to_s) if @body["warnings"]
 
           if @body["error"]
             @api_error_message = @body["error"]

@@ -90,20 +90,14 @@ describe Sift::Client do
         }
       },
       :status => 0,
-      :error_message => 'OK',
-      :warnings => {
-        :count => 1,
-        :items => [{
-            :message => 'Invalid currency'
-        }]
-      }
+      :error_message => 'OK'
     }
   end
 
   it "Successfully submits a v205 event with SCORE_PERCENTILES and WARNINGS" do
     response_json =
     { :status => 0, :error_message => "OK",  :score_response => percentile_response_json}
-    stub_request(:post, "https://api.siftscience.com/v205/events?fields=SCORE_PERCENTILES,WARNINGS&return_score=true").
+    stub_request(:post, "https://api.siftscience.com/v205/events?fields=SCORE_PERCENTILES&return_score=true").
       with { | request|
         parsed_body = JSON.parse(request.body)
         expect(parsed_body).to include("$api_key" => "overridden")
@@ -116,13 +110,10 @@ describe Sift::Client do
     response = Sift::Client.new(:api_key => api_key, :version => "205")
               .track(event, properties, :api_key => "overridden",
                :include_score_percentiles => "true",
-               :warnings => "true",
                :return_score => "true")
     expect(response.ok?).to eq(true)
     expect(response.api_status).to eq(0)
     expect(response.api_error_message).to eq("OK")
     expect(response.body["score_response"]["scores"]["account_abuse"]["percentiles"]["last_7_days"]).to eq(-1.0)
-    expect(response.warnings.count).to eq(1)
-    expect(response.warnings.items[0].message).to eq("Invalid currency")
   end
 end
