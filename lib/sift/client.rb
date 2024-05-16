@@ -17,8 +17,7 @@ module Sift
       :api_error_message,
       :request,
       :api_error_description,
-      :api_error_issues,
-      :api_warnings
+      :api_error_issues
 
     # Constructor
     #
