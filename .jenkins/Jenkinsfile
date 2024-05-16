@@ -1,5 +1,5 @@
 // Load Jenkins shared library
-jenkinsBranch = 'v0.16.0'
+jenkinsBranch = 'v0.37.0'
 sharedLib = library("shared-lib@${jenkinsBranch}")
 
 def siftRubyWorkflow = sharedLib.com.sift.ci.SiftRubyWorkflow.new()
