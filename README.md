@@ -306,7 +306,6 @@ All requests to our apis will return a `Response` instance.
 - `api_error_message` returns a string describing the api error code.
 - `api_error_description` a summary of the error that occured.
 - `api_error_issues` a hash describing the items the error occured. The `key` is the item and the `value` is the description of the error.
-- `warnings` returns list of warnings if requested.
 
 ## Building
 
