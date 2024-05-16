@@ -112,12 +112,10 @@ describe Sift::Client do
 
   def warnings
     {
-      :warnings => {
-        :count => 1,
-        :items => [{
-            :message => 'Invalid currency'
-        }]
-      }
+      :count => 1,
+      :items => [{
+        :message => 'Invalid currency'
+      }]
     }
   end
 
@@ -654,10 +652,7 @@ describe Sift::Client do
     properties = valid_transaction_properties
 
     response = Sift::Client.new(:api_key => api_key, :version => "205")
-              .track(event, properties, :api_key => "overridden",
-               :include_score_percentiles => "true",
-               :warnings => "true",
-               :return_score => "true")
+              .track(event, properties, :api_key => "overridden", :include_score_percentiles => "true", :return_score => "true")
     expect(response.ok?).to eq(true)
     expect(response.api_status).to eq(0)
     expect(response.api_error_message).to eq("OK")
@@ -725,7 +720,7 @@ it "Successfully submits a v205 event with SCORE_PERCENTILES" do
 
   it "Successfully submits a v205 event with WARNINGS" do
     response_json =
-    { :status => 0, :error_message => "OK",  :warnings => warnings}
+    { :status => 0, :error_message => "OK", :warnings => warnings}
     stub_request(:post, "https://api.siftscience.com/v205/events?fields=WARNINGS").
       with { | request|
         parsed_body = JSON.parse(request.body)
@@ -741,7 +736,7 @@ it "Successfully submits a v205 event with SCORE_PERCENTILES" do
     expect(response.ok?).to eq(true)
     expect(response.api_status).to eq(0)
     expect(response.api_error_message).to eq("OK")
-    expect(response.api_warnings["count"]).to eq("1")
-    expect(response.api_warnings["items"][0]["message"]).to eq("Invalid currency")
+    expect(response.body["warnings"]["count"]).to eq(1)
+    expect(response.body["warnings"]["items"][0]["message"]).to eq("Invalid currency")
   end
 end
