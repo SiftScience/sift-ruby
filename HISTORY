@@ -1,3 +1,6 @@
+=== 4.5.0 2024-05-16
+- Support for warnings in Events API
+
 === 4.4.0 2023-10-05
 - Score percentiles in Score API
 

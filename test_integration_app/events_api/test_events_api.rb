@@ -122,7 +122,7 @@ class EventsAPI
             }
         }
         
-        return @@client.track("$transaction", properties)
+        return @@client.track("$transaction", properties, :warnings => 'true')
     end
     
     def create_order()
