@@ -2,9 +2,11 @@ name: Ruby-ci
 
 on:
   push:
-    branches: [ "*" ]
+    branches:
+      - master
   pull_request:
-    branches: [ "master" ]
+    branches:
+      - master
 
 env:
   ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}
@@ -31,6 +33,7 @@ jobs:
 
   run_integration_tests:
     runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/master' }}
     strategy:
       matrix:
         ruby-version: [ '2.4.2' ]
