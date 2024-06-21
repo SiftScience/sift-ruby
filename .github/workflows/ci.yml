@@ -11,12 +11,10 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
         ruby-version: ['2.4.2']
-
     steps:
       - uses: actions/checkout@v4
       - name: Set up Ruby
@@ -26,3 +24,21 @@ jobs:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
       - name: Run tests
         run: bundle exec rspec --format RspecJunitFormatter --out test_results/rspec.xml --format progress
+
+  run_integration_tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby-version: [ '2.4.2' ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+      - name: Run tests
+        run: |
+          bundle check
+          bundle install
+          bundle exec ruby test_integration_app/main.rb 
