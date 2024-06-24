@@ -46,6 +46,4 @@ jobs:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
       - name: Run tests
         run: |
-          bundle check
-          bundle install
           bundle exec ruby test_integration_app/main.rb 
