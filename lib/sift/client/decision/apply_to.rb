@@ -24,11 +24,11 @@ module Sift
         attr_reader :decision_id, :configs, :getter, :api_key
 
         PROPERTIES.each do |attribute|
-          class_eval %{
+          class_eval <<~RUBY, __FILE__, __LINE__ + 1
             def #{attribute}
               getter.get(:#{attribute})
             end
-          }
+          RUBY
         end
 
         def initialize(api_key, decision_id, configs)
