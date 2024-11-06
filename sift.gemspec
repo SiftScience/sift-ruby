@@ -14,6 +14,11 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "sift"
 
+  s.metadata = {
+    "changelog_uri"     => "https://github.com/SiftScience/sift-ruby/blob/master/HISTORY",
+    "source_code_uri"   => "https://github.com/SiftScience/sift-ruby"
+  }
+
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
