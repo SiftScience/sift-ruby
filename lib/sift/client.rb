@@ -774,7 +774,7 @@ module Sift
 
     def verification_resend(properties = {}, opts = {})
       api_key = opts[:api_key] || @api_key
-      version = version = opts[:verification_version] || @verification_version
+      version = opts[:verification_version] || @verification_version
       timeout = opts[:timeout] || @timeout
 
       raise("properties cannot be empty") if properties.empty?
@@ -793,7 +793,7 @@ module Sift
 
     def verification_check(properties = {}, opts = {})
       api_key = opts[:api_key] || @api_key
-      version = version = opts[:verification_version] || @verification_version
+      version = opts[:verification_version] || @verification_version
       timeout = opts[:timeout] || @timeout
 
       raise("properties cannot be empty") if properties.empty?
