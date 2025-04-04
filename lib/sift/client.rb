@@ -806,7 +806,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = self.class.post(Sift.verification_api_check_path(version), options)
+      response = self.class.post(Sift.verification_api_check_path(@version), options)
       Response.new(response.body, response.code, response.response)
     end
 
