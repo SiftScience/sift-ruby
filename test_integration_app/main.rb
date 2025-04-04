@@ -52,6 +52,8 @@ class Main
         puts "Decisions API Tested"
 
         raise "Failed - Verification Send" unless objUtils.isOk(objVerification.send())
+        raise "Failed - Verification Resend" unless objUtils.isOk(objVerification.resend())
+        raise "Failed - Verification Check" unless objUtils.isOk(objVerification.check())
         puts "Verifications API Tested"
 
         merchant_id = "merchant_id_test_sift_ruby_"<< rand.to_s[5..10]
