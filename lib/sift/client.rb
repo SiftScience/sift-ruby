@@ -756,7 +756,7 @@ module Sift
 
     def verification_send(properties = {}, opts = {})
       api_key = opts[:api_key] || @api_key
-      version = @verification_version
+      version = opts[:verification_version] || @verification_version
       timeout = opts[:timeout] || @timeout
 
       raise("properties cannot be empty") if properties.empty?
@@ -768,13 +768,13 @@ module Sift
         :headers => build_default_headers_post(api_key)
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
-      response = self.class.post(Sift.verification_api_send_path(@verification_version), options)
+      response = self.class.post(Sift.verification_api_send_path(@version), options)
       Response.new(response.body, response.code, response.response)
     end
 
     def verification_resend(properties = {}, opts = {})
       api_key = opts[:api_key] || @api_key
-      version = @verification_version
+      version = version = opts[:verification_version] || @verification_version
       timeout = opts[:timeout] || @timeout
 
       raise("properties cannot be empty") if properties.empty?
@@ -787,13 +787,13 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = self.class.post(Sift.verification_api_resend_path(@verification_version), options)
+      response = self.class.post(Sift.verification_api_resend_path(@version), options)
       Response.new(response.body, response.code, response.response)
     end
 
     def verification_check(properties = {}, opts = {})
       api_key = opts[:api_key] || @api_key
-      version = @verification_version
+      version = version = opts[:verification_version] || @verification_version
       timeout = opts[:timeout] || @timeout
 
       raise("properties cannot be empty") if properties.empty?
@@ -806,7 +806,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = self.class.post(Sift.verification_api_check_path(@verification_version), options)
+      response = self.class.post(Sift.verification_api_check_path(version), options)
       Response.new(response.body, response.code, response.response)
     end
 
