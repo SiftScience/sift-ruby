@@ -29,20 +29,4 @@ class VerificationAPI
         return @@client.verification_send(properties)
     end
 
-    def resend()
-        properties = {
-            "$user_id"            => $user_id
-        }
-
-        return @@client.verification_resend(properties)
-    end
-
-    def check()
-        properties = {
-            "$user_id"            => $user_id,
-            "$code"               => "123456"
-        }
-
-        return @@client.verification_check(properties)
-    end
 end
