@@ -2,7 +2,7 @@ require "sift"
 
 class VerificationAPI
 
-    @@client = Sift::Client.new(:api_key => ENV["API_KEY"],  :verification_version => ENV["VERIFICATION_VERSION"])
+    @@client = Sift::Client.new(:api_key => ENV["API_KEY"],  :verification_version => 1.1)
 
     def send()
         properties = {
