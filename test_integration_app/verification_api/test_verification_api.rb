@@ -2,13 +2,13 @@ require "sift"
 
 class VerificationAPI
 
-    @@client = Sift::Client.new(:api_key => ENV["API_KEY"],  :version=>1.1)
+    @@client = Sift::Client.new(:api_key => ENV["API_KEY"],  :version => 1.1)
 
     def send()
         properties = {
             "$user_id"            => $user_id,
             "$send_to"            => $user_email,
-            "$verification_type"            => "$email",
+            "$verification_type"  => "$email",
             "$brand_name"         => "MyTopBrand",
             "$language"           => "en",
             "$site_country" => "IN",
@@ -28,5 +28,5 @@ class VerificationAPI
         
         return @@client.verification_send(properties)
     end
-    
+
 end

@@ -139,6 +139,7 @@ module Sift
       @api_key = opts[:api_key] || Sift.api_key
       @account_id = opts[:account_id] || Sift.account_id
       @version = opts[:version] || API_VERSION
+      @verification_version = opts[:verification_version] || VERIFICATION_API_VERSION
       @timeout = opts[:timeout] || 2  # 2-second timeout by default
       @path = opts[:path] || Sift.rest_api_path(@version)
 
@@ -201,7 +202,7 @@ module Sift
     #
     #   :path::
     #     Overrides the URI path for this API call.
-    # 
+    #
     #   :include_score_percentiles::
     #     include_score_percentiles(optional) : Whether to add new parameter in the query parameter.
     #
@@ -286,7 +287,7 @@ module Sift
     #
     #   :version::
     #     Overrides the version of the Events API to call.
-    # 
+    #
     #   :include_score_percentiles::
     #     include_score_percentiles(optional) : Whether to add new parameter in the query parameter.
     #
@@ -350,7 +351,7 @@ module Sift
     #
     #   :timeout::
     #     Overrides the timeout (in seconds) for this call.
-    # 
+    #
     #   :include_score_percentiles::
     #     include_score_percentiles(optional) : Whether to add new parameter in the query parameter.
     #
@@ -755,7 +756,7 @@ module Sift
 
     def verification_send(properties = {}, opts = {})
       api_key = opts[:api_key] || @api_key
-      version = opts[:version] || @version
+      version = opts[:verification_version] || @verification_version
       timeout = opts[:timeout] || @timeout
 
       raise("properties cannot be empty") if properties.empty?
@@ -767,14 +768,13 @@ module Sift
         :headers => build_default_headers_post(api_key)
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
-
       response = self.class.post(Sift.verification_api_send_path(@version), options)
       Response.new(response.body, response.code, response.response)
     end
 
     def verification_resend(properties = {}, opts = {})
       api_key = opts[:api_key] || @api_key
-      version = opts[:version] || @version
+      version = opts[:verification_version] || @verification_version
       timeout = opts[:timeout] || @timeout
 
       raise("properties cannot be empty") if properties.empty?
@@ -793,7 +793,7 @@ module Sift
 
     def verification_check(properties = {}, opts = {})
       api_key = opts[:api_key] || @api_key
-      version = opts[:version] || @version
+      version = opts[:verification_version] || @verification_version
       timeout = opts[:timeout] || @timeout
 
       raise("properties cannot be empty") if properties.empty?

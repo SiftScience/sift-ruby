@@ -10,17 +10,17 @@ module Sift
   end
 
   # Returns the path for the specified API version
-  def self.verification_api_send_path(version=API_VERSION)
+  def self.verification_api_send_path(version=VERIFICATION_API_VERSION)
     "/v#{version}/verification/send"
   end
 
   # Returns the path for the specified API version
-  def self.verification_api_resend_path(version=API_VERSION)
+  def self.verification_api_resend_path(version=VERIFICATION_API_VERSION)
     "/v#{version}/verification/resend"
   end
 
   # Returns the path for the specified API version
-  def self.verification_api_check_path(version=API_VERSION)
+  def self.verification_api_check_path(version=VERIFICATION_API_VERSION)
     "/v#{version}/verification/check"
   end
 
