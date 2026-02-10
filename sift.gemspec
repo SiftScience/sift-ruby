@@ -7,10 +7,10 @@ Gem::Specification.new do |s|
   s.version     = Sift::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Fred Sadaghiani", "Yoav Schatzberg", "Jacob Burnim"]
-  s.email       = ["support@siftscience.com"]
-  s.homepage    = "http://siftscience.com"
-  s.summary     = %q{Sift Science Ruby API Gem}
-  s.description = %q{Sift Science Ruby API. Please see http://siftscience.com for more details.}
+  s.email       = ["support@sift.com"]
+  s.homepage    = "http://sift.com"
+  s.summary     = %q{Sift Ruby API Gem}
+  s.description = %q{Sift Ruby API. Please see http://sift.com for more details.}
 
   s.rubyforge_project = "sift"
 
@@ -18,6 +18,8 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
+
+  s.required_ruby_version     = '>= 2.7.0'
 
   # Gems that must be intalled for sift to compile and build
   s.add_development_dependency "rspec", "~> 3.5"
