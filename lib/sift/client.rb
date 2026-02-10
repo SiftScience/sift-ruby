@@ -108,6 +108,10 @@ module Sift
     API_ENDPOINT = ENV["SIFT_RUBY_API_URL"] || 'https://api.siftscience.com'
     API3_ENDPOINT = ENV["SIFT_RUBY_API3_URL"] || 'https://api3.siftscience.com'
 
+    # Maintain backward compatibility for users who may rely on HTTParty methods
+    include HTTParty
+    base_uri API_ENDPOINT
+
     attr_reader :api_key, :account_id
 
     def self.build_auth_header(api_key)
