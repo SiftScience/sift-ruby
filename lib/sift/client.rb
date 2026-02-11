@@ -2,9 +2,6 @@ require "httparty"
 require "multi_json"
 require "base64"
 
-require_relative "./client/decision"
-require_relative "./error"
-
 module Sift
 
   # Represents the payload returned from a call through the track API
@@ -952,5 +949,20 @@ module Sift
         end
       end
     end
+  end
+
+  require_relative "./client/decision"
+  require_relative "./error"
+
+  # Internal HTTParty client for api.siftscience.com endpoints
+  # Handles Events, Labels, Scores, PSP Merchant, and Verification APIs
+  class ApiClient < Client
+    base_uri API_ENDPOINT
+  end
+
+  # Internal HTTParty client for api3.siftscience.com endpoints
+  # Handles Decisions and Workflows APIs
+  class Api3Client < Client
+    base_uri API3_ENDPOINT
   end
 end

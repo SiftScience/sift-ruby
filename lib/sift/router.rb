@@ -2,17 +2,18 @@ require_relative "./version"
 require_relative "./client"
 
 module Sift
-  class Router
-    include HTTParty
+  class Router < Client
 
     class << self
       def get(path, options = {})
+        options[:base_uri] = nil
         serialize_body(options)
         add_default_headers(options)
         wrap_response(super(path, options))
       end
 
       def post(path, options = {})
+        options[:base_uri] = nil
         serialize_body(options)
         add_default_headers(options)
         wrap_response(super(path, options))
