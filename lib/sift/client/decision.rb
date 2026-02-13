@@ -10,11 +10,12 @@ module Sift
     class Decision
       FILTER_PARAMS = %w{ limit entity_type abuse_types from }
 
-      attr_reader :account_id, :api_key
+      attr_reader :account_id, :api_key, :client_class
 
-      def initialize(api_key, account_id)
+      def initialize(api_key, account_id, client_class = Sift::Client)
         @account_id = account_id
         @api_key = api_key
+        @client_class = client_class
       end
 
       def list(options = {})
@@ -25,7 +26,8 @@ module Sift
         else
           Router.get(index_path, {
             query: build_query(getter),
-            headers: auth_header
+            headers: auth_header,
+            client_class: client_class
           })
         end
       end
@@ -44,7 +46,7 @@ module Sift
         getter = Utils::HashGetter.new(configs)
         configs[:account_id] = account_id
 
-        ApplyTo.new(api_key, getter.get(:decision_id), configs).run
+        ApplyTo.new(api_key, getter.get(:decision_id), configs, client_class).run
       end
 
       def index_path
@@ -54,7 +56,7 @@ module Sift
       private
 
       def request_next_page(path)
-        Router.get(path, headers: auth_header)
+        Router.get(path, headers: auth_header, client_class: client_class)
       end
 
       def auth_header
@@ -63,4 +65,3 @@ module Sift
     end
   end
 end
-

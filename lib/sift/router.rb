@@ -6,17 +6,19 @@ module Sift
 
     class << self
       def get(path, options = {})
+        client_class = options.delete(:client_class) || Sift::Client
         options[:base_uri] = nil
         serialize_body(options)
         add_default_headers(options)
-        wrap_response(super(path, options))
+        wrap_response(client_class.api3_client.get(path, options))
       end
 
       def post(path, options = {})
+        client_class = options.delete(:client_class) || Sift::Client
         options[:base_uri] = nil
         serialize_body(options)
         add_default_headers(options)
-        wrap_response(super(path, options))
+        wrap_response(client_class.api3_client.post(path, options))
       end
 
       def serialize_body(options)

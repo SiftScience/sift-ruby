@@ -85,20 +85,6 @@ module Sift
     end
   end
 
-  # Internal HTTParty client for api.siftscience.com endpoints
-  # Handles Events, Labels, Scores, PSP Merchant, and Verification APIs
-  class ApiClient
-    include HTTParty
-    base_uri ENV["SIFT_RUBY_API_URL"] || 'https://api.siftscience.com'
-  end
-
-  # Internal HTTParty client for api3.siftscience.com endpoints
-  # Handles Decisions and Workflows APIs
-  class Api3Client
-    include HTTParty
-    base_uri ENV["SIFT_RUBY_API3_URL"] || 'https://api3.siftscience.com'
-  end
-
   # This class wraps accesses through the API
   #
   class Client
@@ -111,12 +97,30 @@ module Sift
 
     attr_reader :api_key, :account_id
 
-    def self.build_auth_header(api_key)
-      { "Authorization" => "Basic #{Base64.encode64(api_key)}" }
-    end
+    class << self
+      def build_auth_header(api_key)
+        { "Authorization" => "Basic #{Base64.encode64(api_key)}" }
+      end
 
-    def self.user_agent
-      "sift-ruby/#{VERSION}"
+      def user_agent
+        "sift-ruby/#{VERSION}"
+      end
+
+      # Factory methods for internal API executors that inherit from the current class context.
+      # This ensures that subclasses of Client propagate their HTTParty configuration
+      # to these internal clients.
+
+      def api_client
+        @api_client ||= Class.new(self) do
+          base_uri API_ENDPOINT
+        end
+      end
+
+      def api3_client
+        @api3_client ||= Class.new(self) do
+          base_uri API3_ENDPOINT
+        end
+      end
     end
 
     # Constructor
@@ -152,7 +156,7 @@ module Sift
       @account_id = opts[:account_id] || Sift.account_id
       @version = opts[:version] || API_VERSION
       @verification_version = opts[:verification_version] || VERIFICATION_API_VERSION
-      @timeout = opts[:timeout] || 2  # 2-second timeout by default
+      @timeout = opts[:timeout]
       @path = opts[:path] || Sift.rest_api_path(@version)
 
       raise("api_key") if !@api_key.is_a?(String) || @api_key.empty?
@@ -268,7 +272,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = ApiClient.post(path, options)
+      response = self.class.api_client.post(path, options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -331,7 +335,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = ApiClient.get(Sift.score_api_path(user_id, version), options)
+      response = self.class.api_client.get(Sift.score_api_path(user_id, version), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -394,7 +398,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = ApiClient.get(Sift.user_score_api_path(user_id, @version), options)
+      response = self.class.api_client.get(Sift.user_score_api_path(user_id, @version), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -446,7 +450,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = ApiClient.post(Sift.user_score_api_path(user_id, @version), options)
+      response = self.class.api_client.post(Sift.user_score_api_path(user_id, @version), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -544,7 +548,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = ApiClient.delete(Sift.users_label_api_path(user_id, version), options)
+      response = self.class.api_client.delete(Sift.users_label_api_path(user_id, version), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -581,7 +585,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = Api3Client.get(Sift.workflow_status_path(account_id, run_id), options)
+      response = self.class.api3_client.get(Sift.workflow_status_path(account_id, run_id), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -618,7 +622,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = Api3Client.get(Sift.user_decisions_api_path(account_id, user_id), options)
+      response = self.class.api3_client.get(Sift.user_decisions_api_path(account_id, user_id), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -655,7 +659,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = Api3Client.get(Sift.order_decisions_api_path(account_id, order_id), options)
+      response = self.class.api3_client.get(Sift.order_decisions_api_path(account_id, order_id), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -694,7 +698,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = Api3Client.get(Sift.session_decisions_api_path(account_id, user_id, session_id), options)
+      response = self.class.api3_client.get(Sift.session_decisions_api_path(account_id, user_id, session_id), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -733,7 +737,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = Api3Client.get(Sift.content_decisions_api_path(account_id, user_id, content_id), options)
+      response = self.class.api3_client.get(Sift.content_decisions_api_path(account_id, user_id, content_id), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -775,7 +779,7 @@ module Sift
         :headers => build_default_headers_post(api_key)
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
-      response = ApiClient.post(Sift.verification_api_send_path(@version), options)
+      response = self.class.api_client.post(Sift.verification_api_send_path(@version), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -794,7 +798,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = ApiClient.post(Sift.verification_api_resend_path(@version), options)
+      response = self.class.api_client.post(Sift.verification_api_resend_path(@version), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -813,7 +817,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = ApiClient.post(Sift.verification_api_check_path(@version), options)
+      response = self.class.api_client.post(Sift.verification_api_check_path(@version), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -838,7 +842,7 @@ module Sift
         :basic_auth => { :username => api_key, :password => "" }
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
-      response = ApiClient.post(Sift.psp_merchant_api_path(account_id), options)
+      response = self.class.api_client.post(Sift.psp_merchant_api_path(account_id), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -865,7 +869,7 @@ module Sift
         :basic_auth => { :username => api_key, :password => "" }
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
-      response = ApiClient.put(Sift.psp_merchant_id_api_path(account_id, merchant_id), options)
+      response = self.class.api_client.put(Sift.psp_merchant_id_api_path(account_id, merchant_id), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -889,7 +893,7 @@ module Sift
       :basic_auth => { :username => api_key, :password => "" }
     }
     options.merge!(:timeout => timeout) unless timeout.nil?
-    response = ApiClient.get(Sift.psp_merchant_id_api_path(account_id, merchant_id), options)
+    response = self.class.api_client.get(Sift.psp_merchant_id_api_path(account_id, merchant_id), options)
     Response.new(response.body, response.code, response.response)
   end
 
@@ -918,7 +922,7 @@ module Sift
       :query => query
     }
     options.merge!(:timeout => timeout) unless timeout.nil?
-    response = ApiClient.get(Sift.psp_merchant_api_path(account_id), options)
+    response = self.class.api_client.get(Sift.psp_merchant_api_path(account_id), options)
     Response.new(response.body, response.code, response.response)
   end
 
@@ -933,7 +937,7 @@ module Sift
     end
 
     def decision_instance
-      @decision_instance ||= Decision.new(api_key, account_id)
+      @decision_instance ||= Decision.new(api_key, account_id, self.class)
     end
 
     def delete_nils(properties)
@@ -954,15 +958,4 @@ module Sift
   require_relative "./client/decision"
   require_relative "./error"
 
-  # Internal HTTParty client for api.siftscience.com endpoints
-  # Handles Events, Labels, Scores, PSP Merchant, and Verification APIs
-  class ApiClient < Client
-    base_uri API_ENDPOINT
-  end
-
-  # Internal HTTParty client for api3.siftscience.com endpoints
-  # Handles Decisions and Workflows APIs
-  class Api3Client < Client
-    base_uri API3_ENDPOINT
-  end
 end
