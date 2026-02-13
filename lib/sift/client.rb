@@ -156,7 +156,7 @@ module Sift
       @account_id = opts[:account_id] || Sift.account_id
       @version = opts[:version] || API_VERSION
       @verification_version = opts[:verification_version] || VERIFICATION_API_VERSION
-      @timeout = opts[:timeout]
+      @timeout = opts[:timeout] || 2  # 2-second timeout by default
       @path = opts[:path] || Sift.rest_api_path(@version)
 
       raise("api_key") if !@api_key.is_a?(String) || @api_key.empty?
@@ -779,7 +779,7 @@ module Sift
         :headers => build_default_headers_post(api_key)
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
-      response = self.class.api_client.post(Sift.verification_api_send_path(@version), options)
+      response = self.class.api_client.post(Sift.verification_api_send_path(version), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -798,7 +798,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = self.class.api_client.post(Sift.verification_api_resend_path(@version), options)
+      response = self.class.api_client.post(Sift.verification_api_resend_path(version), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -817,7 +817,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = self.class.api_client.post(Sift.verification_api_check_path(@version), options)
+      response = self.class.api_client.post(Sift.verification_api_check_path(version), options)
       Response.new(response.body, response.code, response.response)
     end
 
