@@ -254,7 +254,7 @@ module Sift
         def put_auth_in_url(api_key, url)
           protocal, uri = url.split(/(?<=https\:\/\/)/)
 
-          protocal + api_key + "@" + uri
+          protocal + api_key + ":@" + uri
         end
       end
     end

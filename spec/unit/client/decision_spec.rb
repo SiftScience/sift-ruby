@@ -20,7 +20,7 @@ module Sift
         #
         protocal, uri = decision.index_path.split(/(?<=https\:\/\/)/)
 
-        protocal + api_key + "@" + uri
+        protocal + api_key + ":@" + uri
       }
 
       describe "#list" do

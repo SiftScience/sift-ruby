@@ -99,7 +99,7 @@ module Sift
 
     class << self
       def build_auth_header(api_key)
-        { "Authorization" => "Basic #{Base64.encode64(api_key)}" }
+        { "Authorization" => "Basic #{Base64.strict_encode64(api_key + ":")}" }
       end
 
       def user_agent
@@ -380,6 +380,7 @@ module Sift
       abuse_types = opts[:abuse_types]
       api_key = opts[:api_key] || @api_key
       timeout = opts[:timeout] || @timeout
+      version = opts[:version] || @version
       include_score_percentiles = opts[:include_score_percentiles]
 
       raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
@@ -398,7 +399,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = self.class.api_client.get(Sift.user_score_api_path(user_id, @version), options)
+      response = self.class.api_client.get(Sift.user_score_api_path(user_id, version), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -436,6 +437,7 @@ module Sift
       abuse_types = opts[:abuse_types]
       api_key = opts[:api_key] || @api_key
       timeout = opts[:timeout] || @timeout
+      version = opts[:version] || @version
 
       raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
       raise("Bad api_key parameter") if api_key.empty?
@@ -450,7 +452,7 @@ module Sift
       }
       options.merge!(:timeout => timeout) unless timeout.nil?
 
-      response = self.class.api_client.post(Sift.user_score_api_path(user_id, @version), options)
+      response = self.class.api_client.post(Sift.user_score_api_path(user_id, version), options)
       Response.new(response.body, response.code, response.response)
     end
 
@@ -759,7 +761,7 @@ module Sift
 
     def build_default_headers_post(api_key)
       {
-        "Authorization" => "Basic #{Base64.encode64(api_key+":")}",
+        "Authorization" => "Basic #{Base64.strict_encode64(api_key+":")}",
         "User-Agent" => "SiftScience/v#{@version} sift-ruby/#{VERSION}",
         "Content-Type" => "application/json"
       }
