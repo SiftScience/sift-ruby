@@ -88,4 +88,50 @@ describe Sift::Client do
 
   end
 
+  # Regression tests for verification API version bug fix
+  # These tests ensure verification methods use verification_version (1.1)
+  # instead of the events API version (205)
+
+  it "Uses verification API version (1.1) not events API version (205) for verification_send" do
+    api_key = "test_key"
+    response_json = { :status => 0, :error_message => "OK"}
+
+    # Should call v1.1, NOT v205
+    stub_request(:post, "https://test_key:@api.siftscience.com/v1.1/verification/send")
+      .to_return(:status => 200, :body => MultiJson.dump(response_json))
+
+    # Client defaults: version=205 (events), verification_version=1.1
+    response = Sift::Client.new(:api_key => api_key).verification_send(valid_send_properties)
+
+    expect(response.ok?).to eq(true)
+  end
+
+  it "Uses verification API version (1.1) not events API version (205) for verification_resend" do
+    api_key = "test_key"
+    response_json = { :status => 0, :error_message => "OK"}
+
+    # Should call v1.1, NOT v205
+    stub_request(:post, "https://test_key:@api.siftscience.com/v1.1/verification/resend")
+      .to_return(:status => 200, :body => MultiJson.dump(response_json))
+
+    # Client defaults: version=205 (events), verification_version=1.1
+    response = Sift::Client.new(:api_key => api_key).verification_resend(valid_resend_properties)
+
+    expect(response.ok?).to eq(true)
+  end
+
+  it "Uses verification API version (1.1) not events API version (205) for verification_check" do
+    api_key = "test_key"
+    response_json = { :status => 0, :error_message => "OK"}
+
+    # Should call v1.1, NOT v205
+    stub_request(:post, "https://test_key:@api.siftscience.com/v1.1/verification/check")
+      .to_return(:status => 200, :body => MultiJson.dump(response_json))
+
+    # Client defaults: version=205 (events), verification_version=1.1
+    response = Sift::Client.new(:api_key => api_key).verification_check(valid_check_properties)
+
+    expect(response.ok?).to eq(true)
+  end
+
 end

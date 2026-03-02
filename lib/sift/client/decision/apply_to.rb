@@ -21,7 +21,7 @@ module Sift
           time
         }
 
-        attr_reader :decision_id, :configs, :getter, :api_key
+        attr_reader :decision_id, :configs, :getter, :api_key, :client_class
 
         PROPERTIES.each do |attribute|
           class_eval %{
@@ -31,11 +31,12 @@ module Sift
           }
         end
 
-        def initialize(api_key, decision_id, configs)
+        def initialize(api_key, decision_id, configs, client_class = Sift::Client)
           @api_key = api_key
           @decision_id = decision_id
           @configs = configs
           @getter = Utils::HashGetter.new(configs)
+          @client_class = client_class
         end
 
         def run
@@ -58,7 +59,8 @@ module Sift
         def send_request
           Router.post(path, {
             body: request_body,
-            headers: headers
+            headers: headers,
+            client_class: client_class
           })
         end
 
@@ -79,6 +81,8 @@ module Sift
             validator.valid_order?
           elsif applying_to_session?
             validator.valid_session?
+          elsif applying_to_content?
+            validator.valid_content?
           else
             validator.valid_user?
           end

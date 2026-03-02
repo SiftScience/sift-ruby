@@ -4,7 +4,7 @@ The official Ruby bindings for the latest version (v205) of the [Sift API](https
 
 ## Requirements
 
-  * Ruby 2.0.0 or above.
+  * Ruby 2.7.0 or above.
 
 
 ## Installation
