@@ -296,6 +296,27 @@ response = client.get_psp_merchant_profiles()
 response = client.get_psp_merchant_profiles('batch_size', 'batch_token')
 ```
 
+## Global Profile API
+
+To learn more about the Global Profile endpoint visit our [developer docs](https://sift.com/developers/docs/curl/global-profile-api).
+
+```ruby
+# Get the Global Profile for a user.
+response = client.get_global_profile('example_user_id')
+
+# Get the Global Profile for a user, excluding the requesting tenant's own
+# network connections and the user's own feature values.
+response = client.get_global_profile('example_user_id',
+  :global_only => true,
+  :include_own_data => false)
+
+# Look up a Global Profile using account attributes instead of a Sift user_id.
+# At least one of :email or :phone must be provided.
+response = client.get_global_profile_by_attributes(
+  :email => 'user@example.com',
+  :phone => '+15555550100')
+```
+
 ## Response Object
 
 All requests to our apis will return a `Response` instance.

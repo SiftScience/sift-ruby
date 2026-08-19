@@ -83,6 +83,18 @@ module Sift
     "/psp_management/merchants/#{ERB::Util.url_encode(merchant_id)}"
   end
 
+  # Returns the path for the Global Profile API for a specific user
+  def self.global_profile_api_path(account_id, user_id)
+    "/v3/accounts/#{ERB::Util.url_encode(account_id)}" \
+    "/global_profile/users/#{ERB::Util.url_encode(user_id)}"
+  end
+
+  # Returns the path for the Global Profile lookup-by-attributes API
+  def self.global_profile_lookup_api_path(account_id)
+    "/v3/accounts/#{ERB::Util.url_encode(account_id)}" \
+    "/global_profile/lookup"
+  end
+
   # Module-scoped public API key
   class << self
     attr_accessor :api_key
