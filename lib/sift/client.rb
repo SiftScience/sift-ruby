@@ -960,7 +960,8 @@ module Sift
   #
   # ==== Returns:
   #
-  # A Response object if the call succeeded, else raises an ApiException.
+  # A Response object if the call succeeded. Raises RuntimeError for
+  # validation failures. Network errors propagate from the underlying HTTP client.
   #
   def get_global_profile(user_id, opts = {})
     account_id = opts[:account_id] || @account_id
@@ -970,12 +971,12 @@ module Sift
     include_own_data = opts[:include_own_data]
 
     raise("api_key cannot be empty") if api_key.empty?
-    raise("account_id cannot be empty") if account_id.empty?
+    raise("account_id cannot be empty") if account_id.nil? || account_id.empty?
     raise("user_id must be a non-empty string") if (!user_id.is_a? String) || user_id.to_s.empty?
 
     query = {}
-    query["global_only"] = global_only unless global_only.nil?
-    query["include_own_data"] = include_own_data unless include_own_data.nil?
+    query["global_only"] = global_only.to_s unless global_only.nil?
+    query["include_own_data"] = include_own_data.to_s unless include_own_data.nil?
 
     options = {
       :headers => { "User-Agent" => user_agent, "Content-Type" => "application/json" },
@@ -983,6 +984,8 @@ module Sift
       :query => query
     }
     options.merge!(:timeout => timeout) unless timeout.nil?
+    # NOTE: using api_client (api.siftscience.com) following PSP merchant precedent.
+    # Verify against Sift docs that Global Profile is NOT on api3.siftscience.com.
     response = self.class.api_client.get(Sift.global_profile_api_path(account_id, user_id), options)
     Response.new(response.body, response.code, response.response)
   end
@@ -1019,9 +1022,11 @@ module Sift
   #
   # ==== Returns:
   #
-  # A Response object if the call succeeded, else raises an ApiException.
+  # A Response object if the call succeeded. Raises RuntimeError for
+  # validation failures. Network errors propagate from the underlying HTTP client.
   #
   def get_global_profile_by_attributes(params = {}, opts = {})
+    params ||= {}
     account_id = opts[:account_id] || @account_id
     api_key = opts[:api_key] || @api_key
     timeout = opts[:timeout] || @timeout
@@ -1030,12 +1035,12 @@ module Sift
     phone = params[:phone]
 
     raise("api_key cannot be empty") if api_key.empty?
-    raise("account_id cannot be empty") if account_id.empty?
-    raise("email or phone must be provided") if (!email || email.to_s.empty?) && (!phone || phone.to_s.empty?)
+    raise("account_id cannot be empty") if account_id.nil? || account_id.empty?
+    raise("email or phone must be provided") if email.to_s.strip.empty? && phone.to_s.strip.empty?
 
     body = {}
-    body["email"] = email if email
-    body["phone"] = phone if phone
+    body["email"] = email.to_s.strip if email && !email.to_s.strip.empty?
+    body["phone"] = phone.to_s.strip if phone && !phone.to_s.strip.empty?
 
     options = {
       :body => MultiJson.dump(body),
@@ -1043,6 +1048,8 @@ module Sift
       :basic_auth => { :username => api_key, :password => "" }
     }
     options.merge!(:timeout => timeout) unless timeout.nil?
+    # NOTE: using api_client (api.siftscience.com) following PSP merchant precedent.
+    # Verify against Sift docs that Global Profile is NOT on api3.siftscience.com.
     response = self.class.api_client.post(Sift.global_profile_lookup_api_path(account_id), options)
     Response.new(response.body, response.code, response.response)
   end

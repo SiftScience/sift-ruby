@@ -128,6 +128,23 @@ describe Sift::Client do
     }.to raise_error(RuntimeError, "email or phone must be provided")
   end
 
+  it "Raises RuntimeError (not NoMethodError) when account_id is nil" do
+    api_key = "foobar1"
+    # Sift.account_id is not set, so account_id resolves to nil
+    client = Sift::Client.new(:api_key => api_key)
+    expect {
+      client.get_global_profile("user1")
+    }.to raise_error(RuntimeError, "account_id cannot be empty")
+  end
+
+  it "Raises RuntimeError (not NoMethodError) when params is nil in get_global_profile_by_attributes" do
+    api_key = "foobar1"
+
+    expect {
+      Sift::Client.new(:api_key => api_key, :account_id => "ACCT").get_global_profile_by_attributes(nil)
+    }.to raise_error(RuntimeError, "email or phone must be provided")
+  end
+
   it "Handles identity_found => false with null fields" do
     api_key = "foobar1"
 
