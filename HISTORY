@@ -1,3 +1,6 @@
+=== 4.7.0 2026-08-27
+- Added support for KYC, geo, and bot-detection structured fields ($nationality, $year_of_birth, $kyc, $geo, $bot_identification) on existing event types
+
 === 4.6.0 2026-02-10
 - Bump the minimum version of httparty to 0.23.3 to ensure protection against CVE-2025-68696
 - Refactor Client to use dedicated internal HTTP clients for different API endpoints

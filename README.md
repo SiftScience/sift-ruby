@@ -87,6 +87,77 @@ response.api_error_message  # Error message associated with status Error Code
 response = client.score(user_id)
 ```
 
+### New KYC Signals, Geo & Bot Detection
+
+```ruby
+# $verification event with KYC outcome
+response = client.track("$verification", {
+  "$user_id"            => "23056",
+  "$verification_type"  => "$kyc",
+  "$status"             => "$success",
+  "$kyc" => {
+    "$names_match"           => true,
+    "$kyc_level"             => "$basic",
+    "$bin_nationality_match" => false,
+    "$provider"              => "lexisnexis"
+  }
+})
+
+# $create_account with account-level identity attributes
+response = client.track("$create_account", {
+  "$user_id"       => "23056",
+  "$nationality"   => "US",
+  "$year_of_birth" => 1985,
+  "$kyc" => {
+    "$names_match"       => true,
+    "$kyc_level"         => "$full",
+    "$provider"          => "prove"
+  },
+  "$geo" => {
+    "$uuid"     => "gc-abc-123",
+    "$provider" => "geocomply"
+  },
+  "$bot_identification" => {
+    "$result"   => "$human",
+    "$provider" => "datadome"
+  }
+})
+
+# $login event with geo and bot-detection signals
+response = client.track("$login", {
+  "$user_id"      => "23056",
+  "$login_status" => "$success",
+  "$geo" => {
+    "$uuid"     => "gc-abc-123",
+    "$provider" => "geocomply"
+  },
+  "$bot_identification" => {
+    "$result"   => "$human",
+    "$provider" => "datadome"
+  }
+})
+
+# $transaction event with KYC, geo, and bot-detection signals
+response = client.track("$transaction", {
+  "$user_id"        => "23056",
+  "$amount"         => 15230000,
+  "$currency_code"  => "USD",
+  "$kyc" => {
+    "$names_match"           => true,
+    "$bin_nationality_match" => true,
+    "$provider"              => "lexisnexis"
+  },
+  "$geo" => {
+    "$uuid"     => "gc-abc-123",
+    "$provider" => "geocomply"
+  },
+  "$bot_identification" => {
+    "$result"   => "$suspected",
+    "$provider" => "human_security"
+  }
+})
+```
+
 ## Decisions
 
 To learn more about the decisions endpoint visit our [developer docs](https://sift.com/developers/docs/ruby/decisions-api/get-decisions).
