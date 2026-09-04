@@ -25,7 +25,6 @@ class EventsAPI
             "$site_domain"  => "sift.com",
             "$site_country" => "US",
 
-            # Structured fields (geo / bot detection)
             "$geo" => {
                 "$uuid"     => "gc-abc-123",
                 "$provider" => "geocomply"
@@ -118,7 +117,6 @@ class EventsAPI
             # For marketplaces, use $seller_user_id to identify the seller
             "$seller_user_id"     => "slinkys_emporium",
 
-            # Structured fields (KYC / geo / bot detection)
             "$kyc" => {
                 "$names_match"           => true,
                 "$bin_nationality_match" => false,
@@ -259,7 +257,6 @@ class EventsAPI
             "shipping_choice"     => "FedEx Ground Courier",
             "is_first_time_buyer" => false,
 
-            # Structured fields (KYC / geo / bot detection)
             "$kyc" => {
                 "$names_match"       => true,
                 "$kyc_level"         => "$basic",
@@ -498,7 +495,6 @@ class EventsAPI
             "$social_sign_on_type"  => "$twitter",
             "$account_types"        => ["merchant", "premium"],
 
-            # Structured fields (KYC / geo / bot detection)
             "$nationality"   => "US",
             "$year_of_birth" => 1985,
             "$kyc" => {
@@ -643,7 +639,6 @@ class EventsAPI
             "$social_sign_on_type"   => "$twitter",
             "$account_types"         => ["merchant", "premium"],
 
-            # Structured fields (KYC / geo / bot detection)
             "$nationality"   => "US",
             "$year_of_birth" => 1985,
             "$kyc" => {
@@ -694,7 +689,6 @@ class EventsAPI
             "$verification_type"  => "$sms",
             "$verified_value"     => "14155551212",
 
-            # Structured fields (KYC)
             "$kyc" => {
                 "$names_match"           => true,
                 "$kyc_level"             => "$basic",
@@ -911,7 +905,6 @@ class EventsAPI
             "shipping_choice"     => "FedEx Ground Courier",
             "is_first_time_buyer" => false,
 
-            # Structured fields (KYC / geo / bot detection)
             "$kyc" => {
                 "$names_match" => true,
                 "$kyc_level"   => "$basic",
